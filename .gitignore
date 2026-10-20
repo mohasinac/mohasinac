@@ -69,3 +69,14 @@ Thumbs.db
 # (granular token, no publish rights; 2FA needs an interactive OTP), so the
 # branch build ships as a real packed tarball instead. See readme.md.
 !vendor/*.tgz
+
+# ─── Service-account keys ───────────────────────────────────────────────────
+# Google issues these under several naming schemes. The previous rule only
+# matched *-firebase-adminsdk-*.json and MISSED the GCP console format
+# <project-id>-<keyid>.json, which landed a live private key in the repo
+# directory. Match all of them, and keep keys out of the repo entirely.
+*service-account*.json
+*serviceaccount*.json
+*-firebase-adminsdk-*.json
+mohasinac-com-*.json
+/secrets/

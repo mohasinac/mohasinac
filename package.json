@@ -14,7 +14,8 @@
     "check": "npm run check:types && npm run vendor:appkit:check && npm run lint",
     "toolchain:build": "node scripts/build-toolchain-assets.mjs",
     "vendor:appkit": "node scripts/vendor-appkit.mjs",
-    "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check"
+    "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check",
+    "verify:firebase": "node scripts/verify-firebase.mjs ."
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",
