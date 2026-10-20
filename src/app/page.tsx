@@ -1,37 +1,55 @@
 import Link from "next/link";
+import { SectionArt, type SectionArtVariant } from "@/components/SectionArt";
 
 /**
- * Phase 1 landing page — a real page that proves the skeleton boots, not a
- * placeholder to be thrown away. Phase 4 replaces the profile strip with
- * Firestore-backed content from `features/portfolio`.
+ * Home page. Phase 4 replaces the profile strip with Firestore-backed content
+ * from `features/portfolio`.
  */
 
-const SECTIONS = [
+type Section = {
+  href: string;
+  label: string;
+  note: string;
+  art: SectionArtVariant;
+  /** Honest status, so a card never implies something that is not there yet. */
+  status: "live" | "building";
+  meta: string;
+};
+
+const SECTIONS: readonly Section[] = [
   {
     href: "/projects",
     label: "Projects",
-    note: "What I have built and shipped",
-    phase: "Phase 4",
+    note: "What I have built and shipped, the stacks behind each, and what I would do differently.",
+    art: "projects",
+    status: "building",
+    meta: "portfolio",
   },
   {
     href: "/blog",
     label: "Writing",
-    note: "Notes on building things that run in production",
-    phase: "Phase 5",
+    note: "Notes on building things that run in production — the parts that are hard to get right.",
+    art: "writing",
+    status: "building",
+    meta: "technical blog",
   },
   {
     href: "/sandbox",
     label: "Sandbox",
-    note: "Compile and run C++ in your browser — no server",
-    phase: "Phase 6",
+    note: "Compile and run C++ in your browser. Clang is WebAssembly; no server sees your code.",
+    art: "sandbox",
+    status: "building",
+    meta: "clang 22 · wasm",
   },
   {
     href: "/course",
     label: "CP course",
-    note: "C++ from first principles to Blind 75 and beyond",
-    phase: "Phase 7",
+    note: "C++ from first principles: data structures built as classes, then Blind 75 and beyond.",
+    art: "course",
+    status: "live",
+    meta: "sign-in required",
   },
-] as const;
+];
 
 export default function HomePage() {
   return (
@@ -58,14 +76,33 @@ export default function HomePage() {
         <ul className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
           {SECTIONS.map((s) => (
             <li key={s.href} className="bg-surface">
-              <Link href={s.href} className="block p-4 transition-colors hover:bg-bg">
-                <span className="flex items-baseline justify-between gap-2">
-                  <span className="font-medium text-accent">{s.label}</span>
-                  <span className="rounded-sm bg-surface-raised px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-text-faint">
-                    {s.phase}
+              <Link
+                href={s.href}
+                className="flex h-full flex-col gap-3 p-4 transition-colors hover:bg-bg"
+              >
+                <span className="flex items-start justify-between gap-3">
+                  <span className="text-accent">
+                    <SectionArt variant={s.art} />
+                  </span>
+                  <span
+                    className={`rounded-sm px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${
+                      s.status === "live"
+                        ? "bg-surface-raised text-success"
+                        : "bg-surface-raised text-text-faint"
+                    }`}
+                  >
+                    {s.status === "live" ? "live" : "building"}
                   </span>
                 </span>
-                <span className="mt-1 block text-sm text-text-muted">{s.note}</span>
+
+                <span>
+                  <span className="block font-medium text-accent">{s.label}</span>
+                  <span className="mt-1 block text-sm leading-relaxed text-text-muted">{s.note}</span>
+                </span>
+
+                <span className="mt-auto pt-1 text-[11px] uppercase tracking-wider text-text-faint">
+                  {s.meta}
+                </span>
               </Link>
             </li>
           ))}
@@ -73,7 +110,7 @@ export default function HomePage() {
       </nav>
 
       <footer className="mt-12 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-4 text-xs text-text-faint">
-        <span>Skeleton is live. Sections land in the phase marked against each.</span>
+        <span>Built in the open — each section ships as it is finished.</span>
         <span className="text-success">● deployed</span>
       </footer>
     </main>

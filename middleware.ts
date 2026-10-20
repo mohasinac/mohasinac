@@ -13,7 +13,12 @@ import { buildAppCSP, generateNonce } from "@/lib/csp";
  * forged cookie name grants entry.
  */
 
-const SESSION_COOKIE = "session";
+/*
+ * Must match the name appkit's firebase auth provider reads
+ * (providers/auth-firebase/helpers.ts). A mismatch here fails open in the worst
+ * way: the gate sees no cookie and redirects a signed-in user to /login forever.
+ */
+const SESSION_COOKIE = "__session";
 
 /** Paths that require a signed-in user. Course is login-only by design. */
 const PROTECTED_PREFIXES = ["/course", "/admin", "/account"];
