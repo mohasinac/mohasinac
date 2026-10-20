@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "Mohasin A C";
@@ -25,16 +26,36 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   /*
-   * `data-theme` is hardcoded to the dark preset for now. Phase 2 replaces this
-   * with appkit's ThemeProvider plus a pre-paint inline script that reads the
-   * stored preference — that script will need the `x-nonce` header middleware
-   * sets, since the production CSP is nonce-based.
+   * 🛑 This `headers()` read is LOAD-BEARING, not informational — do not
+   * "optimise" it away.
+   *
+   * A nonce-based CSP is incompatible with static prerendering: the HTML is
+   * baked at build time, while middleware mints a fresh nonce per request, so
+   * nothing in cached markup can ever carry a matching nonce. Next only stamps
+   * the nonce onto its inline bootstrap scripts for DYNAMICALLY rendered
+   * routes. Reading a request header opts this layout out of static
+   * generation, which is what makes the nonce reachable at all.
+   *
+   * Without it the deployed page rendered but refused all three Next inline
+   * scripts, so hydration never ran. Verified in a real browser console —
+   * nothing in the build output hints at it.
+   *
+   * The cost is that pages render per-request rather than being served as
+   * static files. For this site that is an acceptable trade: most of it
+   * (course, admin, account) is auth-gated and dynamic anyway.
+   */
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
+  /*
+   * `data-theme` is pinned to the dark preset. A later phase swaps this for
+   * appkit's ThemeProvider plus a pre-paint script that reads the stored
+   * preference — that script is why the nonce is threaded down here.
    */
   return (
     <html lang="en" data-theme="technical-dark" suppressHydrationWarning>
@@ -43,6 +64,10 @@ export default function RootLayout({
           Skip to content
         </a>
         <div id="main">{children}</div>
+        {/* Surfaces the nonce for client code that must inject a styled or
+            scripted element later (e.g. the theme pre-paint script). Reading
+            it is also what keeps this route dynamic — see above. */}
+        <meta name="csp-nonce" content={nonce} />
       </body>
     </html>
   );
