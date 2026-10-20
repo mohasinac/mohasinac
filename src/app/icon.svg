@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A terminal prompt: the technical identity at 16px. Colours are literal
+       rather than themed — a favicon is fetched outside any page context. -->
+  <rect width="32" height="32" rx="6" fill="#0b0d10"/>
+  <path d="M7 10l5 6-5 6" fill="none" stroke="#7c8cff" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 22h9" fill="none" stroke="#56d39a" stroke-width="2.5"
+        stroke-linecap="round"/>
+</svg>

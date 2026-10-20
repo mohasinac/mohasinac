@@ -38,14 +38,29 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   const nonce = generateNonce();
+  // wasm: true — the sandbox and every course problem page compile C++ to
+  // WebAssembly in the browser, which a nonce-only script-src would block.
+  const csp = buildAppCSP(nonce, { wasm: true });
+
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
+  /*
+   * 🛑 Content-Security-Policy must be set on the forwarded REQUEST, not only
+   * on the response. Next.js parses the nonce out of this request header to
+   * stamp it onto the inline bootstrap scripts it injects itself.
+   *
+   * Without it the page still renders — the HTML is static — but every Next
+   * inline script is refused ("Executing inline script violates the following
+   * Content Security Policy directive"), hydration never runs, and the site is
+   * silently non-interactive. Caught in production by a browser console check;
+   * no build, typecheck or header assertion would have found it, because the
+   * response header was correct all along.
+   */
+  requestHeaders.set("Content-Security-Policy", csp);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
 
-  // wasm: true — the sandbox and every course problem page compile C++ to
-  // WebAssembly in the browser, which a nonce-only script-src would block.
-  response.headers.set("Content-Security-Policy", buildAppCSP(nonce, { wasm: true }));
+  response.headers.set("Content-Security-Policy", csp);
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   // Legacy companion to frame-ancestors 'none' in the CSP above, for old agents.
