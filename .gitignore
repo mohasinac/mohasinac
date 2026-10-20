@@ -64,3 +64,8 @@ Thumbs.db
 # re-assert after the .env* rule Vercel appends on `vercel link`:
 # last matching rule wins, and .env.example must stay tracked.
 !.env.example
+
+# The vendored appkit package. npm publishing is blocked on this account
+# (granular token, no publish rights; 2FA needs an interactive OTP), so the
+# branch build ships as a real packed tarball instead. See readme.md.
+!vendor/*.tgz

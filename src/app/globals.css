@@ -2,11 +2,16 @@
 @plugin "@tailwindcss/typography";
 
 /*
- * The technical-dark / technical-light token blocks, generated from the appkit
- * presets by scripts/sync-theme-css.mjs. appkit is the source of truth; this
- * file never redefines a token value.
+ * appkit's full token layer, including the technical-dark / technical-light
+ * blocks. Imported from the package itself — there is no generated copy to
+ * drift, because appkit now ships to this app as a vendored tarball
+ * (vendor/*.tgz, see scripts/vendor-appkit.mjs) rather than via npm.
+ *
+ * The [data-theme="technical-*"] blocks and :root have equal specificity, so
+ * the theme wins on source order — it is declared later in tokens.css. That is
+ * the same mechanism appkit's own cobalt-night and sunset presets rely on.
  */
-@import "./theme.generated.css";
+@import "@mohasinac/appkit/tokens/tokens.css";
 
 /*
  * Map appkit's token names onto Tailwind's theme so utilities like

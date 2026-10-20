@@ -11,16 +11,14 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "check:types": "tsc --noEmit",
-    "check": "npm run check:types && npm run sync:theme:check && npm run lint",
+    "check": "npm run check:types && npm run vendor:appkit:check && npm run lint",
     "toolchain:build": "node scripts/build-toolchain-assets.mjs",
-    "sync:appkit": "node scripts/sync-appkit.mjs",
-    "sync:appkit:check": "node scripts/sync-appkit.mjs --check",
-    "sync:theme": "node scripts/sync-theme-css.mjs",
-    "sync:theme:check": "node scripts/sync-theme-css.mjs --check"
+    "vendor:appkit": "node scripts/vendor-appkit.mjs",
+    "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",
-    "@mohasinac/appkit": "^4.53.2",
+    "@mohasinac/appkit": "file:vendor/mohasinac-appkit-4.55.0-next.0.tgz",
     "@tanstack/react-query": "^5.102.1",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.37.0",
