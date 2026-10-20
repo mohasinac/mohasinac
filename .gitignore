@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# the in-browser C++ toolchain: ~119 MB of binaries staged from node_modules by
+# scripts/build-toolchain-assets.mjs at prebuild. Never commit it.
+/public/toolchain/
+
+# env — only .env.example is tracked
+.env
+.env.local
+.env*.local
+
+# secrets: a Firebase service-account JSON must never land in the repo
+*-firebase-adminsdk-*.json
+firebase-admin-key.json
+service-account*.json
+
+# build / tooling output
+.vercel
+.eslintcache
+coverage/
+
+# editor / OS
+.DS_Store
+Thumbs.db
+*.swp

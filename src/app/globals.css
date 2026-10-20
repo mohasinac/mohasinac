@@ -1,0 +1,85 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/*
+ * Phase 1 baseline only. Phase 2 replaces these literal values with appkit's
+ * token layer (`@mohasinac/appkit/tokens/tokens.css` + the technical-dark /
+ * technical-light presets), at which point every colour below becomes a
+ * var(--appkit-color-*) reference.
+ */
+:root {
+  --bg: #0b0d10;
+  --surface: #13161b;
+  --border: #242a33;
+  --text: #e4e8ee;
+  --text-muted: #9aa4b2;
+  --accent: #7c8cff;
+  --focus: #ffb86b;
+}
+
+:root[data-theme="technical-light"] {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --border: #e2e2df;
+  --text: #16181d;
+  --text-muted: #5c6370;
+  --accent: #4b5bd6;
+  --focus: #b45a00;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  /* Mono-forward by design: a developer-tool identity, not a marketing one. */
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  /* 4px spacing rhythm and dense layout start from a predictable base. */
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-mono);
+  line-height: 1.6;
+}
+
+/*
+ * A keyboard-first console cannot have an invisible focus ring. Set globally
+ * rather than per-component so a new component cannot forget it.
+ */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+}
+
+/* Wide content must scroll inside its own box, never the page body. */
+pre,
+table {
+  overflow-x: auto;
+  max-width: 100%;
+}
