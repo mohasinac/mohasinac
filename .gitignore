@@ -1,5 +1,6 @@
 # dependencies
 node_modules/
+jspm_packages/
 .pnp
 .pnp.js
 
@@ -9,26 +10,50 @@ node_modules/
 next-env.d.ts
 *.tsbuildinfo
 
-# the in-browser C++ toolchain: ~119 MB of binaries staged from node_modules by
-# scripts/build-toolchain-assets.mjs at prebuild. Never commit it.
+# the in-browser C++ toolchain: ~119 MB staged from node_modules by
+# scripts/build-toolchain-assets.mjs at prebuild. Never commit it — it is also
+# what keeps the deployment under Vercel's source-upload limit.
 /public/toolchain/
+
+# the appkit build-host worktree, if checked out inside this repo
+/appkit/
 
 # env — only .env.example is tracked
 .env
-.env.local
-.env*.local
+.env.*
+!.env.example
 
 # secrets: a Firebase service-account JSON must never land in the repo
 *-firebase-adminsdk-*.json
 firebase-admin-key.json
 service-account*.json
 
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
 # build / tooling output
 .vercel
 .eslintcache
-coverage/
+coverage
+*.lcov
+.nyc_output
+.cache
+*.tgz
+
+# runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+.node_repl_history
 
 # editor / OS
 .DS_Store
 Thumbs.db
 *.swp
+.tern-port
