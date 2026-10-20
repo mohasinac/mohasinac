@@ -1,0 +1,22 @@
+# Keep the CLI upload small and well under Vercel's source-file cap
+# (100 MB Hobby / 1 GB Pro). Everything here is either regenerated during the
+# build or irrelevant to it.
+
+# The in-browser C++ toolchain — 119 MB. Regenerated on Vercel by the
+# `prebuild` script (scripts/build-toolchain-assets.mjs) from node_modules, so
+# uploading it would be 119 MB of pure waste AND would breach the cap.
+public/toolchain
+
+# The appkit build-host worktree, if it is ever checked out inside this repo.
+# Vercel installs @mohasinac/appkit from the registry; it must never build the
+# library from source.
+appkit
+
+node_modules
+.next
+.git
+.vercel
+
+# local-only
+.env.local
+*.log

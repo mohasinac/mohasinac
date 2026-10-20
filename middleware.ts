@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { buildCSP, generateNonce } from "@mohasinac/appkit/security/csp";
+import { buildAppCSP, generateNonce } from "@/lib/csp";
 
 /**
  * Edge middleware: security headers, a per-request CSP nonce, and the coarse
@@ -44,10 +44,11 @@ export function middleware(request: NextRequest): NextResponse {
   const response = NextResponse.next({ request: { headers: requestHeaders } });
 
   // wasm: true — the sandbox and every course problem page compile C++ to
-  // WebAssembly in the browser. See appkit security/csp.ts BuildCSPOptions.
-  response.headers.set("Content-Security-Policy", buildCSP(nonce, { wasm: true }));
+  // WebAssembly in the browser, which a nonce-only script-src would block.
+  response.headers.set("Content-Security-Policy", buildAppCSP(nonce, { wasm: true }));
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  // Legacy companion to frame-ancestors 'none' in the CSP above, for old agents.
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set(
     "Permissions-Policy",

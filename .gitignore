@@ -57,3 +57,10 @@ pids
 Thumbs.db
 *.swp
 .tern-port
+
+.vercel
+.env*
+
+# re-assert after the .env* rule Vercel appends on `vercel link`:
+# last matching rule wins, and .env.example must stay tracked.
+!.env.example
