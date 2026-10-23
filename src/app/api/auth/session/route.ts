@@ -2,7 +2,7 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getAuth } from "firebase-admin/auth";
+import { adminAuth } from "@/lib/firebase-admin";
 import { initProviders } from "@/providers.config";
 import { SESSION_COOKIE, SESSION_MAX_AGE_SECONDS } from "@/lib/session";
 
@@ -38,7 +38,7 @@ async function maybeBootstrapAdmin(uid: string, email: string | undefined, exist
   if (email.trim().toLowerCase() !== bootstrap) return null;
   if (typeof existingRole === "string" && existingRole.length > 0) return null;
 
-  await getAuth().setCustomUserClaims(uid, { role: "admin" });
+  await adminAuth().setCustomUserClaims(uid, { role: "admin" });
   console.log(`[auth] bootstrapped admin role for ${email}`);
   return "admin";
 }
@@ -64,12 +64,12 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     // checkRevoked: a token minted before a sign-out-everywhere must not be
     // accepted. Without it, a revoked session can be silently re-established.
-    const decoded = await getAuth().verifyIdToken(parsed.data.idToken, true);
+    const decoded = await adminAuth().verifyIdToken(parsed.data.idToken, true);
 
     const bootstrapped = await maybeBootstrapAdmin(decoded.uid, decoded.email, decoded.role);
     const role = bootstrapped ?? (typeof decoded.role === "string" ? decoded.role : "user");
 
-    const sessionCookie = await getAuth().createSessionCookie(parsed.data.idToken, {
+    const sessionCookie = await adminAuth().createSessionCookie(parsed.data.idToken, {
       expiresIn: SESSION_MAX_AGE_SECONDS * 1000,
     });
 
@@ -118,8 +118,8 @@ export async function DELETE(request: Request): Promise<NextResponse> {
     try {
       // Revoke every refresh token, not just this cookie: otherwise the browser
       // can mint a fresh ID token and rebuild the session immediately.
-      const decoded = await getAuth().verifySessionCookie(cookie, false);
-      await getAuth().revokeRefreshTokens(decoded.sub);
+      const decoded = await adminAuth().verifySessionCookie(cookie, false);
+      await adminAuth().revokeRefreshTokens(decoded.sub);
     } catch (error) {
       // An already-invalid cookie still means "signed out" — clear it anyway.
       console.warn("[auth] sign-out on an unverifiable cookie; clearing regardless", error);

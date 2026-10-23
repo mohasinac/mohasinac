@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { getAuth } from "firebase-admin/auth";
+import { adminAuth } from "@/lib/firebase-admin";
 import { initProviders } from "@/providers.config";
 
 /**
@@ -47,7 +47,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   await initProviders();
 
   try {
-    const decoded = await getAuth().verifySessionCookie(cookie, true);
+    const decoded = await adminAuth().verifySessionCookie(cookie, true);
     return {
       uid: decoded.uid,
       email: decoded.email ?? null,
