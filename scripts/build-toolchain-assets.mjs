@@ -15,7 +15,16 @@
  * exists, unless --force is passed.
  */
 import { createRequire } from "node:module";
-import { mkdirSync, copyFileSync, writeFileSync, readFileSync, existsSync, rmSync, statSync } from "node:fs";
+import {
+  mkdirSync,
+  copyFileSync,
+  writeFileSync,
+  readFileSync,
+  readdirSync,
+  existsSync,
+  rmSync,
+  statSync,
+} from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -112,6 +121,20 @@ for (const name of [
   }
   copyFileSync(src, join(OUT_DIR, name));
   copied.push({ name, bytes: statSync(src).size });
+}
+
+// ---- 1b. the WASI shim ----------------------------------------------------
+// The sandbox worker is served from /public as a plain ES module, so it cannot
+// import from node_modules at runtime. Stage the shim beside the toolchain and
+// let the worker import it with a relative path — same-origin, so CSP stays at
+// connect-src 'self'.
+const wasiEntry = require.resolve("@bjorn3/browser_wasi_shim");
+const wasiDir = dirname(wasiEntry);
+const wasiOut = join(OUT_DIR, "wasi");
+mkdirSync(wasiOut, { recursive: true });
+for (const name of readdirSync(wasiDir).filter((f) => f.endsWith(".js"))) {
+  copyFileSync(join(wasiDir, name), join(wasiOut, name));
+  copied.push({ name: `wasi/${name}`, bytes: statSync(join(wasiDir, name)).size });
 }
 
 // ---- 2. the bits/stdc++.h shim --------------------------------------------

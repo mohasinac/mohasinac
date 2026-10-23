@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
+import { SiteNav } from "@/components/SiteNav";
 import "./globals.css";
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "Mohasin A C";
@@ -63,6 +64,7 @@ export default async function RootLayout({
         <a href="#main" className="skip-link">
           Skip to content
         </a>
+        <SiteNav />
         <div id="main">{children}</div>
         {/* Surfaces the nonce for client code that must inject a styled or
             scripted element later (e.g. the theme pre-paint script). Reading
