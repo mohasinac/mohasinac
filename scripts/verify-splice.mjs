@@ -39,6 +39,9 @@ const BITS = readFileSync(join(base, "stdc++.h"), "utf8");
 const PCH = new Uint8Array(readFileSync(join(base, "stdcxx.pch")));
 
 const CXX_FLAGS = ["-std=c++20", "-O2", "-fno-exceptions"];
+/** 🛑 Must match LINK_FLAGS in public/sandbox-worker.js — see the note there on
+ * why the default 64KB stack makes every traced recursion trap. */
+const LINK_FLAGS = [`-Wl,-z,stack-size=${1024 * 1024}`, `-Wl,--max-memory=${256 * 1024 * 1024}`];
 const td = new TextDecoder();
 
 /** Compile, optionally emitting an AST dump on stdout instead of wasm. */
@@ -49,7 +52,7 @@ async function clang(src, { ast = false, extraFiles = {} } = {}) {
   const args = ast
     ? ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch",
        "-Xclang", "-ast-dump=json", "-fsyntax-only", "t.cpp"]
-    : ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch", "t.cpp", "-o", "t.wasm"];
+    : ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch", ...LINK_FLAGS, "t.cpp", "-o", "t.wasm"];
   try {
     const out = await runClang(args, files, {
       stdout: (b) => { if (b) stdout += td.decode(b); },

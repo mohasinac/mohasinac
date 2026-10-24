@@ -96,6 +96,12 @@ export function ProblemWorkbench({
           const d = ev.data;
           if (d.type === "status") setStatus(d.message);
           if (d.type !== "result" || d.id !== id) return;
+          // 🛑 `cmd:"trace"` replies on this same "result" channel, marked
+          // `traced`. An instrumented run must NEVER produce a verdict — the
+          // trace shares an fd and changed inlining can alter UB — so this
+          // ignores it rather than hashing its stdout. Request ids make a
+          // collision unlikely today; the guard makes it impossible.
+          if (d.traced) return;
           clearTimeout(timer);
           worker.removeEventListener("message", onMessage);
           if (!d.ok) {

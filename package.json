@@ -8,7 +8,7 @@
     "prebuild": "node --experimental-strip-types scripts/stage-trace-header.mjs && node scripts/build-toolchain-assets.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src",
+    "lint": "eslint src scripts",
     "lint:fix": "eslint src --fix",
     "check:types": "tsc --noEmit",
     "check": "npm run check:types && npm run lint && npm run test:dsa && npm run verify:explainers",
@@ -26,7 +26,8 @@
     "verify:az-header": "node --experimental-strip-types scripts/verify-az-header.mjs",
     "stage:trace-header": "node --experimental-strip-types scripts/stage-trace-header.mjs",
     "verify:splice": "node --experimental-strip-types scripts/verify-splice.mjs",
-    "verify:splice:corpus": "node --experimental-strip-types scripts/verify-splice.mjs --corpus"
+    "verify:splice:corpus": "node --experimental-strip-types scripts/verify-splice.mjs --corpus",
+    "verify:gates": "node --experimental-strip-types scripts/verify-gates.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",

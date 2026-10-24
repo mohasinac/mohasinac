@@ -34,6 +34,67 @@ const post = (type, payload = {}) => self.postMessage({ type, ...payload });
  */
 const CXX_FLAGS = ["-std=c++20", "-O2", "-fno-exceptions"];
 
+/**
+ * LINK-time resource limits. Applied to BOTH the judged and the traced build,
+ * so the two can never differ in what they can survive.
+ *
+ * 🛑 These are LINKER flags, so they do not touch preprocessor state and
+ * therefore cannot trigger a PCH mismatch. A `-D` here would.
+ *
+ * `stack-size` is not a tuning knob — it is load-bearing, and the default is
+ * actively broken for tracing. Measured against this toolchain:
+ *
+ *   stack       plain recursion        traced recursion
+ *   64KB (dflt) survives 50,000        TRAPS AT EVERY DEPTH, even 1,000
+ *   1MB         survives 50,000        survives >12,000
+ *   8MB         survives 50,000        survives >12,000  (no gain over 1MB)
+ *
+ * At -O2 the uninstrumented frame is tiny, while an instrumented frame carries
+ * the depth guard and defeats the optimisation — so with the stock 64KB stack
+ * ANY recursive program traps once traced while running fine untraced. That is
+ * exactly the misattribution failure the tracer must never produce, and it
+ * would have happened 100% of the time. 1MB puts the depth ceiling (10,000)
+ * comfortably inside what a traced build survives.
+ *
+ * `max-memory` bounds a runaway allocation, which was previously unbounded —
+ * the plan claimed an explicit maximum that had never actually been set. Note
+ * it does NOT make OOM identifiable from the trap message (see classifyTrap
+ * below); it is what makes the memory-pressure check meaningful.
+ */
+const MAX_MEMORY = 256 * 1024 * 1024;
+const STACK_SIZE = 1024 * 1024;
+const LINK_FLAGS = [`-Wl,-z,stack-size=${STACK_SIZE}`, `-Wl,--max-memory=${MAX_MEMORY}`];
+
+/**
+ * Name a trap, using the instance's memory as evidence.
+ *
+ * 🛑 The trap MESSAGE alone cannot identify an out-of-memory condition. Under
+ * `-fno-exceptions` a failed `operator new` cannot throw, so it aborts, and the
+ * trap reads `unreachable` — identical to a failed assert, a `std::abort()`, or
+ * UB. Verified: a program allocating 100,000 vectors traps `unreachable` both
+ * with and without `--max-memory`.
+ *
+ * So OOM is detected by MEASURING instead: if the program sat against its
+ * memory ceiling when it died, say out of memory. Otherwise `unreachable` is
+ * reported as what it is, rather than guessed at.
+ */
+function classifyTrapWithMemory(message, inst) {
+  const msg = String(message ?? "");
+  const mem = inst?.exports?.memory;
+  const bytes = mem?.buffer?.byteLength ?? 0;
+  const nearCeiling = bytes >= MAX_MEMORY * 0.9;
+
+  if (/unreachable/i.test(msg) && nearCeiling) return "out_of_memory";
+  if (/out of memory|allocation/i.test(msg)) return "out_of_memory";
+  // A wasm stack lives in linear memory, so overflowing it is an OOB access
+  // rather than a named stack error.
+  if (/call stack|stack overflow/i.test(msg)) return "stack_overflow";
+  if (/out of bounds|memory access/i.test(msg)) return "out_of_bounds";
+  if (/divide by zero|integer divide/i.test(msg)) return "divide_by_zero";
+  if (/unreachable/i.test(msg)) return "unreachable";
+  return "unknown";
+}
+
 async function load() {
   if (runClang) return;
 
@@ -79,7 +140,7 @@ async function loadTraceHeader() {
 async function compile(source) {
   let stderr = "";
   const files = { "sol.cpp": source, "stdcxx.pch": PCH, bits: { "stdc++.h": BITS } };
-  const args = ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch", "sol.cpp", "-o", "sol.wasm"];
+  const args = ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch", ...LINK_FLAGS, "sol.cpp", "-o", "sol.wasm"];
 
   const t = performance.now();
   let out;
@@ -112,6 +173,7 @@ async function run(wasmBytes, stdinText) {
   let stdout = "";
   let stderrOut = "";
   let truncated = false;
+  let trapKind = "";
 
   const sink = (append) => (line) => {
     if (stdout.length + stderrOut.length >= OUTPUT_CAP) { truncated = true; return; }
@@ -161,7 +223,7 @@ async function compileTraced(source) {
     bits: { "stdc++.h": BITS },
     "az_trace.h": AZ_HEADER,
   };
-  const args = ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch", "sol.cpp", "-o", "sol.wasm"];
+  const args = ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch", ...LINK_FLAGS, "sol.cpp", "-o", "sol.wasm"];
 
   const t = performance.now();
   let out;
@@ -251,18 +313,27 @@ async function runTraced(wasmBytes, stdinText, id) {
 
   let exitCode = 0;
   let trap = "";
+  let trapKind = "";
   try {
     instance.start(inst);
   } catch (err) {
     exitCode = typeof err?.code === "number" ? err.code : -1;
-    if (exitCode === -1) trap = err?.message ?? String(err);
+    if (exitCode === -1) {
+      trap = err?.message ?? String(err);
+      trapKind = classifyTrapWithMemory(trap, inst);
+    }
   }
 
+  // Flush BEFORE returning and after the catch: a trapped program has already
+  // produced the frames leading up to its trap, and those are the interesting
+  // ones. Returning without flushing would discard exactly the tail that
+  // explains the crash.
   flush();
   return {
     stdout,
     exitCode,
     trap,
+    trapKind,
     stdoutTruncated,
     traceTruncated,
     ms: Math.round(performance.now() - t),

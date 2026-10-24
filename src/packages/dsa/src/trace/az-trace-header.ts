@@ -86,7 +86,13 @@ inline constexpr char SOH = '\x01';
 
 inline long long steps = 0;
 inline int depth = 0;
+// Global stop: only the STEP and BYTE budgets set this. A per-loop cap must
+// NOT, or capping one hot loop would silently end the whole trace and nothing
+// after it would ever be seen — which defeats the point of per-site counters.
 inline bool dead = false;
+// One cap record per reason, so a diagnosis is never swallowed by an earlier
+// unrelated cap.
+inline bool cap_said[4] = {false, false, false, false};
 inline bool open_rec = false;
 inline bool first_var = false;
 inline int nest = 0;
@@ -235,9 +241,22 @@ void v(const T& x) {
 
 // ------------------------------------------------------------------- records
 
+inline int cap_slot(const char* reason) {
+    if (reason[0] == 's') return 0;  // steps
+    if (reason[0] == 'l') return 1;  // loop
+    if (reason[0] == 'd') return 2;  // depth
+    return 3;                         // bytes
+}
+
+/**
+ * Report a cap. Deduped per REASON rather than globally: a depth diagnosis is
+ * worth emitting even after the step budget is spent, because "recursion
+ * reached depth N" is the actionable part.
+ */
 inline void emit_cap(const char* reason, int line) {
-    if (dead) return;
-    dead = true;
+    const int slot = cap_slot(reason);
+    if (cap_said[slot]) return;
+    cap_said[slot] = true;
     put(SOH);
     ps("{\"k\":\"cap\",\"reason\":\"");
     ps(reason);
@@ -262,10 +281,15 @@ inline void tick(int site) {
 /** True if a record should be emitted here. Opens it. */
 inline bool on(int line, int site) {
     if (dead) return false;
-    if (steps >= (long long)AZ_MAX_STEPS) { emit_cap("steps", line); return false; }
+    if (steps >= (long long)AZ_MAX_STEPS) {
+        // Global: the budget really is spent.
+        emit_cap("steps", line);
+        dead = true;
+        return false;
+    }
     if (site > 0 && site <= AZ_SITES && loop_hits[site] > AZ_MAX_LOOP) {
-        // Per-site, so one hot loop cannot consume the whole step budget and
-        // leave everything after it untraced.
+        // Per-site ONLY. Tracing continues elsewhere, which is the entire
+        // reason loop_hits is indexed by site.
         emit_cap("loop", line);
         return false;
     }

@@ -10,10 +10,9 @@
  *
  *   npm run verify:az-header
  */
-import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { tmpdir } from "node:os";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
