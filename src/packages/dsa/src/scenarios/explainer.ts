@@ -32,12 +32,30 @@ export type ExplainerResult =
   | { ok: true; trace: VizTrace }
   | { ok: false; reason: string };
 
-/** Parsed values the renderers can actually draw. */
+/**
+ * Longest string we will split into per-character cells. A 200 000-character
+ * palindrome input is legitimate and undrawable; showing a prefix as if it were
+ * the whole thing would be the usual confident lie, so the panel is refused
+ * instead.
+ */
+const MAX_STRING_CELLS = 120;
+
+/**
+ * Parsed values the renderers can draw.
+ *
+ * A string counts: for the string problems — palindromes, anagrams, bracket
+ * matching, longest-substring — the thing worth showing IS the sequence of
+ * characters, and an array renderer with `asString` draws exactly that.
+ */
 function isDrawable(v: ParsedValue): boolean {
-  return Array.isArray(v);
+  if (Array.isArray(v)) return true;
+  return typeof v === "string" && v.length > 0 && v.length <= MAX_STRING_CELLS;
 }
 
 function toTraceValue(v: ParsedValue): TraceValue {
+  // A string becomes one cell per character — that is what makes the string
+  // problems legible.
+  if (typeof v === "string") return [...v];
   if (Array.isArray(v)) {
     // One level of nesting is enough: a matrix is rows of cells, and the
     // renderers take nothing deeper.
@@ -51,6 +69,12 @@ function toTraceValue(v: ParsedValue): TraceValue {
 function inferKind(value: ParsedValue): VizKind {
   if (Array.isArray(value) && value.length > 0 && Array.isArray(value[0])) return "grid";
   return "array";
+}
+
+/** Cell count of a drawable value, for the narration and the index check. */
+function cellCount(v: ParsedValue): number {
+  if (typeof v === "string") return v.length;
+  return Array.isArray(v) ? v.length : 0;
 }
 
 /** Scalars read from the input, rendered as `n = 4, target = 9`. */
@@ -101,14 +125,20 @@ export function buildExplainer(opts: ExplainerInput): ExplainerResult {
 
   const kind = opts.kind ?? inferKind(drawnValue);
   const value = toTraceValue(drawnValue);
-  const length = Array.isArray(drawnValue) ? drawnValue.length : 0;
+  const length = cellCount(drawnValue);
   const scalars = describeScalars(parsed.values, drawnName);
   const answer = opts.expectedOutput.trim();
 
   const spec: VizSpec =
     kind === "grid"
       ? { id: "explain", kind: "grid", var: drawnName, title: opts.title }
-      : { id: "explain", kind: "array", var: drawnName, title: opts.title };
+      : {
+          id: "explain",
+          kind: "array",
+          var: drawnName,
+          title: opts.title,
+          ...(typeof drawnValue === "string" ? { asString: true } : {}),
+        };
 
   const vars: Record<string, TraceValue> = { [drawnName]: value };
 
@@ -118,7 +148,9 @@ export function buildExplainer(opts: ExplainerInput): ExplainerResult {
       note:
         kind === "grid"
           ? `Here is the input: a ${length}-row grid${scalars ? `, with ${scalars}` : ""}.`
-          : `Here is the input: ${length} ${length === 1 ? "value" : "values"}${scalars ? `, with ${scalars}` : ""}.`,
+          : `Here is the input: ${length} ${
+              typeof drawnValue === "string" ? (length === 1 ? "character" : "characters") : length === 1 ? "value" : "values"
+            }${scalars ? `, with ${scalars}` : ""}.`,
     },
     {
       vars,

@@ -53,6 +53,12 @@
         "input": "Was it a car or a cat I saw?\n",
         "expectedOutput": "true"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "line",
+        "name": "s"
+      }
     ]
   },
   {
@@ -109,6 +115,19 @@
         "input": "6\n-2 0 1 1 2 -1\n",
         "expectedOutput": "3"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
+      }
     ]
   },
   {
@@ -159,6 +178,19 @@
         "visibility": "hidden",
         "input": "5\n1 2 4 3 2\n",
         "expectedOutput": "6"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "h",
+        "length": "n"
       }
     ]
   },
@@ -216,6 +248,12 @@
         "visibility": "hidden",
         "input": "abcdefg\n",
         "expectedOutput": "7"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "line",
+        "name": "s"
       }
     ]
   },
@@ -278,6 +316,12 @@
         "input": "{[]()}\n",
         "expectedOutput": "true"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "line",
+        "name": "s"
+      }
     ]
   },
   {
@@ -332,6 +376,19 @@
         "visibility": "hidden",
         "input": "5\n90 80 70 60 50\n",
         "expectedOutput": "0 0 0 0 0"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "t",
+        "length": "n"
       }
     ]
   },
@@ -391,6 +448,20 @@
         "visibility": "hidden",
         "input": "5 5\n1 2 3 4 5\n",
         "expectedOutput": "4"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n",
+          "target"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
       }
     ]
   },
@@ -452,6 +523,20 @@
         "input": "7 7\n4 5 6 7 0 1 2\n",
         "expectedOutput": "3"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n",
+          "target"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
+      }
     ]
   },
   {
@@ -506,6 +591,19 @@
         "visibility": "hidden",
         "input": "7\n11 13 15 17 -2 0 5\n",
         "expectedOutput": "-2"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
       }
     ]
   }

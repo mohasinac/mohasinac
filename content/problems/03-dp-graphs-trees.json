@@ -52,6 +52,14 @@
         "input": "45\n",
         "expectedOutput": "1836311903"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      }
     ]
   },
   {
@@ -106,6 +114,20 @@
         "visibility": "hidden",
         "input": "1 100\n1\n",
         "expectedOutput": "100"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n",
+          "amount"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "coins",
+        "length": "n"
       }
     ]
   },
@@ -166,6 +188,19 @@
         "visibility": "hidden",
         "input": "3\n0 0 0\n",
         "expectedOutput": "0"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
       }
     ]
   },
@@ -228,6 +263,19 @@
         "input": "6\n-2 -1 0 -5 -4 -3\n",
         "expectedOutput": "3"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
+      }
     ]
   },
   {
@@ -288,6 +336,15 @@
         "visibility": "hidden",
         "input": "abcba\nabcbcba\n",
         "expectedOutput": "5"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "a",
+          "b"
+        ]
       }
     ]
   },
@@ -410,6 +467,15 @@
         "input": "7 3\n",
         "expectedOutput": "28"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "m",
+          "n"
+        ]
+      }
     ]
   },
   {
@@ -472,6 +538,20 @@
         "visibility": "hidden",
         "input": "2 3\n111\n111\n",
         "expectedOutput": "1"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "rows",
+          "cols"
+        ]
+      },
+      {
+        "read": "lines",
+        "name": "grid",
+        "count": "rows"
       }
     ]
   },
@@ -586,6 +666,20 @@
         "input": "3\n1 4\n0 4\n2 3\n",
         "expectedOutput": "0 4"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "matrix",
+        "name": "intervals",
+        "rows": "n",
+        "cols": 2
+      }
     ]
   },
   {
@@ -641,6 +735,20 @@
         "visibility": "hidden",
         "input": "4\n1 2\n2 3\n3 4\n4 5\n",
         "expectedOutput": "1"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "matrix",
+        "name": "meetings",
+        "rows": "n",
+        "cols": 2
       }
     ]
   },
@@ -703,6 +811,20 @@
         "input": "4 3\n-1 -2 -3 -4\n",
         "expectedOutput": "-3"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n",
+          "k"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
+      }
     ]
   },
   {
@@ -758,6 +880,19 @@
         "visibility": "hidden",
         "input": "7\n1 1 2 2 3 3 99\n",
         "expectedOutput": "99"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
       }
     ]
   },
@@ -820,6 +955,19 @@
         "input": "4\n0 1 2 3\n",
         "expectedOutput": "4"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
+      }
     ]
   },
   {
@@ -879,6 +1027,14 @@
         "visibility": "hidden",
         "input": "4294967295\n",
         "expectedOutput": "32"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "value"
+        ]
       }
     ]
   }

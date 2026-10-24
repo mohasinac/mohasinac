@@ -136,3 +136,29 @@ test("an explicit varName overrides the first-drawable default", () => {
   assert.equal(r.trace.specs[0]?.var, "rows");
   assert.deepEqual(r.trace.frames[0]?.vars.rows, ["ab", "cd"]);
 });
+
+test("a string is drawn as one cell per character", () => {
+  // The string problems — palindromes, anagrams, brackets — want the character
+  // sequence shown, so a string counts as drawable.
+  const r = buildExplainer({
+    input: "racecar\n",
+    expectedOutput: "true",
+    inputFormat: [{ read: "line", name: "s" }],
+  });
+  assert.ok(r.ok);
+  assert.deepEqual(r.trace.frames[0]?.vars.s, ["r", "a", "c", "e", "c", "a", "r"]);
+  assert.match(String(r.trace.frames[0]?.note), /7 characters/);
+  const spec = r.trace.specs[0];
+  assert.equal(spec?.kind, "array");
+  assert.equal(spec?.kind === "array" ? spec.asString : undefined, true);
+});
+
+test("REFUSES an absurdly long string rather than drawing a prefix", () => {
+  const r = buildExplainer({
+    input: `${"a".repeat(5000)}\n`,
+    expectedOutput: "true",
+    inputFormat: [{ read: "line", name: "s" }],
+  });
+  assert.ok(!r.ok);
+  assert.match(r.reason, /no drawable value/);
+});

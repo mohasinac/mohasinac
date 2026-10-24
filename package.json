@@ -11,7 +11,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "check:types": "tsc --noEmit",
-    "check": "npm run check:types && npm run lint && npm run test:dsa",
+    "check": "npm run check:types && npm run lint && npm run test:dsa && npm run verify:explainers",
     "toolchain:build": "node scripts/build-toolchain-assets.mjs",
     "vendor:appkit": "node scripts/vendor-appkit.mjs",
     "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check",
@@ -21,7 +21,8 @@
     "deploy:indexes": "node scripts/deploy-indexes.mjs",
     "seed": "node scripts/seed-content.mjs",
     "seed:apply": "node scripts/seed-content.mjs --apply",
-    "test:dsa": "node --test --experimental-strip-types src/packages/dsa/test/*.test.ts"
+    "test:dsa": "node --test --experimental-strip-types src/packages/dsa/test/*.test.ts",
+    "verify:explainers": "node --experimental-strip-types scripts/verify-explainers.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",

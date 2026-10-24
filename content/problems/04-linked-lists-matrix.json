@@ -53,6 +53,19 @@
         "input": "3\n5 5 5\n",
         "expectedOutput": "5 5 5"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "values",
+        "length": "n"
+      }
     ]
   },
   {
@@ -226,6 +239,19 @@
         "input": "3\n7 8 9\n3\n",
         "expectedOutput": "8 9"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "values",
+        "length": "n"
+      }
     ]
   },
   {
@@ -281,6 +307,19 @@
         "visibility": "hidden",
         "input": "6\n1 2 3 4 5 6\n",
         "expectedOutput": "1 6 2 5 3 4"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "values",
+        "length": "n"
       }
     ]
   },
@@ -405,6 +444,21 @@
         "input": "1 3\n1 0 3\n",
         "expectedOutput": "0 0 0"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "rows",
+          "cols"
+        ]
+      },
+      {
+        "read": "matrix",
+        "name": "m",
+        "rows": "rows",
+        "cols": "cols"
+      }
     ]
   },
   {
@@ -466,6 +520,21 @@
         "input": "4 4\n1 2 3 4\n5 6 7 8\n9 10 11 12\n13 14 15 16\n",
         "expectedOutput": "1 2 3 4 8 12 16 15 14 13 9 5 6 7 11 10"
       }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "rows",
+          "cols"
+        ]
+      },
+      {
+        "read": "matrix",
+        "name": "m",
+        "rows": "rows",
+        "cols": "cols"
+      }
     ]
   },
   {
@@ -515,6 +584,20 @@
         "visibility": "hidden",
         "input": "2\n-1 0\n1 -2\n",
         "expectedOutput": "1 -1\n-2 0"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "matrix",
+        "name": "m",
+        "rows": "n",
+        "cols": "n"
       }
     ]
   },
