@@ -11,7 +11,7 @@
     "lint": "eslint src scripts",
     "lint:fix": "eslint src --fix",
     "check:types": "tsc --noEmit",
-    "check": "npm run check:types && npm run lint && npm run test:dsa && npm run verify:explainers && npm run verify:trace-pipeline",
+    "check": "npm run check:types && npm run lint && npm run test:dsa && npm run verify:explainers && npm run verify:trace-pipeline && npm run verify:portfolio",
     "toolchain:build": "node scripts/build-toolchain-assets.mjs",
     "vendor:appkit": "node scripts/vendor-appkit.mjs",
     "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check",
@@ -28,7 +28,8 @@
     "verify:splice": "node --experimental-strip-types scripts/verify-splice.mjs",
     "verify:splice:corpus": "node --experimental-strip-types scripts/verify-splice.mjs --corpus",
     "verify:gates": "node --experimental-strip-types scripts/verify-gates.mjs",
-    "verify:trace-pipeline": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-trace-pipeline.mjs"
+    "verify:trace-pipeline": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-trace-pipeline.mjs",
+    "verify:portfolio": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-portfolio.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",

@@ -31,13 +31,34 @@ export interface Tool {
   name: string;
   category: "language" | "framework" | "infra" | "data" | "tooling";
   note: string;
+  /** Mirrors toolSchema so the fallback has the same shape as a Firestore doc. */
+  proficiency?: string;
+  yearsUsed?: number;
 }
 
 export interface Certification {
   title: string;
   issuer: string;
   issuedAt: string;
+  /** Absent means the credential does not lapse. */
+  expiresAt?: string;
+  credentialId?: string;
   credentialUrl?: string;
+  skills?: readonly string[];
+  verified: boolean;
+}
+
+export interface Experience {
+  company: string;
+  role: string;
+  /** `YYYY-MM` or `YYYY-MM-DD` — see partialDate in lib/resources.ts. */
+  startDate: string;
+  /** Absent means "present", and sorts first. */
+  endDate?: string;
+  location?: string;
+  summary?: string;
+  highlights?: readonly string[];
+  skills?: readonly string[];
   verified: boolean;
 }
 
@@ -127,6 +148,13 @@ export const TOOLS: readonly Tool[] = [
 
 /** TODO(profile): entirely placeholder — replace or delete. */
 export const CERTIFICATIONS: readonly Certification[] = [];
+
+/**
+ * TODO(profile): your roles. Dates must be `YYYY-MM` or `YYYY-MM-DD` — the
+ * timeline sorts them lexicographically, so "March 2024" would order wrongly
+ * and look plausible while doing it.
+ */
+export const EXPERIENCE: readonly Experience[] = [];
 
 /** TODO(profile): replace with your actual interests. */
 export const HOBBIES: readonly Hobby[] = [

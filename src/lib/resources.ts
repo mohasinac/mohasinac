@@ -26,6 +26,39 @@ const base = {
   metaDescription: z.string().max(320).optional(),
 };
 
+/**
+ * A partial calendar date, as `YYYY-MM` or `YYYY-MM-DD`.
+ *
+ * 🛑 Constrained rather than left to authoring discipline, because these
+ * fields are ordered LEXICOGRAPHICALLY by Firestore. `"2024-06" < "2024-07"`
+ * is correct; `"June 2024" < "March 2024"` is not, and neither is
+ * `"6/2024" < "12/2023"`. The symptom of a loose field here is a timeline
+ * that is subtly out of order and looks entirely plausible — the kind of wrong
+ * nobody reports.
+ *
+ * A bare `YYYY` is rejected deliberately: it would sort before every month in
+ * its own year, putting "2024" ahead of "2024-01" and reading as a bug.
+ */
+const partialDate = z
+  .string()
+  .regex(
+    /^\d{4}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?$/,
+    "use YYYY-MM or YYYY-MM-DD, so timelines sort correctly",
+  );
+
+const experienceSchema = z.object({
+  ...base,
+  company: z.string().min(1).max(120),
+  role: z.string().min(1).max(120),
+  startDate: partialDate,
+  /** Absent means "present", which the timeline sorts first. */
+  endDate: partialDate.optional(),
+  location: z.string().max(120).optional(),
+  summary: z.string().max(600).optional(),
+  highlights: z.array(z.string().max(300)).max(20).default([]),
+  skills: z.array(z.string().max(40)).max(40).default([]),
+});
+
 const projectSchema = z.object({
   ...base,
   title: z.string().min(1).max(160),
@@ -51,8 +84,8 @@ const certificationSchema = z.object({
   ...base,
   title: z.string().min(1).max(160),
   issuer: z.string().min(1).max(120),
-  issuedAt: z.string().max(40),
-  expiresAt: z.string().max(40).optional(),
+  issuedAt: partialDate,
+  expiresAt: partialDate.optional(),
   credentialId: z.string().max(120).optional(),
   credentialUrl: z.string().url().optional(),
   skills: z.array(z.string().max(40)).max(30).default([]),
@@ -267,6 +300,20 @@ export const RESOURCES = {
     titleField: "name",
     searchFields: ["name", "note", "category"],
     orderBy: { field: "sortOrder", direction: "asc" },
+  },
+  experience: {
+    collection: "experience",
+    label: "Experience",
+    group: "Portfolio",
+    schema: experienceSchema,
+    titleField: "role",
+    searchFields: ["company", "role", "summary"],
+    // Needs a `status + startDate desc` composite index, declared in
+    // firestore.indexes.json. Without it listPublished() catches
+    // FAILED_PRECONDITION and silently serves bundled content — a page that
+    // renders perfectly while showing stale data. That has already happened
+    // once here.
+    orderBy: { field: "startDate", direction: "desc" },
   },
   certifications: {
     collection: "certifications",

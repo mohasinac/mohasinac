@@ -20,8 +20,17 @@ import { buildAppCSP, generateNonce } from "@/lib/csp";
  */
 const SESSION_COOKIE = "__session";
 
-/** Paths that require a signed-in user. Course is login-only by design. */
-const PROTECTED_PREFIXES = ["/learn", "/problems", "/admin", "/account"];
+/**
+ * Paths that require a signed-in user. Course is login-only by design.
+ *
+ * `/resume` is here as the outer of two gates — the page itself also calls
+ * `getSessionUser()`, because middleware is a redirect convenience and not the
+ * access control. 🛑 Note what is NOT protectable this way: anything matching
+ * the static-asset exclusion in `config.matcher` below never reaches this
+ * function, which is exactly why the resume is a rendered page rather than a
+ * file in `public/`.
+ */
+const PROTECTED_PREFIXES = ["/learn", "/problems", "/admin", "/account", "/resume"];
 
 /** Paths under PROTECTED_PREFIXES that must stay reachable while signed out. */
 const PROTECTED_EXCEPTIONS = ["/course/preview"];

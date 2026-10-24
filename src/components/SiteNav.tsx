@@ -4,11 +4,24 @@ import { SignOutButton } from "@/components/SignOutButton";
 
 const LINKS = [
   { href: "/projects", label: "Projects" },
+  { href: "/experience", label: "Experience" },
+  { href: "/skills", label: "Skills" },
   { href: "/blog", label: "Writing" },
   { href: "/sandbox", label: "Sandbox" },
   { href: "/learn", label: "Learn" },
   { href: "/problems", label: "Problems" },
   { href: "/about", label: "About" },
+] as const;
+
+/**
+ * Shown only to a signed-in user. `/resume` is gated, so offering it while
+ * signed out would advertise a link that only ever redirects — and
+ * `/certifications` is public but belongs next to it rather than crowding the
+ * primary row.
+ */
+const SIGNED_IN_LINKS = [
+  { href: "/certifications", label: "Certifications" },
+  { href: "/resume", label: "Resume" },
 ] as const;
 
 /** Site header. Server component so it can read the session without a flash of
@@ -34,6 +47,17 @@ export async function SiteNav() {
               {l.label}
             </Link>
           ))}
+          {user
+            ? SIGNED_IN_LINKS.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="text-text-muted transition-colors hover:text-accent"
+                >
+                  {l.label}
+                </Link>
+              ))
+            : null}
         </span>
 
         <span className="ml-auto flex items-center gap-3 text-xs">

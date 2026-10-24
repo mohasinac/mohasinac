@@ -98,6 +98,11 @@ const COLLECTIONS = {
     required: ["slug", "title"],
     search: ["title", "summary"],
   },
+  experience: {
+    collection: "experience",
+    required: ["slug", "company", "role", "startDate"],
+    search: ["company", "role", "summary"],
+  },
   certifications: {
     collection: "certifications",
     required: ["slug", "title", "issuer"],

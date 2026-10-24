@@ -23,6 +23,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/projects`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/sandbox`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/experience`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/skills`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/certifications`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    // 🛑 /resume is deliberately absent: it is gated, so a crawler only ever
+    // receives the redirect, and listing it would advertise a path that never
+    // serves content. Same reasoning that keeps /learn and /problems out.
   ];
 
   // A failed read returns null, not []. Falling back to the static pages is

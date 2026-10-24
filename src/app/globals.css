@@ -151,3 +151,69 @@ table {
     animation: none !important;
   }
 }
+
+/*
+ * Resume print styles.
+ *
+ * 🛑 The "Download PDF" button prints THIS page, so print output is the
+ * deliverable rather than an afterthought. The site is dark-first, and a dark
+ * background either wastes a cartridge or is dropped by the browser and takes
+ * the light text with it — so print forces ink-on-paper explicitly instead of
+ * trusting `print-color-adjust` defaults.
+ */
+.resume-h2 {
+  font-family: var(--font-code, ui-monospace), monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--appkit-color-text-faint, #6b7280);
+  border-bottom: 1px solid var(--appkit-color-border, #e5e7eb);
+  padding-bottom: 2px;
+}
+
+@media print {
+  /* Chrome honours this; it is what stops a dark theme printing as a black
+     page with invisible text. */
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  .resume,
+  .resume * {
+    background: transparent !important;
+    color: #111 !important;
+  }
+
+  .resume .text-text-muted,
+  .resume .text-text-faint {
+    color: #555 !important;
+  }
+
+  .resume-h2 {
+    color: #555 !important;
+    border-bottom-color: #bbb !important;
+  }
+
+  /* Site chrome is not part of a resume. */
+  header nav,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* A role or project split across a page break is the main way a printed
+     resume looks careless. */
+  .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 14mm;
+  }
+}
