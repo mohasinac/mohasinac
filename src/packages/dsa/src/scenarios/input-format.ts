@@ -52,8 +52,15 @@ export type ParseResult = ParseSuccess | ParseFailure;
  */
 class Cursor {
   private pos = 0;
+  private readonly text: string;
 
-  constructor(private readonly text: string) {}
+  // Written out longhand rather than as a constructor parameter property:
+  // `constructor(private readonly text: string)` needs code generation, which
+  // node's --experimental-strip-types refuses (ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX).
+  // Keeping the package strippable is what lets it be tested with zero deps.
+  constructor(text: string) {
+    this.text = text;
+  }
 
   /** Next whitespace-delimited token, or null at end of input. */
   token(): string | null {

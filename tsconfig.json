@@ -13,6 +13,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -28,6 +29,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@dsa/*": [
+        "./src/packages/dsa/src/*"
       ]
     }
   },

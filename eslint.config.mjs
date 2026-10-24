@@ -61,4 +61,35 @@ export default [
       ],
     },
   },
+  {
+    /*
+     * @mohasinac/dsa is laid out to be lifted into its own repo unchanged, so
+     * the boundary is enforced here rather than left to discipline — the whole
+     * value of the package is that extracting it is a `git mv`, and one stray
+     * `@/` import silently destroys that.
+     *
+     * Also keeps it framework-free, which is what stops it ever needing
+     * appkit's dedupe-peer-deps hack.
+     */
+    files: ["src/packages/dsa/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/*"],
+              message:
+                "@mohasinac/dsa must not import from the app — it is laid out to be extracted as its own repo. Take the value as a parameter instead.",
+            },
+            {
+              group: ["next", "next/*", "server-only", "firebase", "firebase/*"],
+              message:
+                "@mohasinac/dsa stays framework-free and isomorphic: no Next, no server-only, no Firebase. Data arrives as plain props.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
