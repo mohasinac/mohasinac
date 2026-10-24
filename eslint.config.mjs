@@ -73,6 +73,23 @@ export default [
      */
     files: ["src/packages/dsa/**/*.{ts,tsx}"],
     rules: {
+      /*
+       * 🛑 Constructor parameter properties need code GENERATION, not type
+       * erasure, so `node --experimental-strip-types` refuses them outright
+       * (ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX). The package's whole test story is
+       * zero-dependency `node --test`, so one of these breaks the suite.
+       *
+       * Caught here because I wrote the same mistake twice after already
+       * documenting it — which is the signal that a comment was not enough.
+       */
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "TSParameterProperty",
+          message:
+            "Write the field longhand. Parameter properties need code generation, which node --experimental-strip-types refuses — it breaks `npm run test:dsa`.",
+        },
+      ],
       "no-restricted-imports": [
         "error",
         {
