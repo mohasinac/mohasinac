@@ -258,6 +258,76 @@ const ids = () => ++nextId;
   );
 }
 
+/* ------------------------------- the spec: declared kind, inferred variable */
+{
+  // A list, a stack and a queue all arrive as a flat array of values, so the
+  // KIND cannot be inferred — only declared. 🛑 Getting this wrong renders a
+  // stack as a horizontal strip, teaching away the one property it exists for.
+  const mk = (extra) =>
+    mockWorker({
+      run: { result: { ok: true, stdout: "1", exitCode: 0 } },
+      ast: (m) => ({ result: { ok: true, ast: astFor(m.source) } }),
+      trace: {
+        chunks: [frame(2, { nums: [3, 1, 4], total: 8 })],
+        result: { ok: true, stdout: "1", exitCode: 0 },
+      },
+      ...extra,
+    });
+
+  const base = { source: SOURCE, stdin: "", nextId: ids };
+
+  const plain = await runTrace({ worker: mk(), ...base });
+  check(
+    "with no declared kind the spec defaults to array",
+    plain.trace?.specs[0]?.kind === "array" && plain.trace?.specs[0]?.var === "nums",
+    JSON.stringify(plain.trace?.specs[0]),
+  );
+
+  for (const kind of ["linkedList", "stack", "queue", "tree", "graph"]) {
+    const r = await runTrace({ worker: mk(), ...base, vizKind: kind });
+    check(
+      `a declared ${kind} produces a ${kind} spec, not an array`,
+      r.trace?.specs[0]?.kind === kind,
+      JSON.stringify(r.trace?.specs[0]),
+    );
+  }
+
+  const named = await runTrace({ worker: mk(), ...base, vizVar: "nums" });
+  check("a declared variable is honoured", named.trace?.specs[0]?.var === "nums");
+
+  // A scalar cannot be drawn, so naming one must fall through to no spec
+  // rather than producing a diagram of nothing.
+  const scalar = await runTrace({ worker: mk(), ...base, vizVar: "total" });
+  check(
+    "declaring a scalar variable yields no spec rather than an empty diagram",
+    (scalar.trace?.specs.length ?? 0) === 0,
+    JSON.stringify(scalar.trace?.specs),
+  );
+  check(
+    "and the trace is still usable — code and variables are the point",
+    scalar.attribution.kind === "ok" && (scalar.trace?.frames.length ?? 0) === 1,
+  );
+}
+
+{
+  // A nested value is a grid whatever was declared: drawing a 2-D value as a
+  // stack would silently throw away a dimension.
+  const worker = mockWorker({
+    run: { result: { ok: true, stdout: "1", exitCode: 0 } },
+    ast: (m) => ({ result: { ok: true, ast: astFor(m.source) } }),
+    trace: {
+      chunks: [frame(2, { dp: [[1, 2], [3, 4]] })],
+      result: { ok: true, stdout: "1", exitCode: 0 },
+    },
+  });
+  const r = await runTrace({ worker, source: SOURCE, stdin: "", nextId: ids, vizKind: "stack" });
+  check(
+    "a nested array stays a grid even when another kind is declared",
+    r.trace?.specs[0]?.kind === "grid",
+    JSON.stringify(r.trace?.specs[0]),
+  );
+}
+
 /* --------------------------- a cap is surfaced, never silently swallowed */
 {
   const worker = mockWorker({

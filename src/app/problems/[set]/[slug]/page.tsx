@@ -140,6 +140,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
         starterCode={String(problem.starterCode ?? "")}
         cases={cases}
         {...(problem.vizLimits ? { vizLimits: problem.vizLimits as Partial<AzLimits> } : {})}
+        {...(problem.vizKind ? { vizKind: problem.vizKind as never } : {})}
+        {...(problem.vizVar ? { vizVar: String(problem.vizVar) } : {})}
       />
 
       {problem.editorial ? (

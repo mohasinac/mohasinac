@@ -29,7 +29,7 @@ import {
 import { applyPlan, planSplices } from "@dsa/trace/splice";
 import { parseTraceStream } from "@dsa/trace/protocol";
 import { attributeTrace, type TraceAttribution } from "@dsa/trace/attribute";
-import type { VizSpec, VizTrace } from "@dsa/trace/types";
+import type { VizKind, VizSpec, VizTrace } from "@dsa/trace/types";
 
 export interface TraceRunOptions {
   readonly worker: Worker;
@@ -41,6 +41,12 @@ export interface TraceRunOptions {
   readonly nextId: () => number;
   readonly onStatus?: (message: string) => void;
   readonly timeoutMs?: number;
+  /**
+   * The problem's declared shape. Not inferable from a trace — see inferSpec.
+   */
+  readonly vizKind?: VizKind;
+  /** The problem's declared variable to draw, when its input is not the point. */
+  readonly vizVar?: string;
 }
 
 export interface TraceRunResult {
@@ -228,7 +234,7 @@ export async function runTrace(opts: TraceRunOptions): Promise<TraceRunResult> {
 
   return {
     attribution,
-    trace: buildVizTrace(source, attribution.frames, plan, parsed.capped),
+    trace: buildVizTrace(source, attribution.frames, plan, parsed.capped, opts.vizKind, opts.vizVar),
     stdout: originalOutcome.stdout,
     output: parsed.stderr,
   };
@@ -237,23 +243,63 @@ export async function runTrace(opts: TraceRunOptions): Promise<TraceRunResult> {
 /**
  * Pick what to draw.
  *
- * The first array-valued variable in the first frame that has one — not a
- * guess at semantics, just "this is the collection the code is working on",
- * which for the overwhelming majority of these problems is the right answer.
- * A trace with no array still renders: the code pane and variable panel carry
- * it, and inventing a diagram for scalars would be noise.
+ * The variable is inferred — the first array-valued one in the first frame that
+ * has one, which for the overwhelming majority of these problems is "the
+ * collection the code is working on".
+ *
+ * 🛑 The KIND is not inferred, it is declared. A linked list, a stack and a
+ * queue all arrive as a flat array of values, and nothing in a trace
+ * distinguishes them — so guessing would render a stack as a horizontal strip
+ * and teach away the one property it is taught for. The problem's `vizKind`
+ * says which, and `array` is the fallback because it is the only shape that is
+ * honest about an unknown sequence.
  */
-function inferSpec(frames: readonly { vars: Record<string, unknown> }[]): VizSpec | null {
-  for (const f of frames) {
-    for (const [name, value] of Object.entries(f.vars)) {
-      if (!Array.isArray(value) || value.length === 0) continue;
-      const nested = value.some((v) => Array.isArray(v));
-      return nested
-        ? { id: "auto", kind: "grid", var: name }
-        : { id: "auto", kind: "array", var: name };
+function inferSpec(
+  frames: readonly { vars: Record<string, unknown> }[],
+  declaredKind: VizKind | undefined,
+  declaredVar: string | undefined,
+): VizSpec | null {
+  const pick = (): { name: string; nested: boolean } | null => {
+    for (const f of frames) {
+      // An explicitly named variable wins, so a problem can point at the DP
+      // table rather than its input.
+      if (declaredVar !== undefined) {
+        const v = f.vars[declaredVar];
+        if (Array.isArray(v) && v.length > 0) {
+          return { name: declaredVar, nested: v.some((x) => Array.isArray(x)) };
+        }
+        continue;
+      }
+      for (const [name, value] of Object.entries(f.vars)) {
+        if (!Array.isArray(value) || value.length === 0) continue;
+        return { name, nested: value.some((x) => Array.isArray(x)) };
+      }
     }
+    return null;
+  };
+
+  const chosen = pick();
+  if (!chosen) return null;
+  const { name, nested } = chosen;
+
+  // A nested array is a grid whatever was declared: a 2-D value cannot be drawn
+  // as a list or a stack, and trying would throw away a dimension.
+  if (nested) return { id: "auto", kind: "grid", var: name };
+
+  switch (declaredKind) {
+    case "linkedList":
+      return { id: "auto", kind: "linkedList", var: name };
+    case "stack":
+      return { id: "auto", kind: "stack", var: name };
+    case "queue":
+      return { id: "auto", kind: "queue", var: name };
+    case "tree":
+      return { id: "auto", kind: "tree", var: name, encoding: "levelOrder" };
+    case "graph":
+      return { id: "auto", kind: "graph", var: name, encoding: "adjacencyList" };
+    default:
+      return { id: "auto", kind: "array", var: name };
   }
-  return null;
 }
 
 function buildVizTrace(
@@ -261,8 +307,14 @@ function buildVizTrace(
   frames: VizTrace["frames"],
   plan: ReturnType<typeof planSplices>,
   capped?: NonNullable<VizTrace["capped"]>,
+  declaredKind?: VizKind,
+  declaredVar?: string,
 ): VizTrace {
-  const spec = inferSpec(frames as readonly { vars: Record<string, unknown> }[]);
+  const spec = inferSpec(
+    frames as readonly { vars: Record<string, unknown> }[],
+    declaredKind,
+    declaredVar,
+  );
   const instrumentedCount = plan.points.length;
   return {
     source,

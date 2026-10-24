@@ -5,7 +5,7 @@ import { VizPlayer } from "@dsa/render/VizPlayer";
 import { unavailableMessage } from "@dsa/trace/attribute";
 import { trapMessage } from "@dsa/trace/protocol";
 import type { AzLimits } from "@dsa/trace/az-trace-header";
-import type { VizTrace } from "@dsa/trace/types";
+import type { VizKind, VizTrace } from "@dsa/trace/types";
 import { runTrace } from "@/lib/trace-run";
 
 export interface TestCase {
@@ -61,12 +61,19 @@ export function ProblemWorkbench({
   starterCode,
   cases,
   vizLimits,
+  vizKind,
+  vizVar,
 }: {
   problemSlug: string;
   starterCode: string;
   cases: TestCase[];
   /** Per-problem cap overrides. Clamped to the hard ceilings regardless. */
   vizLimits?: Partial<AzLimits>;
+  /** Declared shape to draw. A list/stack/queue is indistinguishable from an
+   *  array in a trace, so this cannot be inferred. */
+  vizKind?: VizKind;
+  /** Declared variable to draw, when the input is not the interesting one. */
+  vizVar?: string;
 }) {
   const [source, setSource] = useState(starterCode || "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    \n}\n");
   const [busy, setBusy] = useState(false);
@@ -171,6 +178,8 @@ export function ProblemWorkbench({
         source,
         stdin: sample.input,
         ...(vizLimits ? { limits: vizLimits } : {}),
+        ...(vizKind ? { vizKind } : {}),
+        ...(vizVar ? { vizVar } : {}),
         nextId: () => ++seqRef.current,
         onStatus: setStatus,
       });

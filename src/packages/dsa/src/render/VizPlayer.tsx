@@ -30,8 +30,10 @@ import {
   seek,
 } from "../trace/debugger.ts";
 import { ArrayView } from "./ArrayView.tsx";
+import { ChainView } from "./ChainView.tsx";
 import { CodePane } from "./CodePane.tsx";
 import { GridView } from "./GridView.tsx";
+import { SlabsView } from "./SlabsView.tsx";
 import { TreeView } from "./TreeView.tsx";
 import { VarsPane } from "./VarsPane.tsx";
 import { decodeLevelOrder, type TreeModel } from "./tree-layout.ts";
@@ -81,6 +83,27 @@ const at = <T,>(xs: readonly T[], i: number): T | undefined => xs[i];
 
 function asCells(v: TraceValue | undefined): readonly TraceValue[] {
   return Array.isArray(v) ? v : [];
+}
+
+/**
+ * The first edge hint that points at or before its own source.
+ *
+ * A forward edge is just the ordinary `next` and needs no special drawing; a
+ * back-edge is a cycle, and 🛑 without finding it a cyclic list renders as if
+ * it terminated — the single most important fact about `linked-list-cycle`
+ * silently absent from its own diagram.
+ */
+function findBackEdge(
+  edges: Readonly<Record<string, VizRole>> | undefined,
+): { from: number; to: number } | undefined {
+  if (!edges) return undefined;
+  for (const key of Object.keys(edges)) {
+    const [a, b] = key.split("->");
+    const from = Number(a);
+    const to = Number(b);
+    if (Number.isInteger(from) && Number.isInteger(to) && to <= from) return { from, to };
+  }
+  return undefined;
 }
 
 export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) {
@@ -240,6 +263,32 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
     [spec, cells],
   );
 
+  /**
+   * Pointer flags, from the frame's `roles.pointers` hints.
+   *
+   * Only hints that point INTO the drawn variable are kept: a pointer into a
+   * different array would land at a meaningless position on this diagram, and
+   * a flag in the wrong place is worse than no flag.
+   */
+  const pointers = useMemo(() => {
+    const hints = frame?.roles?.pointers;
+    if (!hints || !spec) return [];
+    return Object.entries(hints)
+      .filter(([, h]) => h.into === spec.var)
+      .map(([name, h]) => ({ label: h.label ?? name, at: Number(frame?.vars[name] ?? -1) }))
+      .filter((p) => Number.isInteger(p.at) && p.at >= 0);
+  }, [frame, spec]);
+
+  /**
+   * A cycle, read off the edge hints as a `"from->to"` key.
+   *
+   * 🛑 Without this a cyclic list renders as if it terminated — the single most
+   * important fact about `linked-list-cycle` silently absent from its own
+   * diagram.
+   */
+  const edgeHints = spec ? frame?.roles?.edges?.[spec.var] : undefined;
+  const cycle = useMemo(() => findBackEdge(edgeHints), [edgeHints]);
+
   /** The previous frame, so the variable panel can mark what changed. */
   const prevFrame = at(trace.frames, Math.min(index, Math.max(0, total - 1)) - 1);
 
@@ -348,9 +397,20 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
           />
         ) : spec.kind === "tree" ? (
           <TreeView model={treeModel} roles={roles} idPrefix={idPrefix} />
+        ) : spec.kind === "linkedList" ? (
+          <ChainView
+            values={cells}
+            roles={roles}
+            {...(pointers.length > 0 ? { pointers } : {})}
+            {...(cycle ? { cycleFrom: cycle.from, cycleTo: cycle.to } : {})}
+            idPrefix={idPrefix}
+          />
+        ) : spec.kind === "stack" || spec.kind === "queue" ? (
+          <SlabsView values={cells} kind={spec.kind} roles={roles} idPrefix={idPrefix} />
         ) : (
-          // Linked-list, graph and column views land in later phases. Saying so
-          // beats drawing the wrong shape.
+          // Graph is the one kind still unbuilt. Saying so beats drawing the
+          // wrong shape — a list rendered as a strip, or a graph as a tree,
+          // teaches the exact thing the motif exists to distinguish.
           <p className="text-sm text-text-muted">
             A <code className="font-mono">{spec.kind}</code> view is not built yet — the caption below is
             still accurate.
