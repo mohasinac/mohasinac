@@ -40,6 +40,7 @@ const db = getFirestore(app);
 const LISTS = [
   ["projects", "sortOrder", "asc"],
   ["tools", "sortOrder", "asc"],
+  ["experience", "startDate", "desc"],
   ["certifications", "issuedAt", "desc"],
   ["hobbies", "sortOrder", "asc"],
   ["businesses", "sortOrder", "asc"],
