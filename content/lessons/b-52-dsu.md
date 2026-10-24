@@ -98,6 +98,12 @@ int main() {
 }
 ```
 
+Four unions, the last of which closes a cycle. Watch `parent` flatten as it goes:
+
+```viz
+{ "demo": "dsu", "pairs": [0, 1, 2, 3, 1, 2, 0, 3], "n": 6, "title": "union by size, with path compression" }
+```
+
 ## Why the two optimisations are not optional
 
 **Path compression** flattens the tree during `find`. **Union by size** (or rank) keeps the tree shallow during `unite`. Together they give an amortised cost of O(α(n)) — the inverse Ackermann function, which is below 5 for any `n` you could store. Effectively constant.

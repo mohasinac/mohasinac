@@ -132,6 +132,12 @@ int main() {
 
 That last pair of lines is the point. Inserting sorted data gives a tree of height `n` — every search is O(n), and the structure has bought you nothing over a linked list. This is why production trees self-balance (red-black for `std::map`, AVL, treaps). Hand-rolling a balanced tree is rarely the right contest move: `std::map` and `std::set` are red-black trees already.
 
+Six inserts, then a search — notice each comparison discards an entire subtree:
+
+```viz
+{ "demo": "bst", "values": [8, 3, 10, 1, 6, 14], "target": 6, "title": "build a BST, then find 6" }
+```
+
 ## The four traversals
 
 ```cpp

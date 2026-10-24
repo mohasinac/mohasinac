@@ -119,6 +119,12 @@ int main() {
 
 `find` returning a pointer — `nullptr` for absent — is deliberate. It cannot insert as a side effect, which is the trap in `std::unordered_map::operator[]` covered in the [containers lesson](/learn/foundations/stl-containers).
 
+Five keys into five buckets, including two that land in the same one:
+
+```viz
+{ "demo": "hashTable", "values": [10, 22, 15, 7, 31], "buckets": 5, "title": "insert, with a collision" }
+```
+
 ## Why O(1) is an average
 
 With `n` entries in `b` buckets and a hash that distributes well, the expected chain length is `n/b`. Keeping the load factor under a constant keeps that expected length constant — hence O(1) *expected*.

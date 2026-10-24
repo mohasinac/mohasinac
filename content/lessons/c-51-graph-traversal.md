@@ -20,6 +20,12 @@ summary: BFS versus DFS as a decision, topological order, and Dijkstra — the t
 
 Swapping BFS for DFS when you need a shortest path gives *a* path, not the shortest — a wrong answer that passes the sample.
 
+BFS from node 0, one layer at a time:
+
+```viz
+{ "demo": "bfs", "graph": [[1, 2], [0, 3], [0, 3], [1, 2, 4], [3]], "start": 0, "title": "BFS, layer by layer" }
+```
+
 ## Counting components (flood fill)
 
 ```cpp

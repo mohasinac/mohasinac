@@ -147,6 +147,12 @@ int main() {
 }
 ```
 
+The capacity doubling, and what each push actually costs:
+
+```viz
+{ "demo": "dynamicArray", "values": [3, 1, 4, 1, 5, 9, 2], "title": "push until it grows" }
+```
+
 ## Complexity
 
 | Operation | Cost | Note |

@@ -127,6 +127,12 @@ int main() {
 
 Note that the array is **not sorted** at any point — `[1, 3, 2, 5, 9, 8]` is a perfectly valid min-heap. The heap maintains exactly enough order to find the minimum and no more, and that is why its operations are cheaper than a sorted container's.
 
+Each push lands at the end and then climbs only as far as the invariant requires:
+
+```viz
+{ "demo": "heap", "values": [5, 3, 8, 1, 9, 2], "title": "six pushes, sifting up" }
+```
+
 ## Why building is O(n)
 
 Pushing `n` elements one at a time is O(n log n). Sifting down from the middle backwards is O(n), which is surprising until you count: half the nodes are leaves and do zero work, a quarter sift down at most one level, an eighth at most two. The sum `Σ n/2^(k+1) · k` converges to `n`.

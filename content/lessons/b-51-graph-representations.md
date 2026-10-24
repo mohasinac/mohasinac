@@ -54,6 +54,12 @@ int main() {
 }
 ```
 
+An adjacency list, drawn as the graph it describes:
+
+```viz
+{ "demo": "bfs", "graph": [[1, 2], [0, 3], [0, 3], [1, 2, 4], [3]], "title": "the list, as a graph" }
+```
+
 ## Choosing between them
 
 The deciding question is **density**. A graph is dense when `m` approaches `n²`, sparse when `m` is closer to `n`. Real problem graphs are almost always sparse.

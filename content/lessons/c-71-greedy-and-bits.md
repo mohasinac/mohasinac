@@ -146,6 +146,12 @@ int main() {
 
 `x & (x - 1)` clearing the lowest set bit is the basis of fast popcount: loop until zero and count iterations, which runs once per set bit rather than once per bit.
 
+The bits of 23, one place value at a time:
+
+```viz
+{ "demo": "bits", "value": 23, "title": "23 in binary" }
+```
+
 ## XOR, and why it solves "find the single number"
 
 Three properties: `a ^ a == 0`, `a ^ 0 == a`, and XOR is commutative and associative. So XORing a sequence where everything appears twice except one element cancels all the pairs:

@@ -81,6 +81,12 @@ int main() {
 
 Four versions of one recurrence. The progression — recursion → memoise → tabulate → roll — is the standard path for *every* DP problem, and you can stop at whichever stage passes.
 
+The table filling in, with each cell's two dependencies lit:
+
+```viz
+{ "demo": "dpTable", "n": 8, "title": "climbing stairs, bottom-up" }
+```
+
 ## One dimension: house robber
 
 > **State:** `dp[i]` = the best total from the first `i` houses.

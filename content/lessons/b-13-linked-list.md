@@ -238,6 +238,12 @@ int main() {
 
 The sentinel is worth the extra node. Compare the four-line `erase` above with the version that must handle "node is the head", "node is the tail", "node is the only element" and "list is empty" separately.
 
+Head insertion is free; reaching the middle is not. Both, in order:
+
+```viz
+{ "demo": "linkedList", "values": [3, 2, 1], "title": "insert at the head, then delete the middle" }
+```
+
 ## Complexity
 
 | Operation | Singly | Doubly | `vector` |

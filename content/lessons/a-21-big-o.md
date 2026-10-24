@@ -61,6 +61,18 @@ int main() {
 
 The third loop is the one that catches people. Halving the work is not changing the class — `n²/2` is O(n²).
 
+The difference between O(n) and O(log n) is easier to watch than to read. Same array, same target, both searches:
+
+```viz
+{ "demo": "linearSearch", "values": [1, 3, 5, 7, 9, 11, 13], "target": 13, "title": "linear search — every element" }
+```
+
+And the same thing, halving:
+
+```viz
+{ "demo": "binarySearch", "values": [1, 3, 5, 7, 9, 11, 13], "target": 13, "title": "binary search — three comparisons" }
+```
+
 ## Where the formula lies to you
 
 **Cache behaviour.** These two are both O(n²) and differ by roughly a factor of ten on a large matrix:

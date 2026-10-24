@@ -47,6 +47,12 @@ int main() {
 
 Storing **indices**, not values, is what makes the answer usable — you usually need the distance or the position, not just the value.
 
+Next greater element. The stack only ever holds indices still waiting for an answer:
+
+```viz
+{ "demo": "monotonicStack", "values": [2, 1, 2, 4, 3], "title": "next greater element" }
+```
+
 ## The four variants
 
 One template, four conditions. Get the comparison and the direction right and you have all of them:

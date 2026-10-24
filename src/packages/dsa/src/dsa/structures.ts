@@ -233,13 +233,23 @@ export function tracedTwoPointers(
 
 const SPEC_A: readonly VizSpec[] = [{ id: "a", kind: "array", var: "a" }];
 
-/** Run a stack or queue demo and return the trace. */
+/**
+ * Run a stack or queue demo and return the trace.
+ *
+ * 🛑 `kind: "stack"` and `kind: "queue"`, NOT `"array"`. Both of these used to
+ * declare `array`, so both drew as a flat left-to-right strip — which is
+ * exactly the shape that hides what each structure is taught for. A stack
+ * renders vertically with its top marked, because push and pop act on the same
+ * end; a queue renders horizontally with `front` and `back` labelled, because
+ * the whole point is that they are opposite ends. Drawing both as a strip says
+ * they are the same thing.
+ */
 export function tracedStackDemo(ops: readonly number[], limits?: Partial<TracerLimits>): VizTrace {
   const tracer = new Tracer(limits);
   const s = new TracedStack(tracer);
   for (const x of ops) s.push(x);
   while (s.size > 0) s.pop();
-  return tracer.build([{ id: "stack", kind: "array", var: "stack" }], "", ["stack"]);
+  return tracer.build([{ id: "stack", kind: "stack", var: "stack" }], "", ["stack"]);
 }
 
 export function tracedQueueDemo(ops: readonly number[], limits?: Partial<TracerLimits>): VizTrace {
@@ -247,5 +257,5 @@ export function tracedQueueDemo(ops: readonly number[], limits?: Partial<TracerL
   const q = new TracedQueue(tracer);
   for (const x of ops) q.push(x);
   while (q.size > 0) q.pop();
-  return tracer.build([{ id: "queue", kind: "array", var: "queue" }], "", ["queue"]);
+  return tracer.build([{ id: "queue", kind: "queue", var: "queue" }], "", ["queue"]);
 }

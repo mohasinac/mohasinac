@@ -55,6 +55,12 @@ int main() {
 
 Ten reallocations for a thousand pushes. The expensive case is rare in exactly the proportion that makes the average constant.
 
+Watch the copies rather than counting them. Growth is rare, and it gets rarer — which is the whole argument:
+
+```viz
+{ "demo": "dynamicArray", "values": [3, 1, 4, 1, 5, 9, 2, 6], "title": "eight pushes, three reallocations" }
+```
+
 ## When you may not use the amortised bound
 
 Amortised O(1) is a statement about a *sequence*. It is the wrong bound when a single operation's cost matters:
