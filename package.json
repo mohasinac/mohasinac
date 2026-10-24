@@ -29,7 +29,9 @@
     "verify:splice:corpus": "node --experimental-strip-types scripts/verify-splice.mjs --corpus",
     "verify:gates": "node --experimental-strip-types scripts/verify-gates.mjs",
     "verify:trace-pipeline": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-trace-pipeline.mjs",
-    "verify:portfolio": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-portfolio.mjs"
+    "verify:portfolio": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-portfolio.mjs",
+    "viz:kinds": "node scripts/add-viz-kinds.mjs",
+    "verify:viz-kinds": "node scripts/verify-viz-kinds.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",

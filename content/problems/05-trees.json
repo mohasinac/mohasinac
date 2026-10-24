@@ -394,7 +394,8 @@
         "input": "5 3 6 2 4 null null 1\n6\n",
         "expectedOutput": "6"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "lowest-common-ancestor-of-a-bst",
@@ -455,7 +456,8 @@
         "input": "5 3 8 2 4\n2 4\n",
         "expectedOutput": "3"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "subtree-of-another-tree",
@@ -654,6 +656,7 @@
         "input": "3\ninsert abc\nprefix abcd\nsearch abc\n",
         "expectedOutput": "false\ntrue"
       }
-    ]
+    ],
+    "vizKind": "tree"
   }
 ]

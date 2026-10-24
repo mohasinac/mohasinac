@@ -74,7 +74,8 @@
         "output": "1836311903",
         "why": "fib(46), which only just fits in a signed 32-bit int. This is why the accumulator is 64-bit."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "coin-change",
@@ -163,7 +164,8 @@
         "output": "2",
         "why": "Greedy takes 4 + 1 + 1 = three coins. The answer is 3 + 3 = two. This is the case that proves the problem is not greedy."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "house-robber",
@@ -250,7 +252,8 @@
         "output": "20",
         "why": "Taking the largest house first (10) forces skipping the 5 beside it. The answer takes 5 + 5 + 10 — which is why a local choice is not safe here."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "longest-increasing-subsequence",
@@ -338,7 +341,8 @@
         "output": "1",
         "why": "Every element replaces the single tail, so the answer stays 1."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "longest-common-subsequence",
@@ -408,7 +412,8 @@
           "b"
         ]
       }
-    ]
+    ],
+    "vizKind": "grid"
   },
   {
     "slug": "word-break",
@@ -469,7 +474,8 @@
         "input": "cars\n3\ncar ca rs\n",
         "expectedOutput": "true"
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "unique-paths",
@@ -538,7 +544,8 @@
           "n"
         ]
       }
-    ]
+    ],
+    "vizKind": "grid"
   },
   {
     "slug": "number-of-islands",
@@ -629,7 +636,8 @@
         "output": "5",
         "why": "Five separate islands. A solution using eight directions instead of four merges them into one."
       }
-    ]
+    ],
+    "vizKind": "grid"
   },
   {
     "slug": "course-schedule",
@@ -686,7 +694,8 @@
         "input": "5 4\n1 0\n2 1\n3 2\n4 3\n",
         "expectedOutput": "true"
       }
-    ]
+    ],
+    "vizKind": "graph"
   },
   {
     "slug": "merge-intervals",
@@ -770,7 +779,8 @@
         "output": "1 5",
         "why": "They meet at 4 and merge, because this problem treats touching as overlapping. The `<=` is what decides that, and the statement is the only thing that tells you which to use."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "meeting-rooms-ii",
@@ -854,7 +864,8 @@
         "output": "3",
         "why": "Three simultaneous meetings need three rooms — the maximum-overlap reading of the problem, not the maximum-non-overlapping one."
       }
-    ]
+    ],
+    "vizKind": "heap"
   },
   {
     "slug": "kth-largest-element-in-an-array",
@@ -943,7 +954,8 @@
         "output": "1",
         "why": "The k-th largest with k = n is the minimum — the boundary where an off-by-one on k shows up."
       }
-    ]
+    ],
+    "vizKind": "heap"
   },
   {
     "slug": "single-number",
@@ -1026,7 +1038,8 @@
         "output": "-3",
         "why": "XOR works on bit patterns, so two's-complement negatives cancel exactly as positives do. No special case."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "missing-number",
@@ -1114,7 +1127,8 @@
         "output": "0",
         "why": "The other boundary."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "number-of-1-bits",
@@ -1182,6 +1196,7 @@
           "value"
         ]
       }
-    ]
+    ],
+    "vizKind": "array"
   }
 ]

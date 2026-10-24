@@ -73,7 +73,8 @@
         "output": "false",
         "why": "Digits count as alphanumeric, so this is a two-character comparison that fails. Solutions that only consider letters report true."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "three-sum",
@@ -142,7 +143,8 @@
         "name": "a",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "container-with-most-water",
@@ -206,7 +208,8 @@
         "name": "h",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "longest-substring-without-repeating-characters",
@@ -269,7 +272,8 @@
         "read": "line",
         "name": "s"
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "valid-parentheses",
@@ -356,7 +360,8 @@
         "output": "false",
         "why": "Bracket COUNTS are balanced for both kinds, so counting cannot solve this. Only the stack's ordering catches it."
       }
-    ]
+    ],
+    "vizKind": "stack"
   },
   {
     "slug": "daily-temperatures",
@@ -424,7 +429,8 @@
         "name": "t",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "stack"
   },
   {
     "slug": "binary-search",
@@ -517,7 +523,8 @@
         "output": "4",
         "why": "The other boundary. Half-open bounds make both of these fall out without special cases."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "search-in-rotated-sorted-array",
@@ -591,7 +598,8 @@
         "name": "a",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "find-minimum-in-rotated-sorted-array",
@@ -659,6 +667,7 @@
         "name": "a",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "array"
   }
 ]

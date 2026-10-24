@@ -307,8 +307,15 @@ function inferSpec(
       return { id: "auto", kind: "queue", var: name };
     case "tree":
       return { id: "auto", kind: "tree", var: name, encoding: "levelOrder" };
+    case "heap":
+      return { id: "auto", kind: "heap", var: name };
     case "graph":
-      return { id: "auto", kind: "graph", var: name, encoding: "adjacencyList" };
+      // 🛑 FLAT + graph means an EDGE LIST. An adjacency list is nested by
+      // nature, so it is handled in the nested branch above; a flat array of
+      // node ids declared as a graph is pairs. Decoding pairs as adjacency
+      // would read every value as a neighbour index and draw a different
+      // graph entirely.
+      return { id: "auto", kind: "graph", var: name, encoding: "edgeList" };
     default:
       return { id: "auto", kind: "array", var: name };
   }

@@ -54,7 +54,17 @@ export const VIZ_ROLES: readonly VizRole[] = [
 ] as const;
 
 /** Which structure a spec draws. Several kinds share one renderer. */
-export type VizKind = "array" | "grid" | "tree" | "linkedList" | "graph" | "stack" | "queue";
+export type VizKind =
+  | "array"
+  | "grid"
+  | "tree"
+  | "linkedList"
+  | "graph"
+  | "stack"
+  | "queue"
+  // A binary heap is an implicit tree over an array, drawn as the tree it is
+  // so the shape that makes it O(log n) is visible.
+  | "heap";
 
 export interface RoleHints {
   /**
@@ -101,7 +111,8 @@ export type VizSpec =
   | (VizSpecBase & { kind: "linkedList" })
   | (VizSpecBase & { kind: "graph"; encoding: "adjacencyList" | "edgeList"; directed?: boolean })
   | (VizSpecBase & { kind: "stack" })
-  | (VizSpecBase & { kind: "queue" });
+  | (VizSpecBase & { kind: "queue" })
+  | (VizSpecBase & { kind: "heap" });
 
 /**
  * Why the trace was cut short. Presenting a truncated trace as a complete one

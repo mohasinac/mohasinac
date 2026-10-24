@@ -66,7 +66,8 @@
         "name": "values",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "linkedList"
   },
   {
     "slug": "merge-two-sorted-lists",
@@ -122,7 +123,8 @@
         "input": "3\n-10 -3 0\n2\n-5 5\n",
         "expectedOutput": "-10 -5 -3 0 5"
       }
-    ]
+    ],
+    "vizKind": "linkedList"
   },
   {
     "slug": "linked-list-cycle",
@@ -183,7 +185,8 @@
         "input": "5\n1 2 3 4 5\n-1\n",
         "expectedOutput": "false"
       }
-    ]
+    ],
+    "vizKind": "linkedList"
   },
   {
     "slug": "remove-nth-node-from-end-of-list",
@@ -252,7 +255,8 @@
         "name": "values",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "linkedList"
   },
   {
     "slug": "reorder-list",
@@ -321,7 +325,8 @@
         "name": "values",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "linkedList"
   },
   {
     "slug": "merge-k-sorted-lists",
@@ -383,7 +388,8 @@
         "input": "2\n0\n2 7 8\n",
         "expectedOutput": "7 8"
       }
-    ]
+    ],
+    "vizKind": "linkedList"
   },
   {
     "slug": "set-matrix-zeroes",
@@ -459,7 +465,8 @@
         "rows": "rows",
         "cols": "cols"
       }
-    ]
+    ],
+    "vizKind": "grid"
   },
   {
     "slug": "spiral-matrix",
@@ -535,7 +542,8 @@
         "rows": "rows",
         "cols": "cols"
       }
-    ]
+    ],
+    "vizKind": "grid"
   },
   {
     "slug": "rotate-image",
@@ -599,7 +607,8 @@
         "rows": "n",
         "cols": "n"
       }
-    ]
+    ],
+    "vizKind": "grid"
   },
   {
     "slug": "word-search",
@@ -661,6 +670,7 @@
         "input": "2 2\nAB\nCD\nACDB\n",
         "expectedOutput": "true"
       }
-    ]
+    ],
+    "vizKind": "grid"
   }
 ]

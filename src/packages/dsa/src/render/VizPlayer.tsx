@@ -421,7 +421,7 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
             {...(cycle ? { cycleFrom: cycle.from, cycleTo: cycle.to } : {})}
             idPrefix={idPrefix}
           />
-        ) : spec.kind === "stack" || spec.kind === "queue" ? (
+        ) : spec.kind === "stack" || spec.kind === "queue" || spec.kind === "heap" ? (
           <SlabsView values={cells} kind={spec.kind} roles={roles} idPrefix={idPrefix} />
         ) : (
           <GraphView

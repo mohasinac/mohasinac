@@ -82,7 +82,8 @@
         "output": "-1",
         "why": "Every pair has to be ruled out before concluding there is none. A loop that returns early on the first miss gets this wrong."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "contains-duplicate",
@@ -171,7 +172,8 @@
         "output": "true",
         "why": "Negatives are values like any other, and the answer is found immediately — the early return should fire on the second read, not after all five."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "valid-anagram",
@@ -236,7 +238,8 @@
           "b"
         ]
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "best-time-to-buy-and-sell-stock",
@@ -325,7 +328,8 @@
         "output": "0",
         "why": "If the minimum is updated before the sale is evaluated, this wrongly reports a same-day trade."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "maximum-subarray",
@@ -415,7 +419,8 @@
         "output": "23",
         "why": "The running sum never goes negative, so it is never worth restarting — the opposite of the all-negative case."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "product-of-array-except-self",
@@ -493,7 +498,8 @@
         "output": "0 0 0",
         "why": "With two zeros every answer is 0. A division-based solution cannot handle either zero case, which is why division is forbidden."
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "top-k-frequent-elements",
@@ -559,7 +565,8 @@
         "name": "a",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "heap"
   },
   {
     "slug": "group-anagrams",
@@ -624,7 +631,8 @@
         "name": "words",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "array"
   },
   {
     "slug": "longest-consecutive-sequence",
@@ -693,6 +701,7 @@
         "name": "a",
         "length": "n"
       }
-    ]
+    ],
+    "vizKind": "array"
   }
 ]
