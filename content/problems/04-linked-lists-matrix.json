@@ -124,7 +124,32 @@
         "expectedOutput": "-10 -5 -3 0 5"
       }
     ],
-    "vizKind": "linkedList"
+    "vizKind": "linkedList",
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
+      },
+      {
+        "read": "scalars",
+        "names": [
+          "m"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "b",
+        "length": "m"
+      }
+    ],
+    "vizVar": "a"
   },
   {
     "slug": "linked-list-cycle",
@@ -186,7 +211,27 @@
         "expectedOutput": "false"
       }
     ],
-    "vizKind": "linkedList"
+    "vizKind": "linkedList",
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "nodes",
+        "length": "n"
+      },
+      {
+        "read": "scalars",
+        "names": [
+          "pos"
+        ]
+      }
+    ],
+    "vizVar": "nodes"
   },
   {
     "slug": "remove-nth-node-from-end-of-list",
@@ -671,6 +716,27 @@
         "expectedOutput": "true"
       }
     ],
-    "vizKind": "grid"
+    "vizKind": "grid",
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "rows",
+          "cols"
+        ]
+      },
+      {
+        "read": "lines",
+        "name": "board",
+        "count": "rows"
+      },
+      {
+        "read": "scalars",
+        "names": [
+          "word"
+        ]
+      }
+    ],
+    "vizVar": "board"
   }
 ]

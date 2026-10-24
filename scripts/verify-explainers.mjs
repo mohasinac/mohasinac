@@ -51,6 +51,10 @@ for (const file of readdirSync(CONTENT).filter((f) => f.endsWith(".json"))) {
         inputFormat: p.inputFormat,
         ...(p.vizKind ? { kind: p.vizKind } : {}),
         ...(p.vizVar ? { varName: p.vizVar } : {}),
+        // Must be forwarded, or the three size-only problems are reported here
+        // as undrawable while rendering fine on the page. A verifier that
+        // disagrees with the app is worse than no verifier.
+        ...(p.vizDerive ? { derive: p.vizDerive } : {}),
         patterns: p.patterns ?? [],
       });
 

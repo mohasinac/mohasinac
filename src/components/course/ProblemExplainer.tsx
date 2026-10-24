@@ -1,4 +1,4 @@
-import { buildExplainer } from "@dsa/scenarios/explainer";
+import { buildExplainer, type VizDerive } from "@dsa/scenarios/explainer";
 import type { InputFormat } from "@dsa/scenarios/input-format";
 import type { VizKind } from "@dsa/trace/types";
 import { VizPlayer } from "@dsa/render/VizPlayer";
@@ -19,12 +19,14 @@ export function ProblemExplainer({
   inputFormat,
   vizKind,
   vizVar,
+  vizDerive,
   patterns,
 }: {
   samples: readonly { input: string; expectedOutput: string }[];
   inputFormat: InputFormat | undefined;
   vizKind?: VizKind;
   vizVar?: string;
+  vizDerive?: VizDerive;
   patterns?: readonly string[];
 }) {
   // No descriptor means no panel. Deliberate: guessing the input shape would
@@ -39,6 +41,7 @@ export function ProblemExplainer({
         inputFormat,
         ...(vizKind ? { kind: vizKind } : {}),
         ...(vizVar ? { varName: vizVar } : {}),
+        ...(vizDerive ? { derive: vizDerive } : {}),
         ...(patterns ? { patterns } : {}),
       }),
     )

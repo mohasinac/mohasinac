@@ -395,7 +395,20 @@
         "expectedOutput": "6"
       }
     ],
-    "vizKind": "tree"
+    "vizKind": "tree",
+    "inputFormat": [
+      {
+        "read": "tokens",
+        "name": "nodes"
+      },
+      {
+        "read": "scalars",
+        "names": [
+          "k"
+        ]
+      }
+    ],
+    "vizVar": "nodes"
   },
   {
     "slug": "lowest-common-ancestor-of-a-bst",
@@ -457,7 +470,21 @@
         "expectedOutput": "3"
       }
     ],
-    "vizKind": "tree"
+    "vizKind": "tree",
+    "inputFormat": [
+      {
+        "read": "tokens",
+        "name": "nodes"
+      },
+      {
+        "read": "scalars",
+        "names": [
+          "p",
+          "q"
+        ]
+      }
+    ],
+    "vizVar": "nodes"
   },
   {
     "slug": "subtree-of-another-tree",

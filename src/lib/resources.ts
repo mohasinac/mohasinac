@@ -217,17 +217,52 @@ const problemSchema = z.object({
           count: z.union([z.string().max(40), z.number().int().nonnegative()]),
         }),
         z.object({ read: z.literal("line"), name: z.string().max(40) }),
+        z.object({ read: z.literal("tokens"), name: z.string().max(40) }),
         z.object({ read: z.literal("rest"), name: z.string().max(40) }),
       ]),
     )
     .max(8)
     .optional(),
 
-  /** Which structure the explainer draws, and which parsed var feeds it. */
+  /**
+   * Which structure the explainer draws, and which parsed var feeds it.
+   *
+   * 🛑 `heap` is in the enum because SlabsView renders one; omitting it made
+   * HeapView unreachable once.
+   */
   vizKind: z
-    .enum(["array", "grid", "tree", "linkedList", "graph", "stack", "queue"])
+    .enum(["array", "grid", "tree", "linkedList", "graph", "stack", "queue", "heap"])
     .optional(),
   vizVar: z.string().max(40).optional(),
+
+  /**
+   * Derive something drawable when the input is only a SIZE.
+   *
+   * `climbing-stairs` reads just `n`, `unique-paths` just `m` and `n`,
+   * `number-of-1-bits` one integer — so none of them had an explainer at all,
+   * despite each having an obvious subject (the steps, the grid, the bits).
+   */
+  vizDerive: z
+    .union([
+      z.object({
+        as: z.literal("range"),
+        name: z.string().max(40),
+        from: z.string().max(40),
+      }),
+      z.object({
+        as: z.literal("grid"),
+        name: z.string().max(40),
+        rows: z.string().max(40),
+        cols: z.string().max(40),
+      }),
+      z.object({
+        as: z.literal("bits"),
+        name: z.string().max(40),
+        from: z.string().max(40),
+        width: z.number().int().min(1).max(64).optional(),
+      }),
+    ])
+    .optional(),
 
   /**
    * Teaching cases with VISIBLE expected outputs and an explanation of what

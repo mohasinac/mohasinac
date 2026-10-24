@@ -23,12 +23,35 @@ export type InputStep =
   | { read: "lines"; name: string; count: string | number }
   /** One whole line including spaces — the `getline` problems. */
   | { read: "line"; name: string }
+  /**
+   * One line, split into tokens.
+   *
+   * 🛑 Needed for the common "level-order tree on its own line, then a query
+   * on the next" shape, which neither `rest` nor `line` can express: `rest`
+   * would swallow the query into the tree, and `line` yields an unsplit string
+   * the tree decoder cannot read. `kth-smallest-element-in-a-bst` and
+   * `lowest-common-ancestor-of-a-bst` both have exactly that input, which is
+   * why neither had an explainer at all.
+   */
+  | { read: "tokens"; name: string }
   /** Every remaining token. Level-order trees, where `null` is a real token. */
   | { read: "rest"; name: string };
 
 export type InputFormat = readonly InputStep[];
 
-export type ParsedValue = number | string | readonly (number | string)[] | readonly string[];
+export type ParsedValue =
+  | number
+  | string
+  | readonly (number | string)[]
+  | readonly string[]
+  /**
+   * A matrix: rows of cells.
+   *
+   * Spelled out rather than left to a cast. `matrix` always produced this
+   * shape and reached for `as unknown as readonly (number | string)[]` to fit
+   * the narrower type — a lie that then forced every consumer to re-widen it.
+   */
+  | readonly (readonly (number | string)[])[];
 export type ParsedInput = Record<string, ParsedValue>;
 
 export interface ParseFailure {
@@ -182,8 +205,8 @@ export function parseInput(text: string, format: InputFormat): ParseResult {
           }
           grid.push(row);
         }
-        // Flattened one level: the grid renderer takes rows of cells.
-        values[step.name] = grid as unknown as readonly (number | string)[];
+        // Rows of cells, which `ParsedValue` now admits directly.
+        values[step.name] = grid;
         break;
       }
 
@@ -206,6 +229,17 @@ export function parseInput(text: string, format: InputFormat): ParseResult {
         // whitespace-only case whose answer is true. Only a missing line fails.
         if (l === null) return { ok: false, reason: `input ended while reading "${step.name}"` };
         values[step.name] = l;
+        break;
+      }
+
+      case "tokens": {
+        const l = cursor.line();
+        if (l === null) return { ok: false, reason: `input ended while reading "${step.name}"` };
+        const parts = l.trim().split(/\s+/).filter((t) => t !== "");
+        // An EMPTY line yields no tokens, which is a legitimate "empty tree"
+        // rather than a parse failure — `null` on its own line and a blank line
+        // both mean the same thing to the level-order decoder.
+        values[step.name] = parts;
         break;
       }
 

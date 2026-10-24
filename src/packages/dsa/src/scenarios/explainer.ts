@@ -26,6 +26,8 @@ export interface ExplainerInput {
   readonly varName?: string;
   readonly title?: string;
   readonly patterns?: readonly string[];
+  /** Derive a drawable value when the input is only a size. See VizDerive. */
+  readonly derive?: VizDerive;
 }
 
 export type ExplainerResult =
@@ -64,6 +66,59 @@ function toTraceValue(v: ParsedValue): TraceValue {
     );
   }
   return v as TraceValue;
+}
+
+/**
+ * How a problem whose input is only a size derives something to draw.
+ *
+ * Three shapes, which is all the corpus needs — and each names the scalars it
+ * reads, so a renamed scalar fails to derive rather than drawing the wrong
+ * thing.
+ */
+export type VizDerive =
+  /** `[1, 2, … n]` — the n steps of climbing-stairs. */
+  | { as: "range"; name: string; from: string }
+  /** An empty `rows × cols` lattice — the board unique-paths crosses. */
+  | { as: "grid"; name: string; rows: string; cols: string }
+  /** The bits of a value, most significant first. */
+  | { as: "bits"; name: string; from: string; width?: number };
+
+/** Caps a derived range, so a size of 10^9 refuses rather than hanging. */
+const MAX_DERIVED_CELLS = 120;
+
+function deriveDrawable(
+  derive: VizDerive,
+  values: Record<string, ParsedValue>,
+): [string, ParsedValue] | null {
+  const scalar = (key: string): number | null => {
+    const v = values[key];
+    return typeof v === "number" && Number.isFinite(v) ? v : null;
+  };
+
+  if (derive.as === "range") {
+    const n = scalar(derive.from);
+    // 0 is legitimate and undrawable; a huge n is legitimate and undrawable.
+    // Both refuse, rather than drawing a prefix as if it were the whole thing.
+    if (n === null || n <= 0 || n > MAX_DERIVED_CELLS) return null;
+    return [derive.name, Array.from({ length: n }, (_, i) => i + 1)];
+  }
+
+  if (derive.as === "grid") {
+    const rows = scalar(derive.rows);
+    const cols = scalar(derive.cols);
+    if (rows === null || cols === null || rows <= 0 || cols <= 0) return null;
+    if (rows * cols > MAX_DERIVED_CELLS * 4) return null;
+    // Zeros, not indices: the cells are empty ground to cross, and numbering
+    // them would imply a value the problem does not have.
+    return [derive.name, Array.from({ length: rows }, () => Array.from({ length: cols }, () => 0))];
+  }
+
+  const value = scalar(derive.from);
+  if (value === null || value < 0) return null;
+  const width = derive.width ?? 8;
+  if (value >= 2 ** width) return null;
+  // Most significant bit first, so it reads the way the number is written.
+  return [derive.name, Array.from({ length: width }, (_, i) => (value >> (width - 1 - i)) & 1)];
 }
 
 function inferKind(value: ParsedValue): VizKind {
@@ -111,9 +166,24 @@ export function buildExplainer(opts: ExplainerInput): ExplainerResult {
   if (!parsed.ok) return { ok: false, reason: parsed.reason };
 
   const entries = Object.entries(parsed.values);
-  const chosen =
+  let chosen =
     (opts.varName ? entries.find(([k]) => k === opts.varName) : undefined) ??
     entries.find(([, v]) => isDrawable(v));
+
+  /*
+   * 🛑 Three problems have NOTHING in their input to draw, because the input is
+   * only a size: `climbing-stairs` reads `n`, `unique-paths` reads `m` and `n`,
+   * `number-of-1-bits` reads one integer. Each nonetheless has an obvious
+   * subject — the n steps, the m×n grid, the bits of the value — and refusing a
+   * panel left those three with no "understand this problem" view at all.
+   *
+   * So a problem may DERIVE its drawable value from its scalars. Explicit per
+   * problem rather than guessed: synthesising a shape from whichever scalar
+   * happens to come first is how a diagram ends up confidently wrong.
+   */
+  if (!chosen && opts.derive) {
+    chosen = deriveDrawable(opts.derive, parsed.values) ?? undefined;
+  }
 
   if (!chosen) {
     return { ok: false, reason: "no drawable value in the parsed input" };

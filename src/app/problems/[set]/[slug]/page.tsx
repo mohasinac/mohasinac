@@ -141,6 +141,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
         inputFormat={problem.inputFormat as never}
         {...(problem.vizKind ? { vizKind: problem.vizKind as never } : {})}
         {...(problem.vizVar ? { vizVar: String(problem.vizVar) } : {})}
+        {...(problem.vizDerive ? { vizDerive: problem.vizDerive as never } : {})}
         patterns={patterns}
       />
 
@@ -172,6 +173,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
                 inputFormat={problem.inputFormat as never}
                 {...(problem.vizKind ? { vizKind: problem.vizKind as never } : {})}
                 {...(problem.vizVar ? { vizVar: String(problem.vizVar) } : {})}
+                {...(problem.vizDerive ? { vizDerive: problem.vizDerive as never } : {})}
                 patterns={patterns}
               />
             ) : null}

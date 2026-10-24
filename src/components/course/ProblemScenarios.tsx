@@ -1,4 +1,4 @@
-import { buildExplainer } from "@dsa/scenarios/explainer";
+import { buildExplainer, type VizDerive } from "@dsa/scenarios/explainer";
 import type { InputFormat } from "@dsa/scenarios/input-format";
 import type { VizKind } from "@dsa/trace/types";
 import { VizPlayer } from "@dsa/render/VizPlayer";
@@ -21,12 +21,14 @@ export function ProblemScenarios({
   inputFormat,
   vizKind,
   vizVar,
+  vizDerive,
   patterns,
 }: {
   scenarios: readonly { label: string; input: string; output: string; why: string }[];
   inputFormat: InputFormat | undefined;
   vizKind?: VizKind;
   vizVar?: string;
+  vizDerive?: VizDerive;
   patterns?: readonly string[];
 }) {
   if (scenarios.length === 0) return null;
@@ -51,6 +53,7 @@ export function ProblemScenarios({
                   inputFormat,
                   ...(vizKind ? { kind: vizKind } : {}),
                   ...(vizVar ? { varName: vizVar } : {}),
+        ...(vizDerive ? { derive: vizDerive } : {}),
                   ...(patterns ? { patterns } : {}),
                 })
               : null;

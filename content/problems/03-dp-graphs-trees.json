@@ -75,7 +75,12 @@
         "why": "fib(46), which only just fits in a signed 32-bit int. This is why the accumulator is 64-bit."
       }
     ],
-    "vizKind": "array"
+    "vizKind": "array",
+    "vizDerive": {
+      "as": "range",
+      "name": "steps",
+      "from": "n"
+    }
   },
   {
     "slug": "coin-change",
@@ -475,7 +480,21 @@
         "expectedOutput": "true"
       }
     ],
-    "vizKind": "array"
+    "vizKind": "array",
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "s",
+          "m"
+        ]
+      },
+      {
+        "read": "tokens",
+        "name": "words"
+      }
+    ],
+    "vizVar": "s"
   },
   {
     "slug": "unique-paths",
@@ -546,7 +565,13 @@
         ]
       }
     ],
-    "vizKind": "grid"
+    "vizKind": "grid",
+    "vizDerive": {
+      "as": "grid",
+      "name": "grid",
+      "rows": "m",
+      "cols": "n"
+    }
   },
   {
     "slug": "number-of-islands",
@@ -696,7 +721,21 @@
         "expectedOutput": "true"
       }
     ],
-    "vizKind": "graph"
+    "vizKind": "graph",
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n",
+          "m"
+        ]
+      },
+      {
+        "read": "rest",
+        "name": "edges"
+      }
+    ],
+    "vizVar": "edges"
   },
   {
     "slug": "merge-intervals",
@@ -1200,6 +1239,11 @@
         ]
       }
     ],
-    "vizKind": "array"
+    "vizKind": "array",
+    "vizDerive": {
+      "as": "bits",
+      "name": "bits",
+      "from": "value"
+    }
   }
 ]
