@@ -18,6 +18,21 @@ interface CaseOutcome {
   expected?: string | null;
 }
 
+/**
+ * 🛑 The worker's output budget is shared across stdout AND stderr, and when it
+ * trips it silently drops further lines and sets `truncated`.
+ *
+ * That makes a truncated run UNJUDGEABLE: a learner who leaves debug output in
+ * a loop can push past the cap, have their *stdout* cut short, and get a wrong
+ * answer for code that is correct. Hashing a truncated string produces a
+ * confident, wrong verdict — the worst possible failure. So refuse to judge it
+ * and say why.
+ */
+const TRUNCATED_MESSAGE =
+  "Output limit exceeded, so this run cannot be judged — the comparison would be against " +
+  "incomplete output. Reduce what the program prints (debug output on cerr counts toward " +
+  "the same limit) and run again.";
+
 const TIMEOUT_MS = 30_000;
 const MAX_SOURCE_BYTES = 64 * 1024;
 
@@ -85,6 +100,12 @@ export function ProblemWorkbench({
           worker.removeEventListener("message", onMessage);
           if (!d.ok) {
             reject(new Error(d.compilerStderr?.trim() || d.error || "Run failed"));
+            return;
+          }
+          // Checked BEFORE resolving: the caller immediately hashes this string
+          // for the verdict, so a truncated value must never reach it.
+          if (d.truncated) {
+            reject(new Error(TRUNCATED_MESSAGE));
             return;
           }
           resolve({ stdout: d.stdout ?? "", compileMs: d.compileMs ?? 0 });
