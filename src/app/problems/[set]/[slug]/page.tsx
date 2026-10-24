@@ -9,6 +9,8 @@ import type { AzLimits } from "@dsa/trace/az-trace-header";
 import { Markdown } from "@/components/Markdown";
 import { ProblemExplainer } from "@/components/course/ProblemExplainer";
 import { ProblemScenarios } from "@/components/course/ProblemScenarios";
+import { ReferenceTrace } from "@/components/course/ReferenceTrace";
+import { extractReferenceProgram } from "@dsa/scenarios/reference-program";
 
 export async function generateMetadata({
   params,
@@ -67,6 +69,13 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
   } catch (error) {
     console.error("[course] test cases unavailable", error);
   }
+
+  /*
+   * The editorial program and the first sample input: the only two things a
+   * reference trace needs, both of which the problem already has.
+   */
+  const referenceProgram = extractReferenceProgram(String(problem.editorial ?? ""));
+  const firstSample = cases.find((c) => c.visibility === "sample")?.input;
 
   const patterns = Array.isArray(problem.patterns) ? (problem.patterns as string[]) : [];
   const difficulty = String(problem.difficulty ?? "");
@@ -164,6 +173,20 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
                 {...(problem.vizKind ? { vizKind: problem.vizKind as never } : {})}
                 {...(problem.vizVar ? { vizVar: String(problem.vizVar) } : {})}
                 patterns={patterns}
+              />
+            ) : null}
+
+            {/* Also inside the reveal, and for the same reason: a reference
+                solution stepping through itself above the editor would just be
+                the answer. Needs no authored content — the editorial's own
+                program and the problem's own sample case are the inputs. */}
+            {referenceProgram && firstSample ? (
+              <ReferenceTrace
+                program={referenceProgram.source}
+                input={firstSample}
+                {...(problem.vizLimits ? { vizLimits: problem.vizLimits as Partial<AzLimits> } : {})}
+                {...(problem.vizKind ? { vizKind: problem.vizKind as never } : {})}
+                {...(problem.vizVar ? { vizVar: String(problem.vizVar) } : {})}
               />
             ) : null}
           </div>
