@@ -31,7 +31,6 @@
     "status": "published",
     "summary": "Classes as invariants, encapsulation, RAII and the rule of 0/3/5, composition versus inheritance, virtual dispatch, templates — and when to skip all of it."
   },
-
   {
     "slug": "linear",
     "trackSlug": "data-structures",
@@ -80,10 +79,9 @@
     "status": "published",
     "summary": "Prefix sums, Fenwick trees and segment trees — answering range queries faster than re-reading the range."
   },
-
   {
     "slug": "pointers",
-    "trackSlug": "patterns",
+    "trackSlug": "approaches",
     "title": "Pointer patterns",
     "sortOrder": 10,
     "status": "published",
@@ -91,49 +89,49 @@
   },
   {
     "slug": "search",
-    "trackSlug": "patterns",
+    "trackSlug": "algorithms",
     "title": "Search and prefix patterns",
-    "sortOrder": 20,
+    "sortOrder": 10,
     "status": "published",
     "summary": "Binary search on the answer, and prefix sums as a preprocessing step."
   },
   {
     "slug": "stack-patterns",
-    "trackSlug": "patterns",
+    "trackSlug": "approaches",
     "title": "Monotonic stacks and intervals",
-    "sortOrder": 30,
+    "sortOrder": 20,
     "status": "published",
     "summary": "Next-greater-element in linear time, and the sort-then-sweep interval template."
   },
   {
     "slug": "recursion",
-    "trackSlug": "patterns",
+    "trackSlug": "approaches",
     "title": "Recursion and backtracking",
-    "sortOrder": 40,
+    "sortOrder": 30,
     "status": "published",
     "summary": "Choose, recurse, un-choose — and how to prune before the search explodes."
   },
   {
     "slug": "graph-patterns",
-    "trackSlug": "patterns",
+    "trackSlug": "algorithms",
     "title": "Graph traversal patterns",
-    "sortOrder": 50,
+    "sortOrder": 30,
     "status": "published",
     "summary": "BFS versus DFS, grids as implicit graphs, topological order and shortest paths."
   },
   {
     "slug": "dp",
-    "trackSlug": "patterns",
+    "trackSlug": "algorithms",
     "title": "Dynamic programming",
-    "sortOrder": 60,
+    "sortOrder": 20,
     "status": "published",
     "summary": "State, transition, base case, order — the only four questions, in one and two dimensions."
   },
   {
     "slug": "greedy-bits",
-    "trackSlug": "patterns",
+    "trackSlug": "algorithms",
     "title": "Greedy and bit manipulation",
-    "sortOrder": 70,
+    "sortOrder": 40,
     "status": "published",
     "summary": "When a local choice is provably safe, and the bit tricks worth memorising."
   }

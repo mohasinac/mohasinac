@@ -1,29 +1,46 @@
 [
   {
     "slug": "foundations",
-    "title": "Track A — Foundations",
+    "title": "C++ Foundations",
     "sortOrder": 10,
     "status": "published",
-    "summary": "How to read a problem, derive the complexity you need before writing any code, and the C++ you actually use under a one-second limit. Includes a proper treatment of OOP — classes as invariants, RAII, the rule of 0/3/5 — and an honest section on when *not* to use it in a contest.",
-    "metaTitle": "Foundations — approach, complexity, C++ and OOP",
+    "summary": "The prerequisites. How to read a problem and derive the complexity you need before writing any code, the C++ you actually use under a one-second limit, and a proper treatment of OOP — classes as invariants, RAII, the rule of 0/3/5 — including an honest section on when *not* to use it in a contest.",
+    "metaTitle": "C++ Foundations — approach, complexity, C++ and OOP",
     "metaDescription": "Problem-solving method, complexity analysis, competitive C++ and object-oriented design done properly."
   },
   {
     "slug": "data-structures",
-    "title": "Track B — Data structures from scratch",
+    "title": "Data Structures",
     "sortOrder": 20,
     "status": "published",
-    "summary": "Every structure built as a class, against an interface, with its invariant stated up front. You will not reach for `std::stack` until you have written one. Each lesson follows the same shape: the problem it solves, the invariant, the implementation, the complexity table, the pitfalls, and the problems that need it.",
-    "metaTitle": "Data structures from scratch in C++",
+    "summary": "Every structure built from scratch as a class, against an interface, with its invariant stated up front. You will not reach for `std::stack` until you have written one. Each lesson follows the same shape: the problem it solves, the invariant, the implementation, the complexity table, the pitfalls.",
+    "metaTitle": "Data Structures from scratch in C++",
     "metaDescription": "Dynamic arrays, linked lists, stacks, queues, hash tables, trees, heaps, tries, graphs, DSU and range structures — each implemented as a class."
   },
   {
-    "slug": "patterns",
-    "title": "Track C — Patterns and problems",
+    "slug": "algorithms",
+    "title": "Algorithms",
     "sortOrder": 30,
     "status": "published",
-    "summary": "The fourteen shapes that most interview problems reduce to. Problems attach to patterns rather than to a flat list, because recognising the shape is the part that transfers — a solved problem you cannot classify teaches you almost nothing.",
-    "metaTitle": "Patterns — two pointers to dynamic programming",
-    "metaDescription": "Two pointers, sliding window, binary search on the answer, monotonic stacks, backtracking, graph traversal, DP, greedy and bit manipulation."
+    "summary": "The named algorithms and paradigms, with their complexity results: binary search and searching the answer space, graph traversal and shortest paths, topological order, dynamic programming in one and two dimensions, and greedy — including how to tell when a greedy choice is actually safe.",
+    "metaTitle": "Algorithms — search, graphs, dynamic programming, greedy",
+    "metaDescription": "Binary search, BFS and DFS, topological sort, shortest paths, 1-D and 2-D dynamic programming, and greedy with its proof obligations."
+  },
+  {
+    "slug": "approaches",
+    "title": "Competitive Approaches",
+    "sortOrder": 40,
+    "status": "published",
+    "summary": "The recognition patterns — the shapes most interview problems reduce to. Two pointers, sliding windows, monotonic stacks, intervals and backtracking, taught as templates you learn to *spot*, because recognising the shape is the part that transfers. A solved problem you cannot classify teaches you almost nothing.",
+    "metaTitle": "Competitive Approaches — the patterns that transfer",
+    "metaDescription": "Two pointers, sliding window, monotonic stacks, intervals and backtracking as recognisable templates."
+  },
+  {
+    "//": "Superseded by `algorithms` + `approaches`. Kept as an archived record rather than deleted: the seed script upserts by slug and never removes documents, so dropping this entry would leave a published orphan in Firestore that still appeared in every course list.",
+    "slug": "patterns",
+    "title": "Track C — Patterns and problems (superseded)",
+    "sortOrder": 900,
+    "status": "archived",
+    "summary": "Split into the Algorithms and Competitive Approaches courses."
   }
 ]

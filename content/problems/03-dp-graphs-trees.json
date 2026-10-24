@@ -5,8 +5,16 @@
     "difficulty": "easy",
     "sortOrder": 200,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["dynamic programming"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "dynamic programming"
+    ],
     "sourceUrl": "https://leetcode.com/problems/climbing-stairs/",
     "sourceName": "LeetCode 70",
     "statement": "You are climbing a staircase of `n` steps. Each move takes you up either 1 or 2 steps.\n\nPrint how many distinct sequences of moves reach the top.\n\n## Input\n\nOne line holding `n`.\n\n## Output\n\nThe number of distinct ways.\n\n## Example\n\n```\nInput:\n3\n\nOutput:\n3\n```\n\nThe three ways are `1+1+1`, `1+2` and `2+1`.",
@@ -14,12 +22,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The four questions\n\n- **State:** `dp[i]` = the number of ways to reach step `i`.\n- **Transition:** the last move was either 1 step (from `i-1`) or 2 steps (from `i-2`), and those sets of sequences are disjoint — so `dp[i] = dp[i-1] + dp[i-2]`.\n- **Base:** `dp[0] = 1` (one way to stand at the bottom: do nothing), `dp[1] = 1`.\n- **Order:** increasing `i`.\n\nThat recurrence is Fibonacci. Specifically `dp[n] = fib(n+1)`.\n\n## Why the transitions are disjoint\n\nThis is the step worth checking rather than assuming. Every sequence reaching step `i` has a last move, and it is either 1 or 2 — never both. So no sequence is counted twice, and the sum is exact. When transitions overlap, addition double-counts and the DP is wrong.\n\n## Optimal — O(n) time, O(1) space\n\n`dp[i]` depends only on the previous two values, so two variables suffice.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n\n    long long prev = 1;        // dp[0]\n    long long cur = 1;         // dp[1]\n\n    for (int i = 2; i <= n; ++i) {\n        // Compute before overwriting — a classic ordering bug otherwise.\n        long long next = prev + cur;\n        prev = cur;\n        cur = next;\n    }\n    cout << cur << '\\n';\n}\n```\n\nFor `n = 1` the loop never runs and `cur` is already 1. Correct without a special case.\n\n## The naive version, and why it fails\n\n```cpp\n// O(2^n). At n = 45 this is ~3.5 * 10^13 calls.\nlong long ways(int n) {\n    if (n <= 1) return 1;\n    return ways(n - 1) + ways(n - 2);\n}\n```\n\nThe same subproblem is recomputed exponentially often. Adding a memo array turns it into O(n) with no change to the recurrence — the progression the DP lesson walks through.\n\n## Why `long long`\n\n`fib(46) = 1836311903`, which fits in a signed 32-bit int with very little room. Using `long long` costs nothing and removes the question. The constraint `n <= 45` exists precisely so the answer stays bounded.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Naive recursion | O(2^n) | O(n) stack |\n| Memoised | O(n) | O(n) |\n| Tabulated | O(n) | O(n) |\n| Rolled | O(n) | O(1) |",
     "testCases": [
-      { "visibility": "sample", "input": "3\n", "expectedOutput": "3" },
-      { "visibility": "sample", "input": "2\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "5\n", "expectedOutput": "8" },
-      { "visibility": "hidden", "input": "10\n", "expectedOutput": "89" },
-      { "visibility": "hidden", "input": "45\n", "expectedOutput": "1836311903" }
+      {
+        "visibility": "sample",
+        "input": "3\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "sample",
+        "input": "2\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n",
+        "expectedOutput": "8"
+      },
+      {
+        "visibility": "hidden",
+        "input": "10\n",
+        "expectedOutput": "89"
+      },
+      {
+        "visibility": "hidden",
+        "input": "45\n",
+        "expectedOutput": "1836311903"
+      }
     ]
   },
   {
@@ -28,8 +60,16 @@
     "difficulty": "medium",
     "sortOrder": 210,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["dynamic programming"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "dynamic programming"
+    ],
     "sourceUrl": "https://leetcode.com/problems/coin-change/",
     "sourceName": "LeetCode 322",
     "statement": "You have an unlimited supply of coins in `n` given denominations. Print the fewest coins that sum to exactly `amount`, or `-1` if no combination does.\n\n## Input\n\nThe first line holds `n` and `amount`. The second line holds the `n` denominations.\n\n## Output\n\nThe minimum number of coins, or `-1`.\n\n## Example\n\n```\nInput:\n3 11\n1 2 5\n\nOutput:\n3\n```\n\n`5 + 5 + 1 = 11` uses three coins, and nothing does it in two.",
@@ -37,12 +77,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, amount;\n    cin >> n >> amount;\n    vector<long long> coins(n);\n    for (long long& c : coins) cin >> c;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Greedy does not work\n\nTaking the largest coin that fits is wrong. On denominations `1 3 4` and amount 6, greedy takes `4 + 1 + 1` = three coins; the answer is `3 + 3` = two. Greedy happens to be correct for real currency systems, which is why the mistake feels safe.\n\nNo exchange argument exists here, so it is DP.\n\n## The four questions\n\n- **State:** `dp[a]` = fewest coins summing to exactly `a`.\n- **Transition:** `dp[a] = 1 + min(dp[a - c])` over every coin `c <= a`.\n- **Base:** `dp[0] = 0`. Zero coins make zero.\n- **Order:** increasing `a`, since `a - c < a`.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, amount;\n    cin >> n >> amount;\n    vector<long long> coins(n);\n    for (long long& c : coins) cin >> c;\n\n    const int kUnreachable = INT_MAX;\n    vector<int> dp(amount + 1, kUnreachable);\n    dp[0] = 0;\n\n    for (int a = 1; a <= amount; ++a) {\n        for (long long c : coins) {\n            if (c > a) continue;\n            // 🛑 Guard the sentinel. dp[a-c] == INT_MAX means that amount is\n            // unreachable; INT_MAX + 1 is signed overflow — undefined\n            // behaviour that typically yields a negative number, which then\n            // wins the min() and produces a confidently wrong answer.\n            if (dp[a - (int)c] == kUnreachable) continue;\n            dp[a] = min(dp[a], dp[a - (int)c] + 1);\n        }\n    }\n\n    cout << (dp[amount] == kUnreachable ? -1 : dp[amount]) << '\\n';\n}\n```\n\n## The sentinel guard is the whole problem\n\nEvery wrong submission on this problem is one of two things: using greedy, or omitting that `continue`. Without it, `dp[3]` with only a 2-coin would compute `dp[1] + 1 = INT_MAX + 1`, and the result is garbage rather than `-1`.\n\nAn alternative is to use `amount + 1` as the sentinel instead of `INT_MAX` — it cannot overflow, since no valid answer exceeds `amount`, and the final check becomes `dp[amount] > amount`.\n\n## Edge cases\n\n- `amount = 0` must print `0`. The loop never runs and `dp[0]` is already 0.\n- A denomination larger than `amount` is skipped by `c > a`.\n- A denomination near `2^31 - 1` is why the coins are read as `long long`: comparing it against `a` must not overflow.\n\n## Complexity\n\nO(amount · n) time, O(amount) space. At 10000 · 12 = 120000 operations, trivially fast.\n\nNote that the state is the *amount*, not the coin index — so this is the \"unbounded knapsack\" shape, where each coin may be reused. The variant where each coin may be used once needs a second dimension.",
     "testCases": [
-      { "visibility": "sample", "input": "3 11\n1 2 5\n", "expectedOutput": "3" },
-      { "visibility": "sample", "input": "1 3\n2\n", "expectedOutput": "-1" },
-      { "visibility": "hidden", "input": "1 0\n1\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "3 6\n1 3 4\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "4 30\n1 5 10 25\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "1 100\n1\n", "expectedOutput": "100" }
+      {
+        "visibility": "sample",
+        "input": "3 11\n1 2 5\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "sample",
+        "input": "1 3\n2\n",
+        "expectedOutput": "-1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 0\n1\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 6\n1 3 4\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4 30\n1 5 10 25\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 100\n1\n",
+        "expectedOutput": "100"
+      }
     ]
   },
   {
@@ -51,8 +115,16 @@
     "difficulty": "medium",
     "sortOrder": 220,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["dynamic programming"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "dynamic programming"
+    ],
     "sourceUrl": "https://leetcode.com/problems/house-robber/",
     "sourceName": "LeetCode 198",
     "statement": "A row of `n` houses each hold some amount of money. You may take from any set of houses, provided you never take from two **adjacent** houses.\n\nPrint the largest total you can take.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` values. When `n` is 0 the second line is empty.\n\n## Output\n\nThe maximum total.\n\n## Example\n\n```\nInput:\n5\n2 7 9 3 1\n\nOutput:\n12\n```\n\nTake houses 0, 2 and 4: `2 + 9 + 1 = 12`.",
@@ -60,13 +132,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Why greedy fails\n\nTaking the largest house first is wrong: on `2 7 9 3 1`, greedy takes 9, then must skip 7 and 3, leaving 2 and 1 for a total of 12 — which happens to be right. But on `2 1 1 2` greedy takes a 2, then the other 2, total 4; correct. Try `4 1 1 4 1 1 4`: greedy works again. The failure is subtler — `2 7 9 3 1` with values changed to `5 1 1 5 10`: greedy takes 10, skips 5, takes 5 and 1 → wait, it takes 10 then can take index 0,1,2 → 5+1 = 6, total 16; optimal is 5+5+10 = 20. Greedy by largest value has no exchange argument, so use DP.\n\n## The four questions\n\n- **State:** `dp[i]` = the best total considering the first `i` houses.\n- **Transition:** either skip house `i` (`dp[i-1]`) or take it, which forces skipping `i-1` (`dp[i-2] + a[i]`).\n- **Base:** `dp[0] = 0`, `dp[1] = a[0]`.\n- **Order:** increasing `i`.\n\n## Optimal — O(n) time, O(1) space\n\nSince `dp[i]` depends only on the previous two, carry two variables.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    // best_excluding: best total not using the previous house\n    // best_including: best total that may use the previous house\n    long long best_excluding = 0;\n    long long best_including = 0;\n\n    for (int i = 0; i < n; ++i) {\n        long long value;\n        cin >> value;\n        // Compute BOTH from the old values before assigning either. Writing\n        // best_including first would feed the new value into the second line.\n        long long take = best_excluding + value;\n        long long skip = max(best_excluding, best_including);\n        best_including = take;\n        best_excluding = skip;\n    }\n    cout << max(best_excluding, best_including) << '\\n';\n}\n```\n\n## Dry run on `2 7 9 3 1`\n\n| value | take = excl + v | skip = max(excl, incl) | excl | incl |\n|---|---|---|---|---|\n| start | | | 0 | 0 |\n| 2 | 2 | 0 | 0 | 2 |\n| 7 | 7 | 2 | 2 | 7 |\n| 9 | 11 | 7 | 7 | 11 |\n| 3 | 10 | 11 | 11 | 10 |\n| 1 | 12 | 11 | 11 | 12 |\n\nAnswer `max(11, 12) = 12`.\n\n## Edge cases\n\n- `n = 0` prints `0`; the loop never runs.\n- `n = 1` prints `a[0]`, since `best_including` becomes `a[0]`.\n- All values 0 prints `0`.\n\nBecause all values are non-negative here, starting both accumulators at 0 is correct. If negative values were allowed, \"take nothing\" versus \"must take something\" would need deciding, exactly as in the maximum-subarray problem.\n\n## Complexity\n\nO(n) time, O(1) space. The tabulated version is O(n) space and equally correct — roll it only after the table version works.",
     "testCases": [
-      { "visibility": "sample", "input": "5\n2 7 9 3 1\n", "expectedOutput": "12" },
-      { "visibility": "sample", "input": "4\n1 2 3 1\n", "expectedOutput": "4" },
-      { "visibility": "hidden", "input": "0\n\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1\n5\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "2\n2 1\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "5\n5 1 1 5 10\n", "expectedOutput": "20" },
-      { "visibility": "hidden", "input": "3\n0 0 0\n", "expectedOutput": "0" }
+      {
+        "visibility": "sample",
+        "input": "5\n2 7 9 3 1\n",
+        "expectedOutput": "12"
+      },
+      {
+        "visibility": "sample",
+        "input": "4\n1 2 3 1\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "0\n\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n5\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n2 1\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n5 1 1 5 10\n",
+        "expectedOutput": "20"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n0 0 0\n",
+        "expectedOutput": "0"
+      }
     ]
   },
   {
@@ -75,8 +175,17 @@
     "difficulty": "medium",
     "sortOrder": 230,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["dynamic programming", "binary search"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "dynamic programming",
+      "binary search"
+    ],
     "sourceUrl": "https://leetcode.com/problems/longest-increasing-subsequence/",
     "sourceName": "LeetCode 300",
     "statement": "Given `n` integers, find the length of the longest **strictly increasing subsequence**.\n\nA subsequence keeps the original order but need not be contiguous — unlike a subarray. In `10 9 2 5 3 7 101 18`, the subsequence `2 3 7 101` is increasing and has length 4.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` integers.\n\n## Output\n\nThe length of the longest strictly increasing subsequence.\n\n## Example\n\n```\nInput:\n8\n10 9 2 5 3 7 101 18\n\nOutput:\n4\n```",
@@ -84,13 +193,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The O(n^2) DP — write this first\n\n- **State:** `dp[i]` = length of the longest increasing subsequence *ending at* `i`.\n- **Transition:** `dp[i] = 1 + max(dp[j])` over all `j < i` with `a[j] < a[i]`.\n- **Base:** every `dp[i]` starts at 1 — the element alone.\n\n```cpp\nvector<int> dp(n, 1);\nint best = n ? 1 : 0;\nfor (int i = 1; i < n; ++i) {\n    for (int j = 0; j < i; ++j)\n        if (a[j] < a[i]) dp[i] = max(dp[i], dp[j] + 1);\n    best = max(best, dp[i]);\n}\n```\n\nCorrect, clear, and 10^10 operations at `n = 100000`. Too slow — but it is the reference the fast version must agree with.\n\n## The O(n log n) solution\n\nMaintain an array `tails` where `tails[k]` is the **smallest possible tail value** of an increasing subsequence of length `k+1` found so far.\n\nTwo facts make this work:\n\n1. `tails` is always sorted ascending, so it can be binary searched.\n2. Keeping tails as small as possible is never worse — a smaller tail accepts at least as many future elements.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    vector<long long> tails;\n    for (int i = 0; i < n; ++i) {\n        long long x;\n        cin >> x;\n\n        // lower_bound: the first tail >= x. For STRICTLY increasing, this\n        // replaces an equal tail rather than extending past it, so duplicates\n        // never lengthen the answer. (For non-decreasing, use upper_bound —\n        // one word, different problem.)\n        auto it = lower_bound(tails.begin(), tails.end(), x);\n\n        if (it == tails.end()) tails.push_back(x);   // x extends the longest\n        else *it = x;                                // x improves this length\n    }\n    cout << tails.size() << '\\n';\n}\n```\n\n## What `tails` is and is not\n\n`tails` is **not** an actual increasing subsequence — its contents can be a mixture from different subsequences. Only its *length* is meaningful. People often try to print `tails` as the answer subsequence and get a wrong one; recovering the actual subsequence needs a parent-pointer array alongside.\n\n## Dry run on `10 9 2 5 3 7 101 18`\n\n| x | action | tails |\n|---|---|---|\n| 10 | append | `[10]` |\n| 9 | replace 10 | `[9]` |\n| 2 | replace 9 | `[2]` |\n| 5 | append | `[2,5]` |\n| 3 | replace 5 | `[2,3]` |\n| 7 | append | `[2,3,7]` |\n| 101 | append | `[2,3,7,101]` |\n| 18 | replace 101 | `[2,3,7,18]` |\n\nLength 4. Note the final `tails` is `2 3 7 18`, which *is* a valid LIS here — but that is a coincidence, not a guarantee.\n\n## `lower_bound` versus `upper_bound`\n\nThis is the detail that decides correctness:\n\n- **Strictly increasing** → `lower_bound`. An equal element replaces, so `7 7 7` gives 1.\n- **Non-decreasing** → `upper_bound`. An equal element extends, so `7 7 7` gives 3.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| DP | O(n^2) | O(n) |\n| Patience / binary search | O(n log n) | O(n) |",
     "testCases": [
-      { "visibility": "sample", "input": "8\n10 9 2 5 3 7 101 18\n", "expectedOutput": "4" },
-      { "visibility": "sample", "input": "6\n0 1 0 3 2 3\n", "expectedOutput": "4" },
-      { "visibility": "hidden", "input": "7\n7 7 7 7 7 7 7\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1\n5\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "5\n5 4 3 2 1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "5\n1 2 3 4 5\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "6\n-2 -1 0 -5 -4 -3\n", "expectedOutput": "3" }
+      {
+        "visibility": "sample",
+        "input": "8\n10 9 2 5 3 7 101 18\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "sample",
+        "input": "6\n0 1 0 3 2 3\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "7\n7 7 7 7 7 7 7\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n5\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n5 4 3 2 1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n1 2 3 4 5\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6\n-2 -1 0 -5 -4 -3\n",
+        "expectedOutput": "3"
+      }
     ]
   },
   {
@@ -99,8 +236,17 @@
     "difficulty": "medium",
     "sortOrder": 240,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["dynamic programming", "2d dp"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "dynamic programming",
+      "2d dp"
+    ],
     "sourceUrl": "https://leetcode.com/problems/longest-common-subsequence/",
     "sourceName": "LeetCode 1143",
     "statement": "Given two strings, find the length of their longest common subsequence — the longest sequence of characters appearing in both, in the same relative order, not necessarily contiguously.\n\nFor `abcde` and `ace`, the answer is 3 (`ace`).\n\n## Input\n\nTwo lines, one string per line.\n\n## Output\n\nThe length of the longest common subsequence. `0` if there is none.\n\n## Example\n\n```\nInput:\nabcde\nace\n\nOutput:\n3\n```",
@@ -108,13 +254,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    string a, b;\n    cin >> a >> b;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The canonical 2-D DP\n\n- **State:** `dp[i][j]` = LCS length of the first `i` characters of `a` and the first `j` of `b`.\n- **Transition:**\n  - If `a[i-1] == b[j-1]`, those characters can be paired: `dp[i][j] = dp[i-1][j-1] + 1`.\n  - Otherwise one of them must be dropped: `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.\n- **Base:** row 0 and column 0 are all 0 — an empty string shares nothing.\n- **Order:** increasing `i`, then increasing `j`.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    string a, b;\n    cin >> a >> b;\n    int n = (int)a.size(), m = (int)b.size();\n\n    // (n+1) x (m+1), so index 0 means \"empty prefix\" and the first character\n    // needs no special case — the same +1 trick as a prefix-sum array.\n    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));\n\n    for (int i = 1; i <= n; ++i) {\n        for (int j = 1; j <= m; ++j) {\n            // a[i-1] with dp[i][j]: the table is 1-indexed, the string is 0-\n            // indexed. Write it deliberately once and stay consistent.\n            if (a[i - 1] == b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n            else dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);\n        }\n    }\n    cout << dp[n][m] << '\\n';\n}\n```\n\n## Why the equal case does not also need the max\n\nWhen the characters match, pairing them is never worse than dropping either one. That is a small proof worth knowing: any common subsequence of the two prefixes can be rearranged to end with this matched pair without getting shorter. So `dp[i-1][j-1] + 1` dominates and no `max` is needed.\n\n## Rolling to O(m) space\n\nRow `i` depends only on row `i-1`, so two rows suffice:\n\n```cpp\nvector<int> prev(m + 1, 0), cur(m + 1, 0);\nfor (int i = 1; i <= n; ++i) {\n    for (int j = 1; j <= m; ++j)\n        cur[j] = (a[i - 1] == b[j - 1]) ? prev[j - 1] + 1\n                                        : max(prev[j], cur[j - 1]);\n    swap(prev, cur);        // O(1): swaps the buffers, not the contents\n}\ncout << prev[m] << '\\n';\n```\n\nAt 1000 × 1000 the full table is 4 MB and fits comfortably — so roll it only after the table version is verified correct. Rolling introduces read-after-write bugs that are much harder to find than a memory limit.\n\n## Related problems, same table\n\n- **Edit distance** — same shape, three transitions instead of two (insert, delete, replace).\n- **Longest common substring** (contiguous) — reset to 0 on a mismatch instead of taking a max, and track the best cell rather than the corner.\n- **Longest palindromic subsequence** — the LCS of the string with its own reverse.\n\n## Complexity\n\nO(n · m) time. O(n · m) space, or O(min(n, m)) rolled.",
     "testCases": [
-      { "visibility": "sample", "input": "abcde\nace\n", "expectedOutput": "3" },
-      { "visibility": "sample", "input": "abc\ndef\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "abc\nabc\n", "expectedOutput": "3" },
-      { "visibility": "hidden", "input": "a\na\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "a\nb\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "bsbininm\njmjkbkjkv\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "abcba\nabcbcba\n", "expectedOutput": "5" }
+      {
+        "visibility": "sample",
+        "input": "abcde\nace\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "sample",
+        "input": "abc\ndef\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "abc\nabc\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "a\na\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "a\nb\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "bsbininm\njmjkbkjkv\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "abcba\nabcbcba\n",
+        "expectedOutput": "5"
+      }
     ]
   },
   {
@@ -123,8 +297,17 @@
     "difficulty": "medium",
     "sortOrder": 250,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["dynamic programming", "strings"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "dynamic programming",
+      "strings"
+    ],
     "sourceUrl": "https://leetcode.com/problems/word-break/",
     "sourceName": "LeetCode 139",
     "statement": "Given a string `s` and a dictionary of `n` words, decide whether `s` can be split into a sequence of one or more dictionary words. A dictionary word may be reused any number of times.\n\n## Input\n\nThe first line holds `s`. The second line holds `n`. The third line holds `n` words separated by spaces.\n\n## Output\n\n`true` or `false`.\n\n## Example\n\n```\nInput:\nleetcode\n2\nleet code\n\nOutput:\ntrue\n```\n\n`leetcode` splits into `leet` + `code`.",
@@ -132,13 +315,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    string s;\n    cin >> s;\n    int n;\n    cin >> n;\n    vector<string> words(n);\n    for (string& w : words) cin >> w;\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## Why greedy fails\n\nTaking the longest matching prefix at each step is wrong. On `s = \"catsandog\"` with dictionary `{cats, dog, sand, and, cat}`, greedy takes `cats`, then `and`, then is stuck on `og` — and concludes false. It *is* false here, but on `s = \"aaaaab\"` with `{aaaa, aaa, b}`, greedy takes `aaaa` then cannot split `ab`, while `aaa` + ... also fails — a case where the wrong first choice loses a valid split exists for `{aa, aaa}` on `\"aaaaa\"`: taking `aa, aa` leaves `a`; taking `aa, aaa` works. One wrong choice dooms the rest, so you need to consider all of them.\n\n## The four questions\n\n- **State:** `dp[i]` = can the first `i` characters be split entirely into dictionary words?\n- **Transition:** `dp[i]` is true if there is some `j < i` where `dp[j]` is true **and** `s[j..i-1]` is a dictionary word.\n- **Base:** `dp[0] = true` — the empty prefix is trivially splittable. This is the base case that makes everything work.\n- **Order:** increasing `i`.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    string s;\n    cin >> s;\n    int n;\n    cin >> n;\n\n    unordered_set<string> dict;\n    size_t longest = 0;\n    for (int i = 0; i < n; ++i) {\n        string w;\n        cin >> w;\n        longest = max(longest, w.size());\n        dict.insert(w);\n    }\n\n    int len = (int)s.size();\n    vector<char> dp(len + 1, false);\n    dp[0] = true;                       // the empty prefix splits\n\n    for (int i = 1; i <= len; ++i) {\n        // Only look back as far as the longest dictionary word. Without this\n        // the inner loop is O(len) instead of O(20) — correct either way,\n        // but needlessly slower.\n        for (int j = i - 1; j >= 0 && (size_t)(i - j) <= longest; --j) {\n            if (!dp[j]) continue;       // nothing splittable ends at j\n            if (dict.count(s.substr(j, i - j))) {\n                dp[i] = true;\n                break;                  // one witness is enough\n            }\n        }\n    }\n    cout << (dp[len] ? \"true\" : \"false\") << '\\n';\n}\n```\n\n## Why `dp[0] = true` is essential\n\nIt encodes \"there is a valid split ending just before the first character\", which is what lets the first word be matched at all. Set it to `false` and the entire table stays false — the single most common bug on this problem, and it produces a plausible `false` rather than a crash.\n\n## Dry run on `leetcode` with `{leet, code}`\n\n`dp[0] = true`. Scanning forward, `dp[4]` becomes true because `dp[0]` is true and `s[0..3] = \"leet\"` is in the dictionary. Then `dp[8]` becomes true because `dp[4]` is true and `s[4..7] = \"code\"` is in the dictionary. Answer: `dp[8] = true`.\n\n## Note on `vector<char>` rather than `vector<bool>`\n\n`vector<bool>` is a bit-packed specialisation — it is not a normal container, cannot hand out a `bool&`, and is slower per access. For a DP flag array, `vector<char>` is the better default.\n\n## Complexity\n\nO(len · L) hash lookups where `L` is the longest word, each costing O(L) to build the substring — so O(len · L²) overall, or about 300 · 400 = 120000 operations here. A trie over the dictionary removes the `substr` allocation entirely and is the better structure at scale.",
     "testCases": [
-      { "visibility": "sample", "input": "leetcode\n2\nleet code\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "catsandog\n5\ncats dog sand and cat\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "applepenapple\n2\napple pen\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "a\n1\na\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "a\n1\nb\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "aaaaa\n2\naa aaa\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "cars\n3\ncar ca rs\n", "expectedOutput": "true" }
+      {
+        "visibility": "sample",
+        "input": "leetcode\n2\nleet code\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "catsandog\n5\ncats dog sand and cat\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "applepenapple\n2\napple pen\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "a\n1\na\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "a\n1\nb\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "aaaaa\n2\naa aaa\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "cars\n3\ncar ca rs\n",
+        "expectedOutput": "true"
+      }
     ]
   },
   {
@@ -147,8 +358,16 @@
     "difficulty": "medium",
     "sortOrder": 260,
     "status": "published",
-    "sheets": ["neetcode150", "neetcode250"],
-    "patterns": ["dynamic programming", "2d dp"],
+    "sheets": [
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "dynamic programming",
+      "2d dp"
+    ],
     "sourceUrl": "https://leetcode.com/problems/unique-paths/",
     "sourceName": "LeetCode 62",
     "statement": "A robot starts in the top-left cell of an `m` by `n` grid and must reach the bottom-right cell. At each step it may move only **right** or **down**.\n\nPrint how many distinct paths exist.\n\n## Input\n\nOne line holding `m` and `n`.\n\n## Output\n\nThe number of distinct paths.\n\n## Example\n\n```\nInput:\n3 7\n\nOutput:\n28\n```",
@@ -156,13 +375,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int m, n;\n    cin >> m >> n;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The four questions\n\n- **State:** `dp[r][c]` = number of paths from the start to cell `(r, c)`.\n- **Transition:** you can only arrive from above or from the left, and those path sets are disjoint, so `dp[r][c] = dp[r-1][c] + dp[r][c-1]`.\n- **Base:** the entire first row and first column are 1 — there is exactly one way to walk straight along an edge.\n- **Order:** row by row, left to right.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int m, n;\n    cin >> m >> n;\n\n    // Initialising everything to 1 handles both base cases at once: the first\n    // row and first column are already correct and never written again.\n    vector<vector<long long>> dp(m, vector<long long>(n, 1));\n\n    for (int r = 1; r < m; ++r)\n        for (int c = 1; c < n; ++c)\n            dp[r][c] = dp[r - 1][c] + dp[r][c - 1];\n\n    cout << dp[m - 1][n - 1] << '\\n';\n}\n```\n\n## Rolled to O(n) space\n\nEach row depends only on the row above, and within a row only on the cell to the left — so a single array updated in place works:\n\n```cpp\nvector<long long> row(n, 1);\nfor (int r = 1; r < m; ++r)\n    for (int c = 1; c < n; ++c)\n        row[c] += row[c - 1];     // row[c] is still the row above; row[c-1]\n                                  // is already this row. Both correct.\ncout << row[n - 1] << '\\n';\n```\n\nThat in-place update is subtle and worth staring at: when we read `row[c]` it has not yet been updated this pass, so it holds `dp[r-1][c]`; `row[c-1]` *has* been updated, so it holds `dp[r][c-1]`. Exactly the two values needed. Left-to-right order is load-bearing — reverse it and the answer is wrong.\n\n## The closed form\n\nEvery path is a sequence of exactly `m-1` downs and `n-1` rights, in some order. So the count is the number of ways to choose which of the `m+n-2` moves are downs:\n\n```\nC(m + n - 2, m - 1)\n```\n\nFor `m = 3, n = 7`: `C(8, 2) = 28`. Computing it needs care to avoid overflow in the intermediate factorials — multiply and divide alternately rather than computing `(m+n-2)!` outright.\n\nThe DP is O(m·n) = 10000 operations here, so the combinatorial shortcut buys nothing. It is worth knowing because it generalises badly — add a single obstacle to the grid and the formula collapses while the DP needs one extra line.\n\n## Edge cases\n\n`m = 1` or `n = 1` gives exactly 1 path. The all-ones initialisation handles it: the loops never execute.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Table | O(m·n) | O(m·n) |\n| Rolled | O(m·n) | O(n) |\n| Combinatorics | O(min(m,n)) | O(1) |",
     "testCases": [
-      { "visibility": "sample", "input": "3 7\n", "expectedOutput": "28" },
-      { "visibility": "sample", "input": "3 2\n", "expectedOutput": "3" },
-      { "visibility": "hidden", "input": "1 1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1 10\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "10 1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "2 2\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "7 3\n", "expectedOutput": "28" }
+      {
+        "visibility": "sample",
+        "input": "3 7\n",
+        "expectedOutput": "28"
+      },
+      {
+        "visibility": "sample",
+        "input": "3 2\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 10\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "10 1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 2\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "7 3\n",
+        "expectedOutput": "28"
+      }
     ]
   },
   {
@@ -171,8 +418,19 @@
     "difficulty": "medium",
     "sortOrder": 270,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["graph traversal", "flood fill", "bfs", "dfs"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "graph traversal",
+      "flood fill",
+      "bfs",
+      "dfs"
+    ],
     "sourceUrl": "https://leetcode.com/problems/number-of-islands/",
     "sourceName": "LeetCode 200",
     "statement": "You are given a grid of `1` (land) and `0` (water). An island is a group of land cells connected **horizontally or vertically** — diagonals do not connect.\n\nPrint the number of islands.\n\n## Input\n\nThe first line holds `rows` and `cols`. The next `rows` lines each hold a string of `cols` characters, each `0` or `1`.\n\n## Output\n\nThe number of islands.\n\n## Example\n\n```\nInput:\n4 5\n11000\n11000\n00100\n00011\n\nOutput:\n3\n```\n\nThe top-left 2x2 block, the single cell in the middle, and the pair at the bottom right.",
@@ -180,13 +438,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<string> grid(rows);\n    for (string& row : grid) cin >> row;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The algorithm\n\nScan every cell. When you find unvisited land, increment the count and **flood fill** the whole connected region so it is never counted again. The count of flood fills is the number of islands.\n\nThe grid is an implicit graph: cells are vertices, and the four orthogonal steps are the edges. No adjacency list is needed.\n\n## Iterative flood fill — O(rows · cols)\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<string> grid(rows);\n    for (string& row : grid) cin >> row;\n\n    const int dr[] = {-1, 1, 0, 0};\n    const int dc[] = {0, 0, -1, 1};\n    int islands = 0;\n\n    for (int r = 0; r < rows; ++r) {\n        for (int c = 0; c < cols; ++c) {\n            if (grid[r][c] != '1') continue;\n            ++islands;\n\n            // 🛑 Iterative, not recursive. A 300x300 all-land grid is 90000\n            // cells deep; recursive DFS overflows the stack.\n            stack<pair<int, int>> st;\n            st.push({r, c});\n            grid[r][c] = '0';          // mark at PUSH time\n\n            while (!st.empty()) {\n                auto [cr, cc] = st.top();\n                st.pop();\n                for (int d = 0; d < 4; ++d) {\n                    int nr = cr + dr[d], nc = cc + dc[d];\n                    // Bounds BEFORE access. && short-circuits, so the order\n                    // is guaranteed — reversed, this reads out of range.\n                    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;\n                    if (grid[nr][nc] != '1') continue;\n                    grid[nr][nc] = '0';    // mark before pushing\n                    st.push({nr, nc});\n                }\n            }\n        }\n    }\n    cout << islands << '\\n';\n}\n```\n\n## Mark at push time, not pop time\n\nIf you mark only when popping, a cell reachable from two neighbours gets pushed twice. It is still *correct* — the `!= '1'` check catches it on the second pop — but the stack can grow to four times the region size, and on larger problems that is the difference between passing and a memory limit. Marking at push keeps each cell in the stack at most once.\n\n## Mutating the input as the visited marker\n\nOverwriting land with water uses O(1) extra space instead of a separate `visited` array. Legitimate here because the grid is not needed afterwards. If it were, use a `vector<vector<char>> seen` — destroying your input to save memory is a trade, not a free win.\n\n## The DSU alternative\n\nUnion every pair of adjacent land cells, then count distinct roots. O(rows · cols · α) — asymptotically the same, more code, and it shines only when the problem adds cells dynamically (\"number of islands II\"). Flood fill is the right answer here.\n\n## Pitfalls\n\n- **Recursive DFS on a large grid.** Stack overflow.\n- **Checking bounds after indexing.**\n- **Counting diagonals.** Four directions, not eight — the statement is explicit, and an eight-direction array silently merges islands.\n- **Forgetting to mark the start cell** before the loop, which would push it again from its own neighbour.\n\n## Complexity\n\nO(rows · cols) time — every cell is visited a constant number of times. O(rows · cols) worst-case stack space, for an all-land grid.",
     "testCases": [
-      { "visibility": "sample", "input": "4 5\n11000\n11000\n00100\n00011\n", "expectedOutput": "3" },
-      { "visibility": "sample", "input": "4 5\n11110\n11010\n11000\n00000\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1 1\n0\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1 1\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "2 2\n10\n01\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "3 3\n101\n010\n101\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "2 3\n111\n111\n", "expectedOutput": "1" }
+      {
+        "visibility": "sample",
+        "input": "4 5\n11000\n11000\n00100\n00011\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "sample",
+        "input": "4 5\n11110\n11010\n11000\n00000\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n0\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 2\n10\n01\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 3\n101\n010\n101\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 3\n111\n111\n",
+        "expectedOutput": "1"
+      }
     ]
   },
   {
@@ -195,8 +481,18 @@
     "difficulty": "medium",
     "sortOrder": 280,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["topological sort", "graph traversal", "cycle detection"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "topological sort",
+      "graph traversal",
+      "cycle detection"
+    ],
     "sourceUrl": "https://leetcode.com/problems/course-schedule/",
     "sourceName": "LeetCode 207",
     "statement": "There are `n` courses numbered `0` to `n-1`, and `m` prerequisite pairs. A pair `a b` means course `b` must be taken before course `a`.\n\nDecide whether it is possible to take all `n` courses.\n\n## Input\n\nThe first line holds `n` and `m`. The next `m` lines each hold a pair `a b`, meaning `b` must precede `a`.\n\n## Output\n\n`true` if all courses can be completed, otherwise `false`.\n\n## Example\n\n```\nInput:\n2 1\n1 0\n\nOutput:\ntrue\n```\n\nTake course 0, then course 1. With the extra pair `0 1` the two courses would require each other and the answer would be `false`.",
@@ -204,12 +500,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, m;\n    cin >> n >> m;\n    vector<vector<int>> adj(n);\n    vector<int> in_degree(n, 0);\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;        // b must come before a\n        adj[b].push_back(a);\n        ++in_degree[a];\n    }\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## Restating it as a graph question\n\nDraw an edge from each prerequisite to the course that needs it. All courses are completable exactly when this directed graph has **no cycle** — a cycle means a set of courses that each require another in the set, so none can be first.\n\nSo the question is: is this a DAG?\n\n## Kahn's algorithm — O(n + m)\n\nRepeatedly take a course with no outstanding prerequisites. If you can take all `n` this way, there was no cycle.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, m;\n    cin >> n >> m;\n\n    vector<vector<int>> adj(n);\n    vector<int> in_degree(n, 0);\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;\n        adj[b].push_back(a);     // b -> a: b unlocks a\n        ++in_degree[a];\n    }\n\n    queue<int> ready;\n    for (int v = 0; v < n; ++v)\n        if (in_degree[v] == 0) ready.push(v);   // nothing blocks these\n\n    int taken = 0;\n    while (!ready.empty()) {\n        int u = ready.front();\n        ready.pop();\n        ++taken;\n        for (int v : adj[u])\n            if (--in_degree[v] == 0) ready.push(v);   // last blocker gone\n    }\n\n    // Anything left never reached in-degree 0, so it sits in a cycle.\n    cout << (taken == n ? \"true\" : \"false\") << '\\n';\n}\n```\n\n## Why `taken == n` detects a cycle\n\nEvery vertex in a cycle has at least one incoming edge from another cycle member, which is itself never removed. So no cycle member ever reaches in-degree 0, and the count falls short. The shortfall *is* the cycle detection — no separate pass needed.\n\n## The DFS alternative — three states\n\n```cpp\n// 0 = unvisited, 1 = on the current path, 2 = fully explored\nvector<int> state(n, 0);\nfunction<bool(int)> has_cycle = [&](int u) {\n    state[u] = 1;\n    for (int v : adj[u]) {\n        if (state[v] == 1) return true;            // back edge -> cycle\n        if (state[v] == 0 && has_cycle(v)) return true;\n        // state[v] == 2 is fine: already explored and acyclic.\n    }\n    state[u] = 2;\n    return false;\n};\n```\n\n**Two states are not enough.** With a plain `visited` flag, a vertex legitimately reachable by two different paths — a diamond `0->1->3`, `0->2->3` — is reported as a cycle. The third state distinguishes \"on the current path\" from \"finished and clean\", and that distinction is the entire algorithm.\n\nNote this version is recursive; at `n = 2000` the depth is fine, but on a 10^5-vertex chain it would overflow. Kahn's has no such limit, which is one reason to prefer it.\n\n## Direction of the edges\n\nThe pair `a b` means \"b before a\", so the edge runs `b -> a`. Reversing it gives a graph whose cycles are the same — so this problem still answers correctly — but the *topological order* you would print is reversed. The sibling problem \"course schedule II\" asks for the order, and there the direction matters.\n\n## Duplicate pairs\n\nThe constraints permit them. Kahn's handles them naturally: a duplicate raises the in-degree twice and is decremented twice. No deduplication needed.\n\n## Complexity\n\nO(n + m) time and space, for both approaches.",
     "testCases": [
-      { "visibility": "sample", "input": "2 1\n1 0\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "2 2\n1 0\n0 1\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1 0\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "4 4\n1 0\n2 0\n3 1\n3 2\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "3 3\n0 1\n1 2\n2 0\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "5 4\n1 0\n2 1\n3 2\n4 3\n", "expectedOutput": "true" }
+      {
+        "visibility": "sample",
+        "input": "2 1\n1 0\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "2 2\n1 0\n0 1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 0\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4 4\n1 0\n2 0\n3 1\n3 2\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 3\n0 1\n1 2\n2 0\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5 4\n1 0\n2 1\n3 2\n4 3\n",
+        "expectedOutput": "true"
+      }
     ]
   },
   {
@@ -218,8 +538,17 @@
     "difficulty": "medium",
     "sortOrder": 290,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["intervals", "sorting"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "intervals",
+      "sorting"
+    ],
     "sourceUrl": "https://leetcode.com/problems/merge-intervals/",
     "sourceName": "LeetCode 56",
     "statement": "Given `n` closed intervals, merge every group that overlaps or merely touches, and print the result in ascending order of start.\n\nIntervals `[1, 4]` and `[4, 5]` touch at 4 and merge into `[1, 5]`.\n\n## Input\n\nThe first line holds `n`. The next `n` lines each hold two integers `l` and `r`.\n\n## Output\n\nOne merged interval per line, as `l r`, in ascending order of start.\n\n## Example\n\n```\nInput:\n4\n1 3\n2 6\n8 10\n15 18\n\nOutput:\n1 6\n8 10\n15 18\n```",
@@ -227,12 +556,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<pair<long long, long long>> intervals(n);\n    for (auto& [l, r] : intervals) cin >> l >> r;\n\n    // Print one interval per line as \"l r\".\n\n    return 0;\n}\n",
     "editorial": "## Sort by start, then one pass\n\nSorting is what makes this linear afterwards: once intervals are in ascending order of start, **any overlap must be with the most recently merged interval.** Nothing earlier can reach forward past it. That single fact turns an all-pairs comparison into one sweep.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<pair<long long, long long>> intervals(n);\n    for (auto& [l, r] : intervals) cin >> l >> r;\n\n    // Sorting pairs compares .first then .second — exactly \"by start, then\n    // by end\", which is what we want.\n    sort(intervals.begin(), intervals.end());\n\n    vector<pair<long long, long long>> merged;\n    for (auto [start, end] : intervals) {\n        // `<=` merges touching intervals too: [1,4] and [4,5] become [1,5].\n        // Use `<` if the problem treats touching as separate — read it.\n        if (!merged.empty() && start <= merged.back().second) {\n            // 🛑 max(), not assignment. [1,10] followed by [2,3] must stay\n            // [1,10]; writing `= end` would shrink it to [1,3].\n            merged.back().second = max(merged.back().second, end);\n        } else {\n            merged.push_back({start, end});\n        }\n    }\n\n    for (auto [l, r] : merged) cout << l << ' ' << r << '\\n';\n}\n```\n\n## The two details that decide correctness\n\n**`max` when extending.** A fully-contained interval must not shrink the one containing it. Test it with `1 10` then `2 3` — the expected output is a single `1 10`.\n\n**`<=` versus `<`.** This problem merges touching intervals, so `<=`. The same template with `<` solves the variant where `[1,4]` and `[4,5]` stay separate. Nothing in the code tells you which; only the statement does.\n\n## Why not merge in place\n\nTempting, but an in-place merge needs to shift elements, which is O(n) per merge. Building a separate output vector is O(n) total and much clearer. The output is at most as long as the input, so the memory is not a concern.\n\n## The family of interval problems\n\nAll of them are \"sort, then sweep\"; only the sort key and the sweep differ:\n\n| Problem | Sort by | Sweep |\n|---|---|---|\n| Merge intervals | start | Extend the last merged |\n| Insert interval | start | Three phases: before, merge, after |\n| Non-overlapping intervals (max keep) | **end** | Greedy take if `start >= last_end` |\n| Meeting rooms II (max simultaneous) | — | Sweep line with ±1 events |\n\nSorting by start when the greedy needs end is the classic wrong answer — see the intervals lesson for why earliest-finish is the safe greedy.\n\n## Complexity\n\nO(n log n) time, dominated entirely by the sort. O(n) space for the output.",
     "testCases": [
-      { "visibility": "sample", "input": "4\n1 3\n2 6\n8 10\n15 18\n", "expectedOutput": "1 6\n8 10\n15 18" },
-      { "visibility": "sample", "input": "2\n1 4\n4 5\n", "expectedOutput": "1 5" },
-      { "visibility": "hidden", "input": "1\n5 7\n", "expectedOutput": "5 7" },
-      { "visibility": "hidden", "input": "2\n1 10\n2 3\n", "expectedOutput": "1 10" },
-      { "visibility": "hidden", "input": "3\n5 6\n1 2\n3 4\n", "expectedOutput": "1 2\n3 4\n5 6" },
-      { "visibility": "hidden", "input": "3\n1 4\n0 4\n2 3\n", "expectedOutput": "0 4" }
+      {
+        "visibility": "sample",
+        "input": "4\n1 3\n2 6\n8 10\n15 18\n",
+        "expectedOutput": "1 6\n8 10\n15 18"
+      },
+      {
+        "visibility": "sample",
+        "input": "2\n1 4\n4 5\n",
+        "expectedOutput": "1 5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n5 7\n",
+        "expectedOutput": "5 7"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 10\n2 3\n",
+        "expectedOutput": "1 10"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n5 6\n1 2\n3 4\n",
+        "expectedOutput": "1 2\n3 4\n5 6"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n1 4\n0 4\n2 3\n",
+        "expectedOutput": "0 4"
+      }
     ]
   },
   {
@@ -241,8 +594,17 @@
     "difficulty": "medium",
     "sortOrder": 300,
     "status": "published",
-    "sheets": ["neetcode150", "neetcode250"],
-    "patterns": ["intervals", "sweep line", "heap"],
+    "sheets": [
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "intervals",
+      "sweep line",
+      "heap"
+    ],
     "sourceUrl": "https://leetcode.com/problems/meeting-rooms-ii/",
     "sourceName": "LeetCode 253",
     "statement": "Given `n` meetings with a start and an end time, print the minimum number of rooms needed so that no two meetings share a room at the same moment.\n\nA meeting ending exactly when another begins does **not** need a second room.\n\n## Input\n\nThe first line holds `n`. The next `n` lines each hold `start` and `end`.\n\n## Output\n\nThe minimum number of rooms.\n\n## Example\n\n```\nInput:\n3\n0 30\n5 10\n15 20\n\nOutput:\n2\n```\n\nThe meeting `0 30` overlaps both others, but `5 10` and `15 20` do not overlap each other, so two rooms suffice.",
@@ -250,12 +612,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<pair<long long, long long>> meetings(n);\n    for (auto& [s, e] : meetings) cin >> s >> e;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Restating it\n\nThe minimum number of rooms equals the **maximum number of meetings happening simultaneously**. Once you see that, the problem stops being about scheduling and becomes about counting overlaps.\n\n## Approach A: sweep line — O(n log n)\n\nTurn each meeting into two events: `+1` at its start, `-1` at its end. Sort all events by time and track the running total; its maximum is the answer.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    vector<pair<long long, int>> events;\n    events.reserve(n * 2);\n    for (int i = 0; i < n; ++i) {\n        long long s, e;\n        cin >> s >> e;\n        events.push_back({s, +1});\n        events.push_back({e, -1});\n    }\n\n    // 🛑 The tie-break is the whole correctness argument. Sorting pairs\n    // compares .second when times are equal, and -1 < +1 — so an END is\n    // processed before a START at the same instant. That is exactly what\n    // makes a meeting ending at 10 free the room for one starting at 10.\n    sort(events.begin(), events.end());\n\n    int current = 0, best = 0;\n    for (auto [time, delta] : events) {\n        current += delta;\n        best = max(best, current);\n    }\n    cout << best << '\\n';\n}\n```\n\nThe tie-break falls out of `pair`'s lexicographic comparison rather than needing a custom comparator — a small piece of luck worth noticing, and worth making explicit with a comment because it is otherwise invisible.\n\n## Approach B: a min-heap of end times — O(n log n)\n\nSort meetings by start. Keep a min-heap of the end times of rooms currently in use. For each meeting, free every room that has finished, then allocate one.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<pair<long long, long long>> meetings(n);\n    for (auto& [s, e] : meetings) cin >> s >> e;\n\n    sort(meetings.begin(), meetings.end());        // by start time\n\n    // Min-heap: the root is the room that frees up soonest, which is the only\n    // one worth checking. The greater<> incantation makes it a min-heap.\n    priority_queue<long long, vector<long long>, greater<long long>> busy;\n\n    size_t best = 0;\n    for (auto [start, end] : meetings) {\n        // `<=` because a meeting ending exactly at `start` frees its room.\n        while (!busy.empty() && busy.top() <= start) busy.pop();\n        busy.push(end);\n        best = max(best, busy.size());\n    }\n    cout << best << '\\n';\n}\n```\n\nThis version answers a slightly richer question — it also tells you *which* room each meeting goes in — at the cost of being a little longer.\n\n## Why a min-heap and not a max-heap\n\nThe only room that could possibly be free is the one finishing earliest. If that one is still busy, every other is too. A max-heap would hand you the room finishing *last*, which tells you nothing useful.\n\n## Pitfalls\n\n- **`<` instead of `<=`** at the boundary. On `7 10` and `10 12` the answer is 1; with `<` you get 2. The statement is explicit about touching meetings — read it, because both conventions appear in different problems.\n- **Sorting by end time** and trying the earliest-finish greedy. That answers a different question (the maximum number of non-overlapping meetings), not the room count.\n- **A max-heap.**\n- **Scanning all pairs** for overlap: O(n²), too slow at 10^5.\n\n## Complexity\n\nBoth approaches are O(n log n) time and O(n) space, dominated by the sort.",
     "testCases": [
-      { "visibility": "sample", "input": "3\n0 30\n5 10\n15 20\n", "expectedOutput": "2" },
-      { "visibility": "sample", "input": "2\n7 10\n2 4\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1\n0 1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "2\n7 10\n10 12\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "3\n1 10\n2 7\n3 19\n", "expectedOutput": "3" },
-      { "visibility": "hidden", "input": "4\n1 2\n2 3\n3 4\n4 5\n", "expectedOutput": "1" }
+      {
+        "visibility": "sample",
+        "input": "3\n0 30\n5 10\n15 20\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "sample",
+        "input": "2\n7 10\n2 4\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n0 1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n7 10\n10 12\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n1 10\n2 7\n3 19\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\n1 2\n2 3\n3 4\n4 5\n",
+        "expectedOutput": "1"
+      }
     ]
   },
   {
@@ -264,8 +650,17 @@
     "difficulty": "medium",
     "sortOrder": 310,
     "status": "published",
-    "sheets": ["neetcode150", "neetcode250"],
-    "patterns": ["heap", "sorting", "quickselect"],
+    "sheets": [
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "heap",
+      "sorting",
+      "quickselect"
+    ],
     "sourceUrl": "https://leetcode.com/problems/kth-largest-element-in-an-array/",
     "sourceName": "LeetCode 215",
     "statement": "Given `n` integers and a value `k`, print the `k`-th largest value in **sorted order** — not the `k`-th distinct value.\n\nIn `3 2 3 1 2 4 5 5 6` the sorted-descending order is `6 5 5 4 3 3 2 2 1`, so the 4th largest is `4`.\n\n## Input\n\nThe first line holds `n` and `k`. The second line holds `n` integers.\n\n## Output\n\nThe `k`-th largest value.\n\n## Example\n\n```\nInput:\n6 2\n3 2 1 5 6 4\n\nOutput:\n5\n```",
@@ -273,13 +668,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, k;\n    cin >> n >> k;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Note the wording\n\n\"`k`-th largest in sorted order\" counts duplicates. In `5 5 4`, the 2nd largest is `5`, not `4`. Solutions that deduplicate first answer a different question — and the sample passes either way, which is why this catches people.\n\n## Approach A: sort — O(n log n)\n\n```cpp\nsort(a.begin(), a.end(), greater<int>());\ncout << a[k - 1] << '\\n';\n```\n\nTwo lines. At `n = 100000` it runs in well under the limit. **Write this first** — it is correct, and it is the reference for anything cleverer.\n\n## Approach B: nth_element — O(n) average\n\nThe standard library already has selection, and it is the right answer in a contest:\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, k;\n    cin >> n >> k;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n\n    // Partially orders the range so that the element at position k-1 is the\n    // one that would be there in a full sort. Everything before it is >= it\n    // under this comparator, everything after is <=. O(n) average.\n    nth_element(a.begin(), a.begin() + (k - 1), a.end(), greater<int>());\n    cout << a[k - 1] << '\\n';\n}\n```\n\nOne call, linear average time, and it does less work than a full sort because it only recurses into the half containing the target.\n\n## Approach C: a min-heap of size k — O(n log k)\n\nThe one to reach for when `k` is small or the data arrives as a stream you cannot store.\n\n```cpp\npriority_queue<int, vector<int>, greater<int>> keep;   // MIN-heap\nfor (int i = 0; i < n; ++i) {\n    int x;\n    cin >> x;\n    keep.push(x);\n    if ((int)keep.size() > k) keep.pop();    // evict the weakest\n}\ncout << keep.top() << '\\n';                  // the k-th largest\n```\n\nThe counter-intuitive part, worth stating plainly: to keep the `k` **largest** elements you use a **min**-heap. Its root is the smallest of the current best `k`, which is exactly the element to discard when a better one arrives. At the end, that root is the `k`-th largest.\n\nMemory is O(k) rather than O(n) — so this works on 10^9 streamed values with `k = 10`, which neither sorting nor `nth_element` can do.\n\n## Approach D: quickselect by hand\n\nPartition like quicksort, but recurse only into the side containing position `k-1`. O(n) average, O(n²) worst case on adversarial input — which is why `nth_element` (typically introselect, with a fallback to guarantee O(n)) is the better choice. Worth implementing once for understanding; not worth writing under time pressure.\n\n## Which to use\n\n| | Time | Space | When |\n|---|---|---|---|\n| Sort | O(n log n) | O(1) | Default. Shortest correct answer |\n| `nth_element` | O(n) average | O(1) | One line, strictly better than sorting |\n| Min-heap of k | O(n log k) | **O(k)** | `k` much smaller than `n`, or streaming |\n| Quickselect | O(n) avg, O(n²) worst | O(1) | Learning exercise |\n\n## Pitfalls\n\n- **Deduplicating first.** Different question.\n- **`a[k]` instead of `a[k-1]`.** `k` is 1-based, indices are 0-based.\n- **A max-heap for the k largest.**\n- **`top()` after the final `pop()`.** Check the order of operations.",
     "testCases": [
-      { "visibility": "sample", "input": "6 2\n3 2 1 5 6 4\n", "expectedOutput": "5" },
-      { "visibility": "sample", "input": "9 4\n3 2 3 1 2 4 5 5 6\n", "expectedOutput": "4" },
-      { "visibility": "hidden", "input": "1 1\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "3 2\n5 5 4\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "5 5\n1 2 3 4 5\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "5 1\n1 2 3 4 5\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "4 3\n-1 -2 -3 -4\n", "expectedOutput": "-3" }
+      {
+        "visibility": "sample",
+        "input": "6 2\n3 2 1 5 6 4\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "sample",
+        "input": "9 4\n3 2 3 1 2 4 5 5 6\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 2\n5 5 4\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5 5\n1 2 3 4 5\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5 1\n1 2 3 4 5\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4 3\n-1 -2 -3 -4\n",
+        "expectedOutput": "-3"
+      }
     ]
   },
   {
@@ -288,8 +711,17 @@
     "difficulty": "easy",
     "sortOrder": 320,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["bit manipulation", "xor"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "bit manipulation",
+      "xor"
+    ],
     "sourceUrl": "https://leetcode.com/problems/single-number/",
     "sourceName": "LeetCode 136",
     "statement": "Every value in a list of `n` integers appears exactly twice, except one which appears once. Print that value.\n\nSolve it in O(n) time using O(1) extra space.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` integers.\n\n## Output\n\nThe value that appears exactly once.\n\n## Example\n\n```\nInput:\n5\n4 1 2 1 2\n\nOutput:\n4\n```",
@@ -297,12 +729,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The three properties of XOR\n\n1. `x ^ x == 0` — a value cancels itself.\n2. `x ^ 0 == x` — zero is the identity.\n3. XOR is commutative and associative — **order does not matter**.\n\nPut together: XOR everything. Each pair cancels to 0 regardless of where the two copies sit in the list, and the lone value survives.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    int single = 0;                  // 0 is XOR's identity\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        single ^= x;\n    }\n    cout << single << '\\n';\n}\n```\n\nThree lines, one pass, no extra memory. Property 3 is what makes it work on *unsorted* input — a sorted-pairs argument would be weaker.\n\n## Why the alternatives are worse\n\n| Approach | Time | Space | Problem |\n|---|---|---|---|\n| Hash set: insert, erase on re-see | O(n) | **O(n)** | Violates the O(1) space requirement |\n| Sort, then check adjacent pairs | O(n log n) | O(1) | Slower, and mutates the input |\n| Sum of distinct × 2 − total sum | O(n) | O(n) | Needs the distinct set; can overflow |\n| **XOR** | **O(n)** | **O(1)** | — |\n\n## Negative numbers are fine\n\nXOR operates on the bit pattern, and two's-complement representations cancel exactly as positives do. `-3 ^ -3 == 0`. No special case.\n\n## What this does *not* solve\n\nThe technique is specific to pairs. If every value appeared **three** times except one, XOR would not cancel — you would count each bit modulo 3 instead:\n\n```cpp\n// Every value appears 3 times except one. Count set bits per position mod 3.\nint single_of_triples(const vector<int>& a) {\n    int result = 0;\n    for (int bit = 0; bit < 32; ++bit) {\n        int count = 0;\n        for (int x : a) count += (x >> bit) & 1;\n        if (count % 3) result |= (1 << bit);\n    }\n    return result;\n}\n```\n\nAnd if **two** values appeared once, the total XOR gives `a ^ b`; its lowest set bit is a position where `a` and `b` differ, which partitions the list into two groups each with a single unpaired value.\n\nRecognising that the XOR trick depends on the multiplicity being exactly 2 is more valuable than memorising the trick.\n\n## Pitfalls\n\n- **Initialising the accumulator to `a[0]`** and then XORing from index 0 again — that cancels the first element out. Start at 0, or start at `a[0]` and loop from index 1.\n- **Using `+` instead of `^`.** Summing does not cancel.\n- **Assuming the input is sorted.** It is not, and the algorithm does not care.",
     "testCases": [
-      { "visibility": "sample", "input": "5\n4 1 2 1 2\n", "expectedOutput": "4" },
-      { "visibility": "sample", "input": "3\n2 2 1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1\n0\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "5\n-3 7 7 -9 -9\n", "expectedOutput": "-3" },
-      { "visibility": "hidden", "input": "7\n1 1 2 2 3 3 99\n", "expectedOutput": "99" }
+      {
+        "visibility": "sample",
+        "input": "5\n4 1 2 1 2\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "sample",
+        "input": "3\n2 2 1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n0\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n-3 7 7 -9 -9\n",
+        "expectedOutput": "-3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "7\n1 1 2 2 3 3 99\n",
+        "expectedOutput": "99"
+      }
     ]
   },
   {
@@ -311,8 +767,17 @@
     "difficulty": "easy",
     "sortOrder": 330,
     "status": "published",
-    "sheets": ["neetcode150", "neetcode250"],
-    "patterns": ["bit manipulation", "math", "xor"],
+    "sheets": [
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "bit manipulation",
+      "math",
+      "xor"
+    ],
     "sourceUrl": "https://leetcode.com/problems/missing-number/",
     "sourceName": "LeetCode 268",
     "statement": "You are given `n` distinct integers drawn from the range `0` to `n` inclusive. Exactly one value from that range is missing. Print it.\n\nSolve it in O(n) time using O(1) extra space.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` distinct integers, each between `0` and `n`.\n\n## Output\n\nThe missing value.\n\n## Example\n\n```\nInput:\n3\n3 0 1\n\nOutput:\n2\n```\n\nThe range is `0 1 2 3` and `2` is absent.",
@@ -320,13 +785,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Approach A: Gauss's sum — O(n) time, O(1) space\n\nThe full range `0..n` sums to `n(n+1)/2`. Subtract what is actually present and the difference is the missing value.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    long long n;\n    cin >> n;\n\n    // 🛑 64-bit arithmetic. At n = 100000 the expected sum is about 5*10^9,\n    // which overflows a 32-bit int. `n * (n + 1) / 2` in int is the classic\n    // wrong answer here — see the constraints lesson on 1LL.\n    long long expected = n * (n + 1) / 2;\n    long long actual = 0;\n    for (long long i = 0; i < n; ++i) {\n        long long x;\n        cin >> x;\n        actual += x;\n    }\n    cout << expected - actual << '\\n';\n}\n```\n\nThe `/ 2` is exact without floating point because `n(n+1)` is always even — one of two consecutive integers is.\n\n## Approach B: XOR — no overflow at all\n\nXOR every index `0..n` together with every value present. Each number that *is* present appears twice and cancels; the missing one appears once, from the index side only.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    // Seed with n: the loop below covers indices 0..n-1, so n itself must be\n    // folded in separately to represent the full 0..n range.\n    int result = n;\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        result ^= i ^ x;\n    }\n    cout << result << '\\n';\n}\n```\n\nThis is the better answer. It cannot overflow — XOR never produces a value outside the bit width — so the whole category of bug that Approach A has to guard against simply does not arise.\n\n## Why `result` starts at `n`\n\nThe range is `0..n`, which has `n+1` values, but the loop only runs `n` times and so only generates indices `0..n-1`. Seeding with `n` supplies the last one. Starting at 0 instead gives a wrong answer whenever the missing number is not `n` — and happens to be right when it is, which makes it an easy bug to miss.\n\n## Dry run on `3 0 1` with n = 3\n\n| i | x | i ^ x | result |\n|---|---|---|---|\n| start | | | 3 |\n| 0 | 3 | 3 | 0 |\n| 1 | 0 | 1 | 1 |\n| 2 | 1 | 3 | 2 |\n\nAnswer 2.\n\n## The alternatives\n\n| Approach | Time | Space | Note |\n|---|---|---|---|\n| Sort and scan | O(n log n) | O(1) | Slower; mutates input |\n| Hash set | O(n) | **O(n)** | Breaks the space requirement |\n| Gauss sum | O(n) | O(1) | Needs 64-bit care |\n| **XOR** | **O(n)** | **O(1)** | No overflow possible |\n\n## Pitfalls\n\n- **32-bit overflow** in the sum version.\n- **Seeding the XOR with 0** instead of `n`.\n- **Assuming sorted input.** Neither approach needs it.\n- **Edge case `n = 1`:** the input is either `0` (missing 1) or `1` (missing 0). Both fall out of the formulas with no special case — check them.",
     "testCases": [
-      { "visibility": "sample", "input": "3\n3 0 1\n", "expectedOutput": "2" },
-      { "visibility": "sample", "input": "9\n9 6 4 2 3 5 7 0 1\n", "expectedOutput": "8" },
-      { "visibility": "hidden", "input": "1\n0\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1\n1\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "2\n0 1\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "2\n2 0\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "4\n0 1 2 3\n", "expectedOutput": "4" }
+      {
+        "visibility": "sample",
+        "input": "3\n3 0 1\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "sample",
+        "input": "9\n9 6 4 2 3 5 7 0 1\n",
+        "expectedOutput": "8"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n0\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n1\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n0 1\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n2 0\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\n0 1 2 3\n",
+        "expectedOutput": "4"
+      }
     ]
   },
   {
@@ -335,8 +828,16 @@
     "difficulty": "easy",
     "sortOrder": 340,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["bit manipulation"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "bit manipulation"
+    ],
     "sourceUrl": "https://leetcode.com/problems/number-of-1-bits/",
     "sourceName": "LeetCode 191",
     "statement": "Given a non-negative integer, print how many bits are set to 1 in its binary representation. This count is called the **Hamming weight** or **population count**.\n\n## Input\n\nOne line holding a single non-negative integer.\n\n## Output\n\nThe number of set bits.\n\n## Example\n\n```\nInput:\n11\n\nOutput:\n3\n```\n\n11 in binary is `1011`, which has three 1 bits.",
@@ -344,13 +845,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // unsigned: the input can exceed INT_MAX, and bit operations on signed\n    // negatives are implementation-defined.\n    unsigned long long value;\n    cin >> value;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Approach A: check every bit — O(32)\n\n```cpp\nint count = 0;\nfor (int i = 0; i < 32; ++i)\n    if ((value >> i) & 1) ++count;\n```\n\nAlways 32 iterations regardless of the input.\n\n## Approach B: clear the lowest set bit — O(number of set bits)\n\nThe trick worth memorising: **`v & (v - 1)` clears the lowest set bit.**\n\nWhy: subtracting 1 flips the lowest set bit to 0 and turns every bit below it to 1. ANDing with the original keeps only the bits above, so exactly one 1 bit disappears per iteration.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    unsigned long long value;\n    cin >> value;\n\n    int count = 0;\n    while (value) {\n        value &= value - 1;        // clears exactly one set bit\n        ++count;\n    }\n    cout << count << '\\n';\n}\n```\n\nFor `11 = 1011`: `1011 -> 1010 -> 1000 -> 0000`. Three iterations, three set bits. On a sparse number like `2^31` this is one iteration instead of 32.\n\n## Approach C: the built-in\n\n```cpp\ncout << __builtin_popcountll(value) << '\\n';\n```\n\nCompiles to a single `popcnt` instruction on hardware that has one. Use `__builtin_popcount` for `unsigned int` and `__builtin_popcountll` for `unsigned long long` — passing a 64-bit value to the 32-bit version silently truncates and gives a wrong answer for large inputs.\n\nC++20 also offers `std::popcount` from `<bit>`, which is the portable spelling.\n\n## Why unsigned\n\nTwo reasons, both real:\n\n1. The constraint allows values up to `4294967295`, which exceeds `INT_MAX`. Reading into a signed `int` fails.\n2. Right-shifting a negative signed value is implementation-defined — it may sign-extend, so `>> i` never empties and a `while (value)` loop never terminates. Bit manipulation should use unsigned types by default.\n\n## The related tricks\n\n| Expression | Effect |\n|---|---|\n| `v & -v` | Isolate the lowest set bit |\n| `v & (v - 1)` | Clear the lowest set bit |\n| `v` bitwise-or `(v + 1)` | Set the lowest clear bit |\n| `v && !(v & (v - 1))` | Is `v` a power of two? |\n| `__builtin_ctz(v)` | Index of the lowest set bit — **undefined for 0** |\n\nThe power-of-two test follows directly: a power of two has exactly one set bit, so clearing it leaves zero. The `v &&` guards against 0, which has no set bits and is not a power of two.\n\n## Edge cases\n\n- `0` must print `0`. The `while` loop never runs.\n- `4294967295` is all 32 bits set, so the answer is `32` — and this is the case that catches a signed `int` read.\n\n## Complexity\n\nO(number of set bits) for Approach B, which is at most 32. O(1) space.",
     "testCases": [
-      { "visibility": "sample", "input": "11\n", "expectedOutput": "3" },
-      { "visibility": "sample", "input": "128\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "0\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "7\n", "expectedOutput": "3" },
-      { "visibility": "hidden", "input": "4294967293\n", "expectedOutput": "31" },
-      { "visibility": "hidden", "input": "4294967295\n", "expectedOutput": "32" }
+      {
+        "visibility": "sample",
+        "input": "11\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "sample",
+        "input": "128\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "0\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "7\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4294967293\n",
+        "expectedOutput": "31"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4294967295\n",
+        "expectedOutput": "32"
+      }
     ]
   }
 ]

@@ -5,8 +5,18 @@
     "difficulty": "easy",
     "sortOrder": 500,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "dfs", "recursion"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "dfs",
+      "recursion"
+    ],
     "sourceUrl": "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
     "sourceName": "LeetCode 104",
     "statement": "Print the maximum depth of a binary tree — the number of nodes on the longest path from the root down to a leaf. An empty tree has depth 0.\n\n## Input\n\nOne line of space-separated tokens in **level order**, where `null` marks a missing child. The line may be empty for an empty tree.\n\nSo `3 9 20 null null 15 7` describes:\n\n```\n    3\n   / \\\n  9  20\n    /  \\\n   15   7\n```\n\n## Output\n\nA single integer: the maximum depth.\n\n## Example\n\n```\nInput:\n3 9 20 null null 15 7\n\nOutput:\n3\n```",
@@ -14,12 +24,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\n/**\n * Build a tree from level-order tokens with \"null\" for missing children.\n * Provided so you can focus on the algorithm rather than the parsing.\n */\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* root = read_tree();\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The recursion writes itself\n\nA node's depth is 1 plus the deeper of its two subtrees. An empty subtree has depth 0, which is the base case.\n\n```cpp\nint depth(TreeNode* node) {\n    if (!node) return 0;                 // base case: nothing here\n    return 1 + max(depth(node->left), depth(node->right));\n}\n```\n\nThis is a **post-order** traversal: the node's answer depends on its children's answers, so both children must be computed before the node can be. Recognising which traversal order a problem needs is most of tree work — see the traversals lesson.\n\n## The iterative version, and when you need it\n\nRecursion depth equals the tree's height. A degenerate tree — every node having only a left child — has height `n`, so at 10^4 nodes the recursive version is near the edge and at 10^5 it overflows. Level-order with a queue has no such limit:\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nint main() {\n    // ... read_tree() as given in the starter code ...\n    TreeNode* root = nullptr;   // replaced by read_tree() in your solution\n\n    int levels = 0;\n    if (root) {\n        queue<TreeNode*> q;\n        q.push(root);\n        while (!q.empty()) {\n            // Snapshot the size: the loop below pushes the NEXT level onto\n            // the same queue, and without this the level boundary is lost.\n            int width = (int)q.size();\n            for (int i = 0; i < width; ++i) {\n                TreeNode* node = q.front();\n                q.pop();\n                if (node->left) q.push(node->left);\n                if (node->right) q.push(node->right);\n            }\n            ++levels;\n        }\n    }\n    cout << levels << '\\n';\n}\n```\n\nThe number of level iterations *is* the depth. That `int width = (int)q.size();` is the line that separates a correct level-order traversal from one that merges every level into a single pass.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Recursive | O(n) | O(h) stack — O(n) worst case |\n| Iterative BFS | O(n) | O(w), the widest level |\n\nBoth visit every node once. The space differs by shape: BFS is worse on a bushy tree, recursion is worse on a skewed one.\n\n## Pitfalls\n\n- **Returning 0 for a single node.** One node is depth 1; the base case is the *null* child, not the leaf.\n- **Counting edges instead of nodes.** This problem counts nodes, so a single node is 1. The \"height\" convention that counts edges would give 0 — read the statement.\n- **Forgetting the empty tree.** Must print 0, and `if (root)` is what guards the BFS.",
     "testCases": [
-      { "visibility": "sample", "input": "3 9 20 null null 15 7\n", "expectedOutput": "3" },
-      { "visibility": "sample", "input": "1 null 2\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1 2 3 4 5\n", "expectedOutput": "3" },
-      { "visibility": "hidden", "input": "1 2 null 3 null 4\n", "expectedOutput": "4" }
+      {
+        "visibility": "sample",
+        "input": "3 9 20 null null 15 7\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "sample",
+        "input": "1 null 2\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2 3 4 5\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2 null 3 null 4\n",
+        "expectedOutput": "4"
+      }
     ]
   },
   {
@@ -28,8 +62,18 @@
     "difficulty": "easy",
     "sortOrder": 510,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "dfs", "recursion"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "dfs",
+      "recursion"
+    ],
     "sourceUrl": "https://leetcode.com/problems/same-tree/",
     "sourceName": "LeetCode 100",
     "statement": "Decide whether two binary trees are identical — the same structure **and** the same values at every corresponding position.\n\n## Input\n\nTwo lines, each a level-order description of one tree with `null` for missing children. A line may be empty for an empty tree.\n\n## Output\n\n`true` or `false`.\n\n## Example\n\n```\nInput:\n1 2 3\n1 2 3\n\nOutput:\ntrue\n```\n\nThe trees `1 2` and `1 null 2` are different: same values, different shape.",
@@ -37,13 +81,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* a = read_tree();\n    TreeNode* b = read_tree();\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## Four cases, in order\n\n```cpp\nbool same(TreeNode* a, TreeNode* b) {\n    if (!a && !b) return true;       // 1. both absent: identical\n    if (!a || !b) return false;      // 2. exactly one absent: shapes differ\n    if (a->val != b->val) return false;   // 3. values differ\n    return same(a->left, b->left)    // 4. recurse on both sides\n        && same(a->right, b->right);\n}\n```\n\nThe order matters. Case 1 must come before case 2, or two nulls would be reported as different. Case 2 must come before case 3, or `a->val` would dereference a null pointer.\n\nThat ordering is the whole problem, and it is worth noticing that the three checks form a complete decision: after them, both nodes exist and have equal values, so only the children remain in question.\n\n## Why structure matters, not just values\n\n`1 2` (a root with a left child) and `1 null 2` (a root with a right child) hold the same multiset of values and are not the same tree. Case 2 catches it: at the root's left position one tree has a node and the other has null.\n\nThis is also why comparing in-order traversals is **not** a valid shortcut — different shapes can produce the same traversal.\n\n## The `&&` is doing real work\n\n`&&` short-circuits, so once the left subtrees differ the right ones are never examined. On two large trees that differ near the root, this returns almost immediately.\n\n## The iterative version\n\nIf recursion depth is a concern, walk both trees in lockstep with one stack of pairs:\n\n```cpp\nbool same_iter(TreeNode* a, TreeNode* b) {\n    stack<pair<TreeNode*, TreeNode*>> st;\n    st.push({a, b});\n    while (!st.empty()) {\n        auto [x, y] = st.top();\n        st.pop();\n        if (!x && !y) continue;\n        if (!x || !y) return false;\n        if (x->val != y->val) return false;\n        st.push({x->left, y->left});\n        st.push({x->right, y->right});\n    }\n    return true;\n}\n```\n\nNote `continue` rather than `return true` when both are null — one matching pair of absent subtrees does not prove the whole trees match, only that this branch is fine. Writing `return true` there is a real bug that passes most tests.\n\n## Complexity\n\nO(min(n, m)) time — the traversal stops at the first difference. O(h) space for the stack or recursion.\n\n## Pitfalls\n\n- **Checking values before checking for null.** Segfault.\n- **`if (!a && !b) return false;`** — inverted base case.\n- **Comparing traversals** instead of walking in lockstep.\n- **`return true` instead of `continue`** in the iterative version.\n- **Only recursing on one side**, or writing `||` instead of `&&`.",
     "testCases": [
-      { "visibility": "sample", "input": "1 2 3\n1 2 3\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "1 2\n1 null 2\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "\n\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "1\n\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1 2 1\n1 1 2\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1\n1\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "1\n2\n", "expectedOutput": "false" }
+      {
+        "visibility": "sample",
+        "input": "1 2 3\n1 2 3\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "1 2\n1 null 2\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "\n\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2 1\n1 1 2\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n1\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n2\n",
+        "expectedOutput": "false"
+      }
     ]
   },
   {
@@ -52,8 +124,18 @@
     "difficulty": "easy",
     "sortOrder": 520,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "dfs", "recursion"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "dfs",
+      "recursion"
+    ],
     "sourceUrl": "https://leetcode.com/problems/invert-binary-tree/",
     "sourceName": "LeetCode 226",
     "statement": "Invert a binary tree — mirror it, so every node's left and right subtrees are swapped — then print it in level order.\n\n## Input\n\nOne line of level-order tokens with `null` for missing children. The line may be empty.\n\n## Output\n\nThe inverted tree in level order, with `null` for missing children, on one line separated by single spaces. **Trailing nulls are omitted**, so the output ends with a real value. Print an empty line for an empty tree.\n\n## Example\n\n```\nInput:\n4 2 7 1 3 6 9\n\nOutput:\n4 7 2 9 6 3 1\n```",
@@ -61,13 +143,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\n/** Level order with \"null\" placeholders, trailing nulls trimmed. */\nvoid print_tree(TreeNode* root) {\n    vector<string> out;\n    if (root) {\n        queue<TreeNode*> q;\n        q.push(root);\n        while (!q.empty()) {\n            TreeNode* node = q.front();\n            q.pop();\n            if (!node) { out.push_back(\"null\"); continue; }\n            out.push_back(to_string(node->val));\n            q.push(node->left);\n            q.push(node->right);\n        }\n        while (!out.empty() && out.back() == \"null\") out.pop_back();\n    }\n    for (size_t i = 0; i < out.size(); ++i) cout << out[i] << \" \\n\"[i + 1 == out.size()];\n    if (out.empty()) cout << '\\n';\n}\n\nint main() {\n    TreeNode* root = read_tree();\n\n    // Invert the tree, then call print_tree(root).\n\n    return 0;\n}\n",
     "editorial": "## Three lines\n\n```cpp\nTreeNode* invert(TreeNode* node) {\n    if (!node) return nullptr;\n    swap(node->left, node->right);      // swap the POINTERS at this node\n    invert(node->left);\n    invert(node->right);\n    return node;\n}\n```\n\nSwapping the two child pointers mirrors this node; recursing mirrors everything below. That is the whole algorithm.\n\nThis works as **pre-order** (swap, then recurse) or **post-order** (recurse, then swap) — both are correct, because the swap at a node is independent of what happens inside its subtrees. It is one of the few tree problems where the traversal order genuinely does not matter.\n\n## What must not be swapped\n\nSwap the **child pointers**, not the values. Swapping `node->left->val` with `node->right->val` only exchanges two numbers and leaves the structure untouched — so it gives the right answer on a perfect tree of depth 2 and the wrong one on anything deeper or asymmetric.\n\n## The iterative version\n\nAny traversal works; here it is with a queue:\n\n```cpp\nvoid invert_iter(TreeNode* root) {\n    if (!root) return;\n    queue<TreeNode*> q;\n    q.push(root);\n    while (!q.empty()) {\n        TreeNode* node = q.front();\n        q.pop();\n        swap(node->left, node->right);\n        if (node->left) q.push(node->left);\n        if (node->right) q.push(node->right);\n    }\n}\n```\n\nPush after the swap or before — either is fine, since the swap does not change *which* nodes are children, only their order.\n\n## Dry run on the sample\n\n```\n     4                  4\n   /   \\              /   \\\n  2     7     -->    7     2\n / \\   / \\          / \\   / \\\n1   3 6   9        9   6 3   1\n```\n\nLevel order of the result: `4 7 2 9 6 3 1`. Reading it off confirms the mirror: each level is reversed, which is what a full mirroring looks like on a perfect tree.\n\n## Complexity\n\nO(n) time — every node is visited once and does O(1) work. O(h) space recursively, O(w) iteratively.\n\n## Pitfalls\n\n- **Swapping values instead of pointers.**\n- **Forgetting the null base case**, which segfaults at the first leaf.\n- **Swapping only at the root.**\n- **Reversing each level of the level-order output** instead of inverting the tree. That produces the same string on a *perfect* tree and a different one otherwise — a good reminder to test asymmetric inputs like `1 2`.",
     "testCases": [
-      { "visibility": "sample", "input": "4 2 7 1 3 6 9\n", "expectedOutput": "4 7 2 9 6 3 1" },
-      { "visibility": "sample", "input": "2 1 3\n", "expectedOutput": "2 3 1" },
-      { "visibility": "hidden", "input": "\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "1 2\n", "expectedOutput": "1 null 2" },
-      { "visibility": "hidden", "input": "1 null 2\n", "expectedOutput": "1 2" },
-      { "visibility": "hidden", "input": "1 2 3 4\n", "expectedOutput": "1 3 2 null null null 4" }
+      {
+        "visibility": "sample",
+        "input": "4 2 7 1 3 6 9\n",
+        "expectedOutput": "4 7 2 9 6 3 1"
+      },
+      {
+        "visibility": "sample",
+        "input": "2 1 3\n",
+        "expectedOutput": "2 3 1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2\n",
+        "expectedOutput": "1 null 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 null 2\n",
+        "expectedOutput": "1 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2 3 4\n",
+        "expectedOutput": "1 3 2 null null null 4"
+      }
     ]
   },
   {
@@ -76,8 +186,18 @@
     "difficulty": "medium",
     "sortOrder": 530,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "bfs", "queue"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "bfs",
+      "queue"
+    ],
     "sourceUrl": "https://leetcode.com/problems/binary-tree-level-order-traversal/",
     "sourceName": "LeetCode 102",
     "statement": "Print the values of a binary tree level by level, from the root downwards, left to right within each level.\n\n## Input\n\nOne line of level-order tokens with `null` for missing children. The line may be empty.\n\n## Output\n\nOne line per level, values separated by single spaces. Print nothing for an empty tree.\n\n## Example\n\n```\nInput:\n3 9 20 null null 15 7\n\nOutput:\n3\n9 20\n15 7\n```",
@@ -85,12 +205,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* root = read_tree();\n\n    // Print one line per level.\n\n    return 0;\n}\n",
     "editorial": "## BFS with a level-size snapshot\n\nA plain BFS visits nodes in level order but gives you no idea where one level ends. The fix is one line: record how many nodes are in the queue *before* processing the level, and consume exactly that many.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nint main() {\n    // ... read_tree() as given ...\n    TreeNode* root = nullptr;   // replaced by read_tree() in your solution\n    if (!root) return 0;        // empty tree prints nothing\n\n    queue<TreeNode*> q;\n    q.push(root);\n\n    while (!q.empty()) {\n        // 🛑 Snapshot the size. The loop body pushes the NEXT level onto the\n        // same queue, so without this the boundary is lost and every level\n        // merges into one.\n        int width = (int)q.size();\n\n        for (int i = 0; i < width; ++i) {\n            TreeNode* node = q.front();\n            q.pop();\n            cout << node->val;\n            if (i + 1 < width) cout << ' ';\n            if (node->left) q.push(node->left);\n            if (node->right) q.push(node->right);\n        }\n        cout << '\\n';\n    }\n}\n```\n\n## Why the snapshot works\n\nAt the top of each outer iteration the queue holds **exactly** the nodes of one level — nothing more, nothing less. That is an invariant, and it is worth stating: the body removes all `width` of them and enqueues precisely their children, which together are exactly the next level. The invariant is restored, so the next iteration is correct for the same reason.\n\nWithout the snapshot, `q.size()` grows mid-loop and the condition never lines up with a level boundary.\n\n## The DFS alternative\n\nYou can also do this depth-first, passing the depth down and appending to the right bucket:\n\n```cpp\nvoid collect(TreeNode* node, int depth, vector<vector<int>>& levels) {\n    if (!node) return;\n    // The first node to reach this depth creates its row. Because we recurse\n    // left before right, each row fills left to right — which is what makes\n    // the output order correct despite this being a depth-first walk.\n    if ((int)levels.size() == depth) levels.push_back({});\n    levels[depth].push_back(node->val);\n    collect(node->left, depth + 1, levels);\n    collect(node->right, depth + 1, levels);\n}\n```\n\nSame O(n), and it needs the whole result in memory rather than streaming it. Useful when the problem wants the levels as data rather than printed.\n\n## Variants built on the same loop\n\n- **Right side view** — print the last value of each level.\n- **Zigzag order** — reverse alternate levels.\n- **Bottom-up order** — collect into a vector and reverse it.\n- **Level averages** — sum each level and divide by `width`.\n\nAll four are the snapshot loop with a different line inside, which is why this is the template worth memorising rather than the variants.\n\n## Complexity\n\nO(n) time. O(w) space where `w` is the widest level — up to `n/2` for a perfect tree, which is the worst case for BFS and the best case for recursion depth.\n\n## Pitfalls\n\n- **Omitting the size snapshot.**\n- **Pushing null children.** They must be filtered, or the output gains phantom entries.\n- **Not handling the empty tree.**\n- **Calling `q.size()` inside the inner loop condition.** Same bug as omitting the snapshot, in disguise.",
     "testCases": [
-      { "visibility": "sample", "input": "3 9 20 null null 15 7\n", "expectedOutput": "3\n9 20\n15 7" },
-      { "visibility": "sample", "input": "1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "1 2 3 4 5 6 7\n", "expectedOutput": "1\n2 3\n4 5 6 7" },
-      { "visibility": "hidden", "input": "1 2 null 3\n", "expectedOutput": "1\n2\n3" },
-      { "visibility": "hidden", "input": "1 null 2 null 3\n", "expectedOutput": "1\n2\n3" }
+      {
+        "visibility": "sample",
+        "input": "3 9 20 null null 15 7\n",
+        "expectedOutput": "3\n9 20\n15 7"
+      },
+      {
+        "visibility": "sample",
+        "input": "1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2 3 4 5 6 7\n",
+        "expectedOutput": "1\n2 3\n4 5 6 7"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2 null 3\n",
+        "expectedOutput": "1\n2\n3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 null 2 null 3\n",
+        "expectedOutput": "1\n2\n3"
+      }
     ]
   },
   {
@@ -99,8 +243,18 @@
     "difficulty": "medium",
     "sortOrder": 540,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "bst", "dfs"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "bst",
+      "dfs"
+    ],
     "sourceUrl": "https://leetcode.com/problems/validate-binary-search-tree/",
     "sourceName": "LeetCode 98",
     "statement": "Decide whether a binary tree is a valid binary search tree.\n\nA valid BST requires that for **every** node, *every* value in its left subtree is strictly less than the node, and *every* value in its right subtree is strictly greater. Note that this is a condition on all descendants, not merely on the immediate children.\n\n## Input\n\nOne line of level-order tokens with `null` for missing children. The line may be empty; an empty tree is valid.\n\n## Output\n\n`true` or `false`.\n\n## Example\n\n```\nInput:\n5 1 4 null null 3 6\n\nOutput:\nfalse\n```\n\nThe node 3 is in the right subtree of 5 but is smaller than 5.",
@@ -108,14 +262,46 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* root = read_tree();\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## The wrong answer almost everyone writes first\n\n```cpp\n// WRONG. Checks only the immediate children.\nbool bad(TreeNode* n) {\n    if (!n) return true;\n    if (n->left && n->left->val >= n->val) return false;\n    if (n->right && n->right->val <= n->val) return false;\n    return bad(n->left) && bad(n->right);\n}\n```\n\nThis accepts the sample input `5 1 4 null null 3 6`:\n\n```\n    5\n   / \\\n  1   4        <- 4 < 5, so 4 is wrongly in the RIGHT subtree...\n     / \\          ...and the local check never notices\n    3   6\n```\n\nEvery parent-child pair satisfies the local rule, yet 3 and 4 both sit in 5's right subtree while being smaller than 5. The BST property is about **all descendants**, so a local check cannot decide it.\n\n## The fix: carry a valid range down\n\nEach node inherits an open interval `(lo, hi)` that it must lie within. Descending left tightens the upper bound to the current node; descending right tightens the lower bound.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\n// optional<long long> rather than a sentinel: values span the whole int32\n// range, so there is no \"impossible\" int to use as \"no bound\", and INT_MIN /\n// INT_MAX as sentinels break on a tree containing those very values.\nbool valid(TreeNode* node, optional<long long> lo, optional<long long> hi) {\n    if (!node) return true;\n    if (lo && node->val <= *lo) return false;\n    if (hi && node->val >= *hi) return false;\n    // The bounds TIGHTEN as we descend, so each node is checked against every\n    // ancestor rather than just its parent.\n    return valid(node->left, lo, node->val)\n        && valid(node->right, node->val, hi);\n}\n\nint main() {\n    // ... read_tree() as given ...\n    TreeNode* root = nullptr;   // replaced by read_tree() in your solution\n    cout << (valid(root, nullopt, nullopt) ? \"true\" : \"false\") << '\\n';\n}\n```\n\nTrace the failing sample: node 4 is reached as the right child of 5, so it carries `lo = 5`. `4 <= 5`, rejected immediately — the ancestor constraint is what the local check was missing.\n\n## Why not INT_MIN and INT_MAX as sentinels\n\nValues are allowed to be exactly `-2^31` and `2^31 - 1`. A tree whose root is `INT_MIN` would be rejected by `node->val <= INT_MIN`, even though a single node is always a valid BST. `optional` says \"no bound\" without borrowing a real value to mean it; widening to `long long` is the other common fix.\n\n## Approach B: in-order traversal must be strictly increasing\n\nAn in-order walk of a valid BST yields sorted values. So traverse in order and check each value against the previous one:\n\n```cpp\nbool check_inorder(TreeNode* node, optional<long long>& prev) {\n    if (!node) return true;\n    if (!check_inorder(node->left, prev)) return false;\n    // Strictly greater: equal values are not allowed in a BST.\n    if (prev && node->val <= *prev) return false;\n    prev = node->val;\n    return check_inorder(node->right, prev);\n}\n```\n\nThis is arguably the more elegant characterisation, and it only needs one previous value rather than two bounds. It also generalises: the \"recover a BST with two swapped nodes\" problem is built on exactly this observation.\n\n## Complexity\n\nO(n) time for both — every node is visited once. O(h) space for recursion, which is O(n) on a degenerate tree. At 10^4 nodes a fully skewed tree is close to the stack limit; the iterative in-order walk with an explicit stack avoids the risk.\n\n## Pitfalls\n\n- **Checking only parent and child.** The headline bug.\n- **`INT_MIN` / `INT_MAX` sentinels** against a tree containing them.\n- **Using `<` instead of `<=`** in the bound checks, which would accept duplicates.\n- **Collecting the in-order traversal into a vector and checking `is_sorted`.** Correct, but O(n) extra space for no reason — and `is_sorted` permits equal neighbours, so you need `adjacent_find` or a strict comparator.",
     "testCases": [
-      { "visibility": "sample", "input": "5 1 4 null null 3 6\n", "expectedOutput": "false" },
-      { "visibility": "sample", "input": "2 1 3\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "1\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "10 5 15 null null 6 20\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "3 1 5 0 2 4 6\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "-2147483648\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "5 4 6 null null 3 7\n", "expectedOutput": "false" }
+      {
+        "visibility": "sample",
+        "input": "5 1 4 null null 3 6\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "sample",
+        "input": "2 1 3\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "10 5 15 null null 6 20\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 1 5 0 2 4 6\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "-2147483648\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5 4 6 null null 3 7\n",
+        "expectedOutput": "false"
+      }
     ]
   },
   {
@@ -124,8 +310,18 @@
     "difficulty": "medium",
     "sortOrder": 550,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "bst", "in-order traversal"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "bst",
+      "in-order traversal"
+    ],
     "sourceUrl": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/",
     "sourceName": "LeetCode 230",
     "statement": "Given a binary search tree and a value `k`, print the `k`-th smallest value it contains (`k = 1` is the smallest).\n\n## Input\n\nThe first line holds a level-order description of the tree with `null` for missing children. The second line holds `k`.\n\n## Output\n\nThe `k`-th smallest value.\n\n## Example\n\n```\nInput:\n3 1 4 null 2\n1\n\nOutput:\n1\n```",
@@ -133,12 +329,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* root = read_tree();\n    int k;\n    cin >> k;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The one fact you need\n\n**An in-order traversal of a BST visits values in ascending order.** So the `k`-th node visited in order is the `k`-th smallest. No sorting, no heap.\n\n## Iterative in-order, stopping early\n\nThe iterative form is the one to prefer here, because it can stop the moment it has counted `k` nodes rather than walking the whole tree.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nint main() {\n    // ... read_tree() as given ...\n    TreeNode* root = nullptr;   // replaced by read_tree() in your solution\n    int k = 0;\n    cin >> k;\n\n    stack<TreeNode*> st;\n    TreeNode* cur = root;\n    int seen = 0;\n\n    while (cur || !st.empty()) {\n        // Descend as far left as possible, stacking the path. The leftmost\n        // node is the smallest, which is where in-order must begin.\n        while (cur) {\n            st.push(cur);\n            cur = cur->left;\n        }\n        cur = st.top();\n        st.pop();\n\n        if (++seen == k) {\n            cout << cur->val << '\\n';\n            return 0;          // stop immediately — no need to finish\n        }\n\n        // Having visited this node, its right subtree comes next.\n        cur = cur->right;\n    }\n}\n```\n\nThe structure is worth internalising: *go left as far as you can, visit, then go right once and repeat.* That is in-order traversal with an explicit stack, and it is the same loop used for \"BST iterator\" problems.\n\n## The recursive version\n\n```cpp\nvoid walk(TreeNode* node, int k, int& seen, int& answer) {\n    if (!node || seen >= k) return;      // the second test is the pruning\n    walk(node->left, k, seen, answer);\n    if (++seen == k) answer = node->val;\n    walk(node->right, k, seen, answer);\n}\n```\n\nShorter, but note it needs `seen` and `answer` passed **by reference**. Passing `seen` by value is the classic bug: each call gets its own copy, the count never accumulates across subtrees, and the answer is silently wrong.\n\nThe `seen >= k` guard is what stops it exploring the rest of the tree after the answer is found. Without it the complexity is O(n) rather than O(h + k).\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| In-order, early exit | **O(h + k)** | O(h) |\n| Full in-order into a vector | O(n) | O(n) |\n\nFor `k = 1` on a balanced tree that is O(log n) — it just walks to the leftmost node.\n\n## The follow-up worth knowing\n\nIf the tree is modified often and `k`-th queries are frequent, augment each node with the **size of its subtree**. Then finding the `k`-th smallest is a descent: if the left subtree has `L` nodes, compare `k` with `L + 1` and go left, stop, or go right with `k - L - 1`. That is O(h) per query regardless of `k`, and it is how order-statistic trees work.\n\n## Pitfalls\n\n- **Passing the counter by value.**\n- **Collecting everything then indexing.** Works, O(n) space, discards the early exit.\n- **Using pre-order or post-order.** Only in-order is sorted.\n- **Off-by-one on `k`.** `k = 1` is the smallest, so increment *before* comparing, or compare then increment consistently.",
     "testCases": [
-      { "visibility": "sample", "input": "3 1 4 null 2\n1\n", "expectedOutput": "1" },
-      { "visibility": "sample", "input": "5 3 6 2 4 null null 1\n3\n", "expectedOutput": "3" },
-      { "visibility": "hidden", "input": "1\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "3 1 4 null 2\n4\n", "expectedOutput": "4" },
-      { "visibility": "hidden", "input": "2 1 3\n2\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "5 3 6 2 4 null null 1\n6\n", "expectedOutput": "6" }
+      {
+        "visibility": "sample",
+        "input": "3 1 4 null 2\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "sample",
+        "input": "5 3 6 2 4 null null 1\n3\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 1 4 null 2\n4\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 1 3\n2\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5 3 6 2 4 null null 1\n6\n",
+        "expectedOutput": "6"
+      }
     ]
   },
   {
@@ -147,8 +367,17 @@
     "difficulty": "medium",
     "sortOrder": 560,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "bst"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "bst"
+    ],
     "sourceUrl": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/",
     "sourceName": "LeetCode 235",
     "statement": "Given a binary search tree and two values `p` and `q` that are both present in it, print the value of their lowest common ancestor — the deepest node that has both of them as descendants. A node counts as a descendant of itself.\n\n## Input\n\nThe first line holds a level-order description of the tree with `null` for missing children. The second line holds `p` and `q`.\n\n## Output\n\nThe value of the lowest common ancestor.\n\n## Example\n\n```\nInput:\n6 2 8 0 4 7 9 null null 3 5\n2 8\n\nOutput:\n6\n```\n\nThe values 2 and 8 lie in different subtrees of 6, so 6 is the deepest node containing both.",
@@ -156,13 +385,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* root = read_tree();\n    long long p, q;\n    cin >> p >> q;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The BST property makes this trivial\n\nStart at the root and compare. If **both** targets are smaller than the current node, the answer is somewhere to the left. If both are larger, it is to the right. Otherwise — one on each side, or the current node *is* one of them — this node is the split point and therefore the lowest common ancestor.\n\nNo recursion needed, no parent pointers, no path storage:\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nint main() {\n    // ... read_tree() as given ...\n    TreeNode* root = nullptr;   // replaced by read_tree() in your solution\n    long long p = 0, q = 0;\n    cin >> p >> q;\n\n    TreeNode* cur = root;\n    while (cur) {\n        if (p < cur->val && q < cur->val) {\n            cur = cur->left;            // both in the left subtree\n        } else if (p > cur->val && q > cur->val) {\n            cur = cur->right;           // both in the right subtree\n        } else {\n            // They split here, or cur is one of them. Either way this is the\n            // deepest node with both as descendants — note a node counts as\n            // its own descendant, which is why equality lands in this branch.\n            cout << cur->val << '\\n';\n            return 0;\n        }\n    }\n}\n```\n\n## Why the split point is the answer\n\nSuppose at node `x` the targets go different ways — `p` left, `q` right. Then `x` has both as descendants, so it is *a* common ancestor. Could anything deeper also be one? No: any deeper node lies entirely within `x`'s left subtree or entirely within its right, and so can contain only one of the two. Therefore `x` is the lowest.\n\nThe case where `cur->val` equals `p` is the same argument with the \"a node is its own descendant\" convention: nothing below `p` can contain `p` itself.\n\n## Note on the input order\n\nThe code never assumes `p < q`. Both comparisons are made explicitly against `cur->val`, so `2 8` and `8 2` behave identically. A solution that sorts them first is also fine — but one that assumes the order without checking will fail half the tests.\n\n## Complexity\n\nO(h) time — one root-to-node descent, so O(log n) on a balanced tree. **O(1) space**, which is the payoff for iterating rather than recursing.\n\n## The general-tree version is a different problem\n\nWithout the BST ordering you cannot decide which way to go, so the standard solution recurses everywhere and reports upwards:\n\n```cpp\nTreeNode* lca(TreeNode* node, TreeNode* p, TreeNode* q) {\n    if (!node || node == p || node == q) return node;\n    TreeNode* l = lca(node->left, p, q);\n    TreeNode* r = lca(node->right, p, q);\n    // Found in both subtrees -> this node is the split point.\n    if (l && r) return node;\n    return l ? l : r;\n}\n```\n\nThat is O(n) time and O(h) space. Worth knowing both, and worth noticing that the BST version is faster precisely because the ordering tells you where *not* to look.\n\n## Pitfalls\n\n- **Assuming `p < q`.**\n- **Using `<=` in the descent**, which would walk past a node equal to a target instead of stopping there.\n- **Reaching for the general O(n) algorithm** and discarding the ordering that makes the problem easy.",
     "testCases": [
-      { "visibility": "sample", "input": "6 2 8 0 4 7 9 null null 3 5\n2 8\n", "expectedOutput": "6" },
-      { "visibility": "sample", "input": "6 2 8 0 4 7 9 null null 3 5\n2 4\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "2 1\n2 1\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "6 2 8 0 4 7 9 null null 3 5\n8 2\n", "expectedOutput": "6" },
-      { "visibility": "hidden", "input": "6 2 8 0 4 7 9 null null 3 5\n3 5\n", "expectedOutput": "4" },
-      { "visibility": "hidden", "input": "6 2 8 0 4 7 9 null null 3 5\n7 9\n", "expectedOutput": "8" },
-      { "visibility": "hidden", "input": "5 3 8 2 4\n2 4\n", "expectedOutput": "3" }
+      {
+        "visibility": "sample",
+        "input": "6 2 8 0 4 7 9 null null 3 5\n2 8\n",
+        "expectedOutput": "6"
+      },
+      {
+        "visibility": "sample",
+        "input": "6 2 8 0 4 7 9 null null 3 5\n2 4\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 1\n2 1\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6 2 8 0 4 7 9 null null 3 5\n8 2\n",
+        "expectedOutput": "6"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6 2 8 0 4 7 9 null null 3 5\n3 5\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6 2 8 0 4 7 9 null null 3 5\n7 9\n",
+        "expectedOutput": "8"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5 3 8 2 4\n2 4\n",
+        "expectedOutput": "3"
+      }
     ]
   },
   {
@@ -171,8 +428,18 @@
     "difficulty": "easy",
     "sortOrder": 570,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "dfs", "recursion"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "dfs",
+      "recursion"
+    ],
     "sourceUrl": "https://leetcode.com/problems/subtree-of-another-tree/",
     "sourceName": "LeetCode 572",
     "statement": "Given two binary trees, decide whether the second one appears as a subtree of the first.\n\nA subtree means some node of the first tree, **together with all of its descendants**, is identical to the second tree. A partial match does not count.\n\n## Input\n\nTwo lines, each a level-order description with `null` for missing children. A line may be empty.\n\n## Output\n\n`true` or `false`.\n\n## Example\n\n```\nInput:\n3 4 5 1 2\n4 1 2\n\nOutput:\ntrue\n```\n\nThe node 4 with its children 1 and 2 matches the second tree exactly.",
@@ -180,13 +447,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* root = read_tree();\n    TreeNode* sub = read_tree();\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## Two functions, composed\n\nThis is \"Same Tree\" used as a helper. At every node of the big tree, ask whether the subtree rooted there is *identical* to the target.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\n/** Exactly the Same Tree problem — note the ordering of the null checks. */\nbool identical(TreeNode* a, TreeNode* b) {\n    if (!a && !b) return true;\n    if (!a || !b) return false;\n    if (a->val != b->val) return false;\n    return identical(a->left, b->left) && identical(a->right, b->right);\n}\n\nbool contains(TreeNode* root, TreeNode* sub) {\n    // An empty target is a subtree of anything, including an empty tree.\n    if (!sub) return true;\n    // A non-empty target cannot be found in an empty tree.\n    if (!root) return false;\n    // Either this node matches, or the target is somewhere below.\n    return identical(root, sub)\n        || contains(root->left, sub)\n        || contains(root->right, sub);\n}\n\nint main() {\n    // ... read_tree() as given ...\n    TreeNode* root = nullptr;   // replaced by read_tree() in your solution\n    TreeNode* sub = nullptr;\n    cout << (contains(root, sub) ? \"true\" : \"false\") << '\\n';\n}\n```\n\n## The distinction that makes this subtle\n\n`identical` requires an **exact** match all the way down. That is what separates \"subtree\" from \"subtree pattern\": consider\n\n```\nbig:  3            target:  4\n     / \\                   /\n    4   5                 1\n   / \\\n  1   2\n```\n\nThe target `4 1` is *not* a subtree of the big tree, even though the big tree has a node 4 with a left child 1 — because that node also has a right child 2, and a subtree includes all descendants. `identical` catches it: at the right child, one side is null and the other is node 2, so case 2 rejects.\n\nThis is the test case people fail, and it is included below as `3 4 5 1 2` against `4 1`.\n\n## The short-circuit is load-bearing\n\n`||` evaluates left to right and stops at the first `true`. So once a match is found, no further subtrees are examined. Similarly `&&` inside `identical` abandons a comparison at the first difference, which is why the average cost is far below the worst case.\n\n## Complexity\n\nO(n · m) worst case — every one of the `n` nodes may trigger an O(m) comparison. With `n = 2000` and `m = 1000` that is 2·10^6, comfortable.\n\nThe worst case is real though: a big tree of all identical values against a target of all identical values forces the full comparison at every node.\n\n## The O(n + m) approach\n\nSerialise both trees in pre-order **with explicit null markers**, then ask whether the target's string is a substring of the big tree's. With a linear-time substring search (KMP) the whole thing is O(n + m).\n\nThe null markers are essential. Without them, the trees `1 2` and `1 null 2` serialise identically, and unrelated trees produce false matches. Each value also needs a delimiter, or `1,2` and `12` collide — the same ambiguity problem as the anagram signature in Group Anagrams.\n\n## Pitfalls\n\n- **Treating a partial match as a subtree.** The headline bug.\n- **Returning `false` for an empty target.**\n- **Checking only whether the root values match somewhere**, without comparing structure.\n- **Serialising without null markers or delimiters.**",
     "testCases": [
-      { "visibility": "sample", "input": "3 4 5 1 2\n4 1 2\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "3 4 5 1 2\n4 1\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1 1\n1\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "\n\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "\n1\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1\n\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "3 4 5 1 2 null null null null 0\n4 1 2\n", "expectedOutput": "false" }
+      {
+        "visibility": "sample",
+        "input": "3 4 5 1 2\n4 1 2\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "3 4 5 1 2\n4 1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n1\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "\n\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "\n1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 4 5 1 2 null null null null 0\n4 1 2\n",
+        "expectedOutput": "false"
+      }
     ]
   },
   {
@@ -195,8 +490,18 @@
     "difficulty": "hard",
     "sortOrder": 580,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["tree", "dfs", "post-order traversal"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "tree",
+      "dfs",
+      "post-order traversal"
+    ],
     "sourceUrl": "https://leetcode.com/problems/binary-tree-maximum-path-sum/",
     "sourceName": "LeetCode 124",
     "statement": "A **path** is any sequence of nodes where each consecutive pair is connected by an edge, and no node appears twice. A path need not pass through the root, and may bend at a node — going up one side and down the other.\n\nPrint the largest possible sum of the values along such a path. A path must contain at least one node.\n\n## Input\n\nOne line of level-order tokens with `null` for missing children.\n\n## Output\n\nThe maximum path sum.\n\n## Example\n\n```\nInput:\n-10 9 20 null null 15 7\n\nOutput:\n42\n```\n\nThe best path is 15 → 20 → 7, summing to 42. It does not include the root.",
@@ -204,14 +509,46 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nTreeNode* read_tree() {\n    string line;\n    getline(cin, line);\n    istringstream in(line);\n    vector<string> tokens;\n    for (string t; in >> t; ) tokens.push_back(t);\n    if (tokens.empty() || tokens[0] == \"null\") return nullptr;\n\n    TreeNode* root = new TreeNode(stoi(tokens[0]));\n    queue<TreeNode*> q;\n    q.push(root);\n    size_t i = 1;\n    while (!q.empty() && i < tokens.size()) {\n        TreeNode* node = q.front();\n        q.pop();\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->left = new TreeNode(stoi(tokens[i]));\n            q.push(node->left);\n        }\n        ++i;\n        if (i < tokens.size() && tokens[i] != \"null\") {\n            node->right = new TreeNode(stoi(tokens[i]));\n            q.push(node->right);\n        }\n        ++i;\n    }\n    return root;\n}\n\nint main() {\n    TreeNode* root = read_tree();\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The key insight: two different quantities\n\nThis problem is hard because each node needs **two** answers, and conflating them is the usual failure:\n\n1. **What I can contribute upwards** — the best sum of a path that starts at this node and goes *down* one side only. A path through my parent can use at most one of my branches, because using both would make the parent's path revisit me.\n2. **The best path that bends here** — left branch + me + right branch. This is a candidate for the global answer but can **never** be passed up.\n\nSo the recursion *returns* quantity 1 and *records* quantity 2 in a running maximum.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left = nullptr;\n    TreeNode* right = nullptr;\n    explicit TreeNode(int v) : val(v) {}\n};\n\nlong long best = LLONG_MIN;      // the global answer\n\n/** Returns the best DOWNWARD path sum starting at `node`. */\nlong long gain(TreeNode* node) {\n    if (!node) return 0;\n\n    // 🛑 max(0, ...) is the whole trick: a branch with a negative total is\n    // worse than not taking that branch at all, so clamp it to zero and\n    // simply skip it. Without this, negative subtrees drag down every path.\n    long long left = max(0LL, gain(node->left));\n    long long right = max(0LL, gain(node->right));\n\n    // Candidate for the global answer: bend at this node, using BOTH sides.\n    best = max(best, node->val + left + right);\n\n    // What we can offer our parent: this node plus the better ONE side.\n    return node->val + max(left, right);\n}\n\nint main() {\n    // ... read_tree() as given ...\n    TreeNode* root = nullptr;   // replaced by read_tree() in your solution\n    gain(root);\n    cout << best << '\\n';\n}\n```\n\n## Why the return value uses one side but the candidate uses both\n\nPicture the path as a shape. A path that passes *through* this node and continues to the parent enters from the parent and must leave downwards — it can only use one branch. A path that *terminates* its upward movement here may descend both ways, forming a peak. Those are genuinely different shapes, hence two quantities.\n\nReturning `node->val + left + right` would be wrong: the parent would then build a path that visits this node twice.\n\n## Why `max(0, ...)` and not `max(0, node->val + ...)`\n\nThe clamp applies to each *child's* contribution, not to the node itself. The node must always be included — a path has at least one node, and the candidate `node->val + left + right` has to be a legal path. Clamping the whole return to 0 would let a path contain no nodes at all, and on an all-negative tree would wrongly answer 0 instead of the largest single value.\n\n## Dry run on the sample\n\n`-10 9 20 null null 15 7`:\n\n- `gain(15)` → left and right are 0, candidate `15`, returns `15`.\n- `gain(7)` → candidate `7`, returns `7`.\n- `gain(20)` → left `15`, right `7`, candidate `20 + 15 + 7 = 42` ← the answer. Returns `20 + 15 = 35`.\n- `gain(9)` → candidate `9`, returns `9`.\n- `gain(-10)` → left `9`, right `35`, candidate `-10 + 9 + 35 = 34`. Returns `-10 + 35 = 25`.\n\nGlobal best is 42. Note it was found at node 20, not at the root — which is exactly why a single return value cannot carry the answer.\n\n## The all-negative case\n\nOn a single node `-3`, the answer is `-3`. `best` starting at `LLONG_MIN` and the candidate being `node->val + 0 + 0 = -3` gives it correctly. Initialising `best` to 0 is the classic wrong answer — the same trap as Maximum Subarray.\n\n## Complexity\n\nO(n) time — one post-order pass, O(1) work per node. O(h) stack space, which at 30000 nodes on a skewed tree is a genuine risk; an explicit-stack post-order traversal is the safe variant.\n\n## Pitfalls\n\n- **Returning the bent path** to the parent.\n- **Initialising `best` to 0.**\n- **Clamping the node's own value to 0.**\n- **Taking `max(left, right)` for the candidate** instead of `left + right`.\n- **Using a global without resetting it** between test cases — fine for a single run, a bug in a reused function.",
     "testCases": [
-      { "visibility": "sample", "input": "-10 9 20 null null 15 7\n", "expectedOutput": "42" },
-      { "visibility": "sample", "input": "1 2 3\n", "expectedOutput": "6" },
-      { "visibility": "hidden", "input": "-3\n", "expectedOutput": "-3" },
-      { "visibility": "hidden", "input": "2 -1\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "-2 -1\n", "expectedOutput": "-1" },
-      { "visibility": "hidden", "input": "5\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "-1 -2 -3\n", "expectedOutput": "-1" },
-      { "visibility": "hidden", "input": "1 -2 3\n", "expectedOutput": "4" }
+      {
+        "visibility": "sample",
+        "input": "-10 9 20 null null 15 7\n",
+        "expectedOutput": "42"
+      },
+      {
+        "visibility": "sample",
+        "input": "1 2 3\n",
+        "expectedOutput": "6"
+      },
+      {
+        "visibility": "hidden",
+        "input": "-3\n",
+        "expectedOutput": "-3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 -1\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "-2 -1\n",
+        "expectedOutput": "-1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "-1 -2 -3\n",
+        "expectedOutput": "-1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 -2 3\n",
+        "expectedOutput": "4"
+      }
     ]
   },
   {
@@ -220,8 +557,17 @@
     "difficulty": "medium",
     "sortOrder": 590,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["trie", "design"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "trie",
+      "design"
+    ],
     "sourceUrl": "https://leetcode.com/problems/implement-trie-prefix-tree/",
     "sourceName": "LeetCode 208",
     "statement": "Implement a prefix tree supporting three operations:\n\n- `insert word` — add a word\n- `search word` — is this exact word stored?\n- `prefix p` — is any stored word prefixed by `p`?\n\n## Input\n\nThe first line holds `n`, the number of operations. Each of the next `n` lines holds an operation: `insert`, `search` or `prefix`, followed by a lowercase string.\n\n## Output\n\nOne line per `search` and `prefix` operation: `true` or `false`. `insert` produces no output.\n\n## Example\n\n```\nInput:\n5\ninsert apple\nsearch apple\nsearch app\nprefix app\ninsert app\n\nOutput:\ntrue\nfalse\ntrue\n```\n\n`search app` is false because `app` was only a prefix at that point, not a stored word.",
@@ -229,12 +575,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    // Implement the trie, then process the n operations.\n\n    for (int i = 0; i < n; ++i) {\n        string op, arg;\n        cin >> op >> arg;\n        // ...\n    }\n\n    return 0;\n}\n",
     "editorial": "## The distinction the problem is testing\n\n`search` and `prefix` differ by exactly one thing: whether the node you land on is marked as the **end of a stored word**. Without that flag, inserting `apple` would make `search(\"app\")` return true — which is the bug the sample is designed to catch.\n\n## The implementation\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nclass Trie {\npublic:\n    Trie() : nodes_(1) {}            // node 0 is the root: the empty prefix\n\n    void insert(const string& word) {\n        int cur = 0;\n        for (char ch : word) {\n            int c = ch - 'a';\n            if (nodes_[cur].next[c] == -1) {\n                nodes_.push_back(Node{});           // may reallocate...\n                // ...so re-index nodes_[cur] AFTER the push_back. Holding a\n                // Node& across the push would be a dangling reference.\n                nodes_[cur].next[c] = (int)nodes_.size() - 1;\n            }\n            cur = nodes_[cur].next[c];\n        }\n        nodes_[cur].is_word = true;\n    }\n\n    bool search(const string& word) const {\n        int node = walk(word);\n        return node != -1 && nodes_[node].is_word;   // the flag matters here\n    }\n\n    bool starts_with(const string& prefix) const {\n        return walk(prefix) != -1;                   // reaching it is enough\n    }\n\nprivate:\n    struct Node {\n        array<int, 26> next;      // -1 means \"no child\"\n        bool is_word = false;\n        Node() { next.fill(-1); }\n    };\n\n    /** Index of the node for this string, or -1 if the path breaks. */\n    int walk(const string& s) const {\n        int cur = 0;\n        for (char ch : s) {\n            int c = ch - 'a';\n            cur = nodes_[cur].next[c];\n            if (cur == -1) return -1;\n        }\n        return cur;\n    }\n\n    /*\n     * Nodes live in one vector and children are INDICES, not pointers.\n     * Deliberate: a vector<Node> reallocates as it grows, which would\n     * invalidate every raw Node* in the structure. Indices survive\n     * reallocation, and the contiguous storage beats tens of thousands of\n     * separate allocations on cache behaviour.\n     */\n    vector<Node> nodes_;\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    Trie trie;\n\n    for (int i = 0; i < n; ++i) {\n        string op, arg;\n        cin >> op >> arg;\n        if (op == \"insert\") trie.insert(arg);\n        else if (op == \"search\") cout << (trie.search(arg) ? \"true\" : \"false\") << '\\n';\n        else cout << (trie.starts_with(arg) ? \"true\" : \"false\") << '\\n';\n    }\n}\n```\n\n## Indices rather than pointers\n\nThis is the detail worth stealing for every tree you build in competitive C++. A `vector<Node>` with `int` children:\n\n- survives reallocation, where raw `Node*` would dangle;\n- allocates in a handful of large blocks rather than once per node;\n- is trivially copyable and serialisable.\n\nThe trap to avoid is writing `Node& cur = nodes_[i];` and then calling `push_back` — the reference may dangle immediately. The code above re-indexes after every growth, and the comment says why.\n\n## Why lookup is independent of the dictionary size\n\nA trie walks one character at a time, so `search` costs **O(L)** in the word's length — not in the number of stored words. A trie holding a million words finds a five-letter word in five steps. A hash set matches that for exact lookup, but cannot answer `prefix` at all without scanning everything.\n\n## Complexity\n\n| Operation | Time | Note |\n|---|---|---|\n| `insert` | O(L) | Creates at most L nodes |\n| `search` | O(L) | Independent of word count |\n| `prefix` | O(L) | The query a hash set cannot do |\n| Memory | O(total length × 26) worst | The `array<int,26>` is the cost |\n\nThat memory column is the real trade. 26 ints per node is 104 bytes, so a sparse trie wastes a lot. For a large or unknown alphabet, swap `array<int,26>` for a small `unordered_map<char,int>` or a sorted vector of pairs.\n\n## Pitfalls\n\n- **No `is_word` flag**, making `search` behave like `prefix`.\n- **Raw `Node*` children with `vector<Node>` storage.**\n- **Holding a reference across `push_back`.**\n- **Assuming lowercase** without validating — `ch - 'a'` on an uppercase letter or digit indexes out of bounds.",
     "testCases": [
-      { "visibility": "sample", "input": "5\ninsert apple\nsearch apple\nsearch app\nprefix app\ninsert app\n", "expectedOutput": "true\nfalse\ntrue" },
-      { "visibility": "sample", "input": "3\ninsert a\nsearch a\nprefix b\n", "expectedOutput": "true\nfalse" },
-      { "visibility": "hidden", "input": "2\nsearch x\nprefix y\n", "expectedOutput": "false\nfalse" },
-      { "visibility": "hidden", "input": "6\ninsert apple\ninsert app\nsearch app\nsearch appl\nprefix appl\nprefix apple\n", "expectedOutput": "true\nfalse\ntrue\ntrue" },
-      { "visibility": "hidden", "input": "4\ninsert cat\ninsert car\nprefix ca\nsearch ca\n", "expectedOutput": "true\nfalse" },
-      { "visibility": "hidden", "input": "3\ninsert abc\nprefix abcd\nsearch abc\n", "expectedOutput": "false\ntrue" }
+      {
+        "visibility": "sample",
+        "input": "5\ninsert apple\nsearch apple\nsearch app\nprefix app\ninsert app\n",
+        "expectedOutput": "true\nfalse\ntrue"
+      },
+      {
+        "visibility": "sample",
+        "input": "3\ninsert a\nsearch a\nprefix b\n",
+        "expectedOutput": "true\nfalse"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\nsearch x\nprefix y\n",
+        "expectedOutput": "false\nfalse"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6\ninsert apple\ninsert app\nsearch app\nsearch appl\nprefix appl\nprefix apple\n",
+        "expectedOutput": "true\nfalse\ntrue\ntrue"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\ninsert cat\ninsert car\nprefix ca\nsearch ca\n",
+        "expectedOutput": "true\nfalse"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\ninsert abc\nprefix abcd\nsearch abc\n",
+        "expectedOutput": "false\ntrue"
+      }
     ]
   }
 ]

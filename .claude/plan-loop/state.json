@@ -1,0 +1,17 @@
+{
+  "active": true,
+  "sessionId": "53251c34-1442-441c-a8bc-dfb6132928cb",
+  "tasks": [
+    "Part 8: split Track C into Algorithms + Competitive Approaches; 4 courses in content/tracks.json + modules.json; reassign the 19 lesson moduleSlugs",
+    "Part 8: author content/problemSets.json (75, 100, A-Z) with order[]; seed:apply; verify:course",
+    "Part 8: routes /learn, /learn/[course], /learn/[course]/[lesson], /problems, /problems/[set], /problems/[set]/[slug] + permanent redirects from /course/* in next.config.ts",
+    "10.1 Tier 1 explainer: inputFormat descriptors on problemSchema + explainer frame builder + tests",
+    "10.1 Tier 1 UI: VizPlayer chrome=explain + array renderer + wire into the problem page",
+    "10.2 JS Proxy tracer in @dsa/dsa + scenarios/walkthrough schema fields",
+    "10a C++ trace spine: if-constexpr emitter, AST splice planner, 0x01 framing, fixture suite (GATE A-E)",
+    "Run npm run check and push after each task"
+  ],
+  "continuations": 0,
+  "maxContinuations": 40,
+  "armedAt": "2026-10-24T04:22:59.418Z"
+}

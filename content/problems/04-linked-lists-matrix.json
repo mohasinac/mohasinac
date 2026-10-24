@@ -5,8 +5,17 @@
     "difficulty": "easy",
     "sortOrder": 400,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["linked list", "two pointers"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "linked list",
+      "two pointers"
+    ],
     "sourceUrl": "https://leetcode.com/problems/reverse-linked-list/",
     "sourceName": "LeetCode 206",
     "statement": "Reverse a singly linked list and print its values.\n\n## Input\n\nThe first line holds `n`, the number of nodes. The second line holds `n` values in list order. When `n` is 0 the second line is empty.\n\n## Output\n\nThe `n` values in reversed order, separated by single spaces. Print an empty line for an empty list.\n\n## Example\n\n```\nInput:\n5\n1 2 3 4 5\n\nOutput:\n5 4 3 2 1\n```",
@@ -14,12 +23,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    // Build the list.\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n\n    // Reverse `head`, then print the values separated by single spaces.\n\n    return 0;\n}\n",
     "editorial": "## Three pointers, four lines, and the order is the problem\n\n```cpp\nListNode* reverse(ListNode* head) {\n    ListNode* prev = nullptr;\n    while (head) {\n        ListNode* next = head->next;   // 1. SAVE, or you lose the rest\n        head->next = prev;             // 2. flip this link\n        prev = head;                   // 3. prev advances\n        head = next;                   // 4. head advances\n    }\n    return prev;                       // prev is the new head\n}\n```\n\nStep 1 is the one people omit. Without saving `next` first, assigning `head->next = prev` destroys the only reference to the remainder of the list — everything after the current node becomes unreachable.\n\n## Printing without a trailing space\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n\n    ListNode* prev = nullptr;\n    while (head) {\n        ListNode* next = head->next;\n        head->next = prev;\n        prev = head;\n        head = next;\n    }\n\n    bool first = true;\n    for (ListNode* p = prev; p; p = p->next) {\n        if (!first) cout << ' ';\n        cout << p->val;\n        first = false;\n    }\n    cout << '\\n';\n}\n```\n\nThat `first` flag emits separators *between* values rather than after each one. An empty list prints just the newline, which is the expected output for `n = 0`.\n\n## The recursive version, and why not to use it\n\n```cpp\nListNode* reverse_rec(ListNode* head) {\n    if (!head || !head->next) return head;\n    ListNode* rest = reverse_rec(head->next);\n    head->next->next = head;\n    head->next = nullptr;\n    return rest;\n}\n```\n\nElegant, and O(n) **stack** depth. At `n = 5000` it is fine; at 10^5 it overflows. The iterative version is O(1) space and has no such limit, so it is the default.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Iterative | O(n) | O(1) |\n| Recursive | O(n) | O(n) stack |\n\n## Pitfalls\n\n- **Not saving `next` before flipping.**\n- **Returning `head` instead of `prev`.** At loop exit `head` is null; `prev` is the new head.\n- **A trailing space** on the output line. Harmless here because the judge normalises trailing whitespace, but a bad habit.",
     "testCases": [
-      { "visibility": "sample", "input": "5\n1 2 3 4 5\n", "expectedOutput": "5 4 3 2 1" },
-      { "visibility": "sample", "input": "2\n1 2\n", "expectedOutput": "2 1" },
-      { "visibility": "hidden", "input": "0\n\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "1\n7\n", "expectedOutput": "7" },
-      { "visibility": "hidden", "input": "4\n-1 0 1 2\n", "expectedOutput": "2 1 0 -1" },
-      { "visibility": "hidden", "input": "3\n5 5 5\n", "expectedOutput": "5 5 5" }
+      {
+        "visibility": "sample",
+        "input": "5\n1 2 3 4 5\n",
+        "expectedOutput": "5 4 3 2 1"
+      },
+      {
+        "visibility": "sample",
+        "input": "2\n1 2\n",
+        "expectedOutput": "2 1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "0\n\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n7\n",
+        "expectedOutput": "7"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\n-1 0 1 2\n",
+        "expectedOutput": "2 1 0 -1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n5 5 5\n",
+        "expectedOutput": "5 5 5"
+      }
     ]
   },
   {
@@ -28,8 +61,17 @@
     "difficulty": "easy",
     "sortOrder": 410,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["linked list", "two pointers"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "linked list",
+      "two pointers"
+    ],
     "sourceUrl": "https://leetcode.com/problems/merge-two-sorted-lists/",
     "sourceName": "LeetCode 21",
     "statement": "Given two linked lists whose values are already in ascending order, merge them into one ascending list and print its values.\n\n## Input\n\nThe first line holds `n`, the second line holds `n` ascending values. The third line holds `m`, the fourth line holds `m` ascending values. A count of 0 is followed by an empty line.\n\n## Output\n\nThe merged values in ascending order, separated by single spaces.\n\n## Example\n\n```\nInput:\n3\n1 2 4\n3\n1 3 4\n\nOutput:\n1 1 2 3 4 4\n```",
@@ -37,12 +79,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nListNode* read_list() {\n    int n;\n    cin >> n;\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n    return head;\n}\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    ListNode* a = read_list();\n    ListNode* b = read_list();\n\n    // Merge and print.\n\n    return 0;\n}\n",
     "editorial": "## The dummy-head trick\n\nThe awkward part of building a list is that the first node is special — there is no previous node to attach it to. A **dummy head** removes that case entirely: attach to `dummy.next` like any other link, and return `dummy.next` at the end.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nListNode* read_list() {\n    int n;\n    cin >> n;\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n    return head;\n}\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    ListNode* a = read_list();\n    ListNode* b = read_list();\n\n    // Stack-allocated dummy: no `new`, no leak, and `dummy.next` is the\n    // real head once we are done.\n    ListNode dummy(0);\n    ListNode* tail = &dummy;\n\n    while (a && b) {\n        // `<=` rather than `<` keeps the merge STABLE — equal values keep\n        // list a's element first. Not observable here, but it is the habit\n        // that makes merge sort stable.\n        if (a->val <= b->val) { tail->next = a; a = a->next; }\n        else { tail->next = b; b = b->next; }\n        tail = tail->next;\n    }\n\n    // At most one list is non-empty; attach the whole remainder at once\n    // rather than looping. The other is null, which is the correct terminator.\n    tail->next = a ? a : b;\n\n    bool first = true;\n    for (ListNode* p = dummy.next; p; p = p->next) {\n        if (!first) cout << ' ';\n        cout << p->val;\n        first = false;\n    }\n    cout << '\\n';\n}\n```\n\n## Why `tail->next = a ? a : b` is enough\n\nThe `while` exits as soon as either list is exhausted. The remaining list is already sorted and every one of its values is at least as large as everything merged so far — so it can be appended wholesale in O(1). Looping through it would be correct but pointless.\n\nIf both are exhausted, both are null, and `tail->next` becomes null, correctly terminating the list.\n\n## Edge cases\n\n- Both empty → prints an empty line. The dummy makes `dummy.next` null with no special case.\n- One empty → the `while` never runs and the whole non-empty list is attached directly.\n\n## Complexity\n\nO(n + m) time — each node is visited once. O(1) extra space: the nodes are relinked, not copied.\n\n## Why not copy into a vector and sort\n\nIt works, and it is O((n+m) log(n+m)) instead of O(n+m), discarding the fact that the inputs are already sorted. The merge *is* the linear-time step at the heart of merge sort; recognising it is the point of the problem.",
     "testCases": [
-      { "visibility": "sample", "input": "3\n1 2 4\n3\n1 3 4\n", "expectedOutput": "1 1 2 3 4 4" },
-      { "visibility": "sample", "input": "0\n\n0\n\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "0\n\n1\n0\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1\n5\n0\n\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "2\n1 2\n2\n3 4\n", "expectedOutput": "1 2 3 4" },
-      { "visibility": "hidden", "input": "3\n-10 -3 0\n2\n-5 5\n", "expectedOutput": "-10 -5 -3 0 5" }
+      {
+        "visibility": "sample",
+        "input": "3\n1 2 4\n3\n1 3 4\n",
+        "expectedOutput": "1 1 2 3 4 4"
+      },
+      {
+        "visibility": "sample",
+        "input": "0\n\n0\n\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "0\n\n1\n0\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n5\n0\n\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 2\n2\n3 4\n",
+        "expectedOutput": "1 2 3 4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n-10 -3 0\n2\n-5 5\n",
+        "expectedOutput": "-10 -5 -3 0 5"
+      }
     ]
   },
   {
@@ -51,8 +117,17 @@
     "difficulty": "easy",
     "sortOrder": 420,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["linked list", "fast and slow pointers"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "linked list",
+      "fast and slow pointers"
+    ],
     "sourceUrl": "https://leetcode.com/problems/linked-list-cycle/",
     "sourceName": "LeetCode 141",
     "statement": "Decide whether a linked list contains a cycle.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` values. The third line holds `pos`: the 0-based index of the node that the last node points back to, or `-1` if the list ends normally.\n\n## Output\n\n`true` if the list has a cycle, otherwise `false`.\n\n## Example\n\n```\nInput:\n4\n3 2 0 -4\n1\n\nOutput:\ntrue\n```\n\nThe tail points back to the node at index 1, forming a cycle.",
@@ -60,13 +135,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<ListNode*> nodes;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        nodes.push_back(new ListNode(v));\n        if (i) nodes[i - 1]->next = nodes[i];\n    }\n    int pos;\n    cin >> pos;\n    if (n && pos >= 0) nodes[n - 1]->next = nodes[pos];\n\n    ListNode* head = n ? nodes[0] : nullptr;\n\n    // Print exactly \"true\" or \"false\". Do NOT use the `nodes` vector —\n    // solve it with pointers only, in O(1) extra space.\n\n    return 0;\n}\n",
     "editorial": "## Floyd's tortoise and hare\n\nMove one pointer one step at a time and another two steps at a time. If there is a cycle, the fast pointer eventually laps the slow one and they land on the same node. If there is no cycle, the fast pointer runs off the end.\n\n```cpp\nbool has_cycle(ListNode* head) {\n    ListNode* slow = head;\n    ListNode* fast = head;\n\n    // Checking BOTH fast and fast->next is what makes this safe: the body\n    // dereferences fast->next->next, and on an even-length list fast->next\n    // is the last node, whose next is null.\n    while (fast && fast->next) {\n        slow = slow->next;\n        fast = fast->next->next;\n        if (slow == fast) return true;\n    }\n    return false;\n}\n```\n\n## Why they must meet\n\nThis is the part worth understanding rather than memorising. Once both pointers are inside the cycle, consider the gap between them measured forward along the cycle. Each step, `slow` advances 1 and `fast` advances 2, so the gap **shrinks by exactly 1** per step. A quantity that decreases by 1 each step and lives in a finite range must reach 0 — and gap 0 means they are on the same node.\n\nThat also shows why 2 is not special: any speed greater than 1 works, as long as the gap strictly decreases. Speed 2 is just the simplest.\n\n## Comparing nodes, not values\n\n`slow == fast` compares **pointers**. Comparing `slow->val == fast->val` would report a cycle for any list with a duplicate value — a wrong answer on `1 1`, which has no cycle.\n\n## The hash-set alternative\n\n```cpp\n// O(n) time but O(n) space — and it needs a container keyed on pointers.\nunordered_set<ListNode*> seen;\nfor (ListNode* p = head; p; p = p->next) {\n    if (!seen.insert(p).second) return true;\n}\nreturn false;\n```\n\nCorrect and easier to reason about. Floyd's wins on space: O(1) versus O(n), which is the whole reason the technique exists.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Floyd's | O(n) | **O(1)** |\n| Hash set | O(n) | O(n) |\n\n## Finding where the cycle starts\n\nThe follow-up (LeetCode 142) uses the same machinery: after they meet, reset one pointer to the head and advance both one step at a time. They meet at the cycle's entry point. The proof is a short bit of algebra on the distances, and it is worth doing once.\n\n## Pitfalls\n\n- **Not checking `fast->next`** before `fast->next->next`. Dereferences null on even-length lists.\n- **Comparing values instead of pointers.**\n- **Starting `fast` at `head->next`** — a common variant that then needs a different loop condition. Starting both at `head` is simpler and handles `n = 0` and `n = 1` with no special case.",
     "testCases": [
-      { "visibility": "sample", "input": "4\n3 2 0 -4\n1\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "1\n1\n-1\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "0\n\n-1\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1\n1\n0\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "2\n1 2\n0\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "2\n1 1\n-1\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "5\n1 2 3 4 5\n-1\n", "expectedOutput": "false" }
+      {
+        "visibility": "sample",
+        "input": "4\n3 2 0 -4\n1\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "1\n1\n-1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "0\n\n-1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n1\n0\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 2\n0\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 1\n-1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n1 2 3 4 5\n-1\n",
+        "expectedOutput": "false"
+      }
     ]
   },
   {
@@ -75,8 +178,17 @@
     "difficulty": "medium",
     "sortOrder": 430,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["linked list", "two pointers"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "linked list",
+      "two pointers"
+    ],
     "sourceUrl": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/",
     "sourceName": "LeetCode 19",
     "statement": "Remove the `k`-th node counting from the **end** of a linked list and print the remaining values. The last node is `k = 1`.\n\nAim to do it in one pass.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` values. The third line holds `k`.\n\n## Output\n\nThe remaining values separated by single spaces. Print an empty line if nothing remains.\n\n## Example\n\n```\nInput:\n5\n1 2 3 4 5\n2\n\nOutput:\n1 2 3 5\n```\n\nThe 2nd node from the end is the one holding 4.",
@@ -84,12 +196,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n    int k;\n    cin >> k;\n\n    // Remove the k-th node from the end, then print what remains.\n\n    return 0;\n}\n",
     "editorial": "## The gap technique\n\nA singly linked list cannot be walked backwards, so \"k-th from the end\" is not directly addressable. The trick: advance one pointer `k` steps ahead, then move both together. When the leading pointer reaches the end, the trailing one is exactly `k` nodes behind it.\n\nTo *delete* a node you need the node **before** it, so put the trailing pointer on a dummy head. That also handles the case where the node to remove is the head itself — which is otherwise a separate branch.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n    int k;\n    cin >> k;\n\n    // The dummy is what makes \"remove the head\" need no special case.\n    ListNode dummy(0);\n    dummy.next = head;\n\n    ListNode* lead = &dummy;\n    ListNode* trail = &dummy;\n\n    // Open a gap of exactly k links.\n    for (int i = 0; i < k; ++i) lead = lead->next;\n\n    // Advance together until lead is on the LAST node. trail then sits just\n    // before the k-th from the end.\n    while (lead->next) {\n        lead = lead->next;\n        trail = trail->next;\n    }\n\n    trail->next = trail->next->next;      // unlink\n\n    bool first = true;\n    for (ListNode* p = dummy.next; p; p = p->next) {\n        if (!first) cout << ' ';\n        cout << p->val;\n        first = false;\n    }\n    cout << '\\n';\n}\n```\n\n## Why the loop stops at `lead->next`\n\nStopping when `lead` itself becomes null would leave `trail` one position too far forward, deleting the wrong node. Stopping while `lead` is still on the last node leaves `trail` on the predecessor of the target — which is exactly what the unlink needs.\n\nWorth dry-running on `n = 1, k = 1`: `lead` moves one step to the only node, `lead->next` is null so the loop never runs, `trail` is still the dummy, and `dummy.next = nullptr`. The list becomes empty. Correct, with no branch for it.\n\n## The two-pass version\n\nCount the nodes, then walk to position `n - k`. Simpler to reason about, and perfectly acceptable:\n\n```cpp\nint length = 0;\nfor (ListNode* p = head; p; p = p->next) ++length;\nListNode dummy(0);\ndummy.next = head;\nListNode* before = &dummy;\nfor (int i = 0; i < length - k; ++i) before = before->next;\nbefore->next = before->next->next;\n```\n\nThe one-pass version matters when the list is a stream you cannot re-read. Otherwise either is fine — and the two-pass one is harder to get wrong.\n\n## Complexity\n\nO(n) time, O(1) space, one traversal.\n\n## Pitfalls\n\n- **No dummy head**, forcing a special case when `k == n`.\n- **Advancing the gap by `k + 1` or `k - 1`.** Off by one; dry-run `n = 2, k = 1` and `n = 2, k = 2`.\n- **Stopping the second loop on `lead` rather than `lead->next`.**\n- **Not freeing the removed node.** Irrelevant to the judge, and the right habit everywhere else.",
     "testCases": [
-      { "visibility": "sample", "input": "5\n1 2 3 4 5\n2\n", "expectedOutput": "1 2 3 5" },
-      { "visibility": "sample", "input": "1\n1\n1\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "2\n1 2\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "2\n1 2\n2\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "5\n1 2 3 4 5\n5\n", "expectedOutput": "2 3 4 5" },
-      { "visibility": "hidden", "input": "3\n7 8 9\n3\n", "expectedOutput": "8 9" }
+      {
+        "visibility": "sample",
+        "input": "5\n1 2 3 4 5\n2\n",
+        "expectedOutput": "1 2 3 5"
+      },
+      {
+        "visibility": "sample",
+        "input": "1\n1\n1\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 2\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 2\n2\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n1 2 3 4 5\n5\n",
+        "expectedOutput": "2 3 4 5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n7 8 9\n3\n",
+        "expectedOutput": "8 9"
+      }
     ]
   },
   {
@@ -98,8 +234,17 @@
     "difficulty": "medium",
     "sortOrder": 440,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["linked list", "fast and slow pointers"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "linked list",
+      "fast and slow pointers"
+    ],
     "sourceUrl": "https://leetcode.com/problems/reorder-list/",
     "sourceName": "LeetCode 143",
     "statement": "Reorder a linked list so that it alternates between the front and the back: first node, last node, second node, second-to-last node, and so on.\n\nFor `1 2 3 4` the result is `1 4 2 3`.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` values.\n\n## Output\n\nThe reordered values separated by single spaces.\n\n## Example\n\n```\nInput:\n5\n1 2 3 4 5\n\nOutput:\n1 5 2 4 3\n```",
@@ -107,12 +252,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n\n    // Reorder, then print.\n\n    return 0;\n}\n",
     "editorial": "## Three techniques, composed\n\nThis problem is the reason the linked-list lesson teaches find-the-middle and reversal separately: the answer is those two plus a merge.\n\n1. **Find the middle** with fast and slow pointers.\n2. **Reverse the second half.**\n3. **Merge the two halves alternately.**\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    ListNode* head = nullptr;\n    ListNode* tail = nullptr;\n    for (int i = 0; i < n; ++i) {\n        int v;\n        cin >> v;\n        ListNode* node = new ListNode(v);\n        if (!head) head = tail = node;\n        else { tail->next = node; tail = node; }\n    }\n\n    if (head && head->next) {\n        // --- 1. find the middle ---------------------------------------\n        // slow ends on the last node of the FIRST half, which is what lets\n        // us cut cleanly below. Starting fast at head->next rather than head\n        // is what biases it that way on even lengths.\n        ListNode* slow = head;\n        ListNode* fast = head->next;\n        while (fast && fast->next) {\n            slow = slow->next;\n            fast = fast->next->next;\n        }\n\n        ListNode* second = slow->next;\n        slow->next = nullptr;              // cut: first half now terminates\n\n        // --- 2. reverse the second half --------------------------------\n        ListNode* prev = nullptr;\n        while (second) {\n            ListNode* next = second->next;\n            second->next = prev;\n            prev = second;\n            second = next;\n        }\n        second = prev;\n\n        // --- 3. merge alternately --------------------------------------\n        // The first half is never shorter than the reversed second half, so\n        // driving the loop on `second` is safe.\n        ListNode* first = head;\n        while (second) {\n            ListNode* f_next = first->next;\n            ListNode* s_next = second->next;\n            first->next = second;\n            second->next = f_next;\n            first = f_next;\n            second = s_next;\n        }\n    }\n\n    bool first_out = true;\n    for (ListNode* p = head; p; p = p->next) {\n        if (!first_out) cout << ' ';\n        cout << p->val;\n        first_out = false;\n    }\n    cout << '\\n';\n}\n```\n\n## The cut is the subtle part\n\n`slow->next = nullptr` is mandatory. Without it the first half still runs into the second, the merge walks into nodes it has already relinked, and you get a cycle — which shows up as a hang or a flood of output, not a wrong answer.\n\n## Why `fast = head->next`\n\nOn an even-length list `1 2 3 4`, starting `fast` at `head` leaves `slow` on node 3, splitting as `1 2 3` / `4`. Starting at `head->next` leaves `slow` on node 2, splitting as `1 2` / `3 4` — the balanced split the merge wants. Dry-run both on four nodes to see it.\n\n## Dry run on `1 2 3 4 5`\n\n- Middle: `slow` ends on node 3 (`1 2 3`), second half `4 5`.\n- Reversed second half: `5 4`.\n- Merge: `1`, `5`, `2`, `4`, `3`. The first half had one node spare, which lands last.\n\n## Complexity\n\nO(n) time, O(1) space. Copying into a `vector` and re-threading by index is O(n) space and much easier — a legitimate trade when the list is small, and the point of the problem is that it is unnecessary.\n\n## Pitfalls\n\n- **Forgetting the cut**, creating a cycle.\n- **Driving the merge loop on `first`** instead of `second`, which overruns on odd lengths.\n- **Not guarding `n <= 1`.** A single node is already reordered.",
     "testCases": [
-      { "visibility": "sample", "input": "4\n1 2 3 4\n", "expectedOutput": "1 4 2 3" },
-      { "visibility": "sample", "input": "5\n1 2 3 4 5\n", "expectedOutput": "1 5 2 4 3" },
-      { "visibility": "hidden", "input": "1\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "2\n1 2\n", "expectedOutput": "1 2" },
-      { "visibility": "hidden", "input": "3\n1 2 3\n", "expectedOutput": "1 3 2" },
-      { "visibility": "hidden", "input": "6\n1 2 3 4 5 6\n", "expectedOutput": "1 6 2 5 3 4" }
+      {
+        "visibility": "sample",
+        "input": "4\n1 2 3 4\n",
+        "expectedOutput": "1 4 2 3"
+      },
+      {
+        "visibility": "sample",
+        "input": "5\n1 2 3 4 5\n",
+        "expectedOutput": "1 5 2 4 3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 2\n",
+        "expectedOutput": "1 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n1 2 3\n",
+        "expectedOutput": "1 3 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6\n1 2 3 4 5 6\n",
+        "expectedOutput": "1 6 2 5 3 4"
+      }
     ]
   },
   {
@@ -121,8 +290,18 @@
     "difficulty": "hard",
     "sortOrder": 450,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["heap", "linked list", "divide and conquer"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "heap",
+      "linked list",
+      "divide and conquer"
+    ],
     "sourceUrl": "https://leetcode.com/problems/merge-k-sorted-lists/",
     "sourceName": "LeetCode 23",
     "statement": "Given `k` linked lists, each already sorted ascending, merge them all into one sorted list and print its values.\n\n## Input\n\nThe first line holds `k`. Each of the next `k` lines describes one list: a count followed by that many ascending values.\n\n## Output\n\nAll values in ascending order, separated by single spaces. Print an empty line if there are none.\n\n## Example\n\n```\nInput:\n3\n3 1 4 5\n3 1 3 4\n2 2 6\n\nOutput:\n1 1 2 3 4 4 5 6\n```\n\nThe first list is `1 4 5`, the second `1 3 4`, the third `2 6`.",
@@ -130,13 +309,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int k;\n    cin >> k;\n    vector<ListNode*> lists;\n    for (int i = 0; i < k; ++i) {\n        int n;\n        cin >> n;\n        ListNode* head = nullptr;\n        ListNode* tail = nullptr;\n        for (int j = 0; j < n; ++j) {\n            int v;\n            cin >> v;\n            ListNode* node = new ListNode(v);\n            if (!head) head = tail = node;\n            else { tail->next = node; tail = node; }\n        }\n        lists.push_back(head);\n    }\n\n    // Merge all of them and print.\n\n    return 0;\n}\n",
     "editorial": "## The naive approach and why it is too slow\n\nMerging list 1 into list 2, then the result into list 3, and so on, re-walks the growing accumulator every time: O(k · N) where `N` is the total node count. With `k = 10^4` that is 10^8 pointer hops on a list that keeps getting longer.\n\n## Approach A: a min-heap of list heads — O(N log k)\n\nAt any moment the next value to emit is the smallest among the `k` current heads. A heap gives that in O(log k).\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nstruct ListNode {\n    int val;\n    ListNode* next = nullptr;\n    explicit ListNode(int v) : val(v) {}\n};\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int k;\n    cin >> k;\n    // Min-heap of {value, node}. Pairs compare on .first, which is exactly\n    // the ordering we want; the pointer is only carried along.\n    priority_queue<pair<int, ListNode*>, vector<pair<int, ListNode*>>, greater<>> pq;\n\n    for (int i = 0; i < k; ++i) {\n        int n;\n        cin >> n;\n        ListNode* head = nullptr;\n        ListNode* tail = nullptr;\n        for (int j = 0; j < n; ++j) {\n            int v;\n            cin >> v;\n            ListNode* node = new ListNode(v);\n            if (!head) head = tail = node;\n            else { tail->next = node; tail = node; }\n        }\n        // Only non-empty lists go in. Pushing a null head would crash on pop.\n        if (head) pq.push({head->val, head});\n    }\n\n    ListNode dummy(0);\n    ListNode* tail = &dummy;\n\n    while (!pq.empty()) {\n        auto [value, node] = pq.top();\n        pq.pop();\n        tail->next = node;\n        tail = node;\n        // Replace it with its successor, keeping the heap at k entries.\n        if (node->next) pq.push({node->next->val, node->next});\n    }\n    tail->next = nullptr;   // the last node still points into its old list\n\n    bool first = true;\n    for (ListNode* p = dummy.next; p; p = p->next) {\n        if (!first) cout << ' ';\n        cout << p->val;\n        first = false;\n    }\n    cout << '\\n';\n}\n```\n\nThe `tail->next = nullptr` at the end is easy to miss: the final node was relinked from its original list and may still carry a stale `next`, which would print extra values.\n\n## Approach B: divide and conquer — O(N log k), no heap\n\nMerge the lists in pairs, halving the count each round. Log k rounds, each touching every node once.\n\n```cpp\nListNode* merge_two(ListNode* a, ListNode* b) {\n    ListNode dummy(0);\n    ListNode* tail = &dummy;\n    while (a && b) {\n        if (a->val <= b->val) { tail->next = a; a = a->next; }\n        else { tail->next = b; b = b->next; }\n        tail = tail->next;\n    }\n    tail->next = a ? a : b;\n    return dummy.next;\n}\n\nListNode* merge_all(vector<ListNode*>& lists) {\n    if (lists.empty()) return nullptr;\n    // Pairwise sweeps: k -> k/2 -> k/4 -> ... -> 1\n    while (lists.size() > 1) {\n        vector<ListNode*> next_round;\n        for (size_t i = 0; i < lists.size(); i += 2) {\n            ListNode* second = (i + 1 < lists.size()) ? lists[i + 1] : nullptr;\n            next_round.push_back(merge_two(lists[i], second));\n        }\n        lists = std::move(next_round);\n    }\n    return lists[0];\n}\n```\n\nThe `dummy` is stack-allocated inside `merge_two`, so returning `dummy.next` is safe — the returned pointer is to a real list node, not to the dummy.\n\n## Why both are O(N log k)\n\nFor the heap: every node is pushed and popped once, each costing O(log k) since the heap never exceeds `k` entries.\n\nFor divide and conquer: there are log k rounds, and each round's merges together touch all `N` nodes.\n\nThe divide-and-conquer version usually wins on constant factor — no heap allocation, better locality. The heap version is the one to reach for when the lists are streams rather than fully materialised.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Sequential merging | O(k · N) | O(1) |\n| Min-heap | O(N log k) | O(k) |\n| Divide and conquer | O(N log k) | O(k) for the vector |\n\n## Pitfalls\n\n- **Pushing null heads into the heap.** Crashes on the first pop.\n- **Forgetting `tail->next = nullptr`** at the end of the heap version.\n- **A max-heap.** `greater<>` is what makes it a min-heap.\n- **`k = 0`,** or every list empty. Both must print an empty line.",
     "testCases": [
-      { "visibility": "sample", "input": "3\n3 1 4 5\n3 1 3 4\n2 2 6\n", "expectedOutput": "1 1 2 3 4 4 5 6" },
-      { "visibility": "sample", "input": "0\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "1\n0\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "2\n0\n0\n", "expectedOutput": "" },
-      { "visibility": "hidden", "input": "1\n3 1 2 3\n", "expectedOutput": "1 2 3" },
-      { "visibility": "hidden", "input": "3\n1 -5\n2 -3 0\n1 -4\n", "expectedOutput": "-5 -4 -3 0" },
-      { "visibility": "hidden", "input": "2\n0\n2 7 8\n", "expectedOutput": "7 8" }
+      {
+        "visibility": "sample",
+        "input": "3\n3 1 4 5\n3 1 3 4\n2 2 6\n",
+        "expectedOutput": "1 1 2 3 4 4 5 6"
+      },
+      {
+        "visibility": "sample",
+        "input": "0\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n0\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n0\n0\n",
+        "expectedOutput": ""
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n3 1 2 3\n",
+        "expectedOutput": "1 2 3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n1 -5\n2 -3 0\n1 -4\n",
+        "expectedOutput": "-5 -4 -3 0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n0\n2 7 8\n",
+        "expectedOutput": "7 8"
+      }
     ]
   },
   {
@@ -145,8 +352,17 @@
     "difficulty": "medium",
     "sortOrder": 460,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["matrix", "arrays"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "matrix",
+      "arrays"
+    ],
     "sourceUrl": "https://leetcode.com/problems/set-matrix-zeroes/",
     "sourceName": "LeetCode 73",
     "statement": "Given a matrix, if any cell is 0 then set that cell's entire row and column to 0. Print the resulting matrix.\n\nThe zeroing is based on the **original** matrix — a zero you write must not cause further rows and columns to be cleared.\n\n## Input\n\nThe first line holds `rows` and `cols`. The next `rows` lines each hold `cols` integers.\n\n## Output\n\n`rows` lines, each holding `cols` integers separated by single spaces.\n\n## Example\n\n```\nInput:\n3 3\n1 1 1\n1 0 1\n1 1 1\n\nOutput:\n1 0 1\n0 0 0\n1 0 1\n```",
@@ -154,13 +370,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<vector<long long>> m(rows, vector<long long>(cols));\n    for (auto& row : m) for (long long& x : row) cin >> x;\n\n    // Print the matrix, values separated by single spaces.\n\n    return 0;\n}\n",
     "editorial": "## The trap\n\nThe naive loop — \"when you see a 0, clear its row and column immediately\" — is wrong. The zeros you write look identical to the original ones, so the next iteration treats them as triggers and the whole matrix cascades to zero.\n\n**Decide what to clear first, then clear it.** That two-phase shape is the lesson.\n\n## Approach A: two marker sets — O(rows + cols) space\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<vector<long long>> m(rows, vector<long long>(cols));\n    for (auto& row : m) for (long long& x : row) cin >> x;\n\n    // Phase 1: RECORD which rows and columns must be cleared, reading only\n    // the original values.\n    vector<char> clear_row(rows, 0), clear_col(cols, 0);\n    for (int r = 0; r < rows; ++r)\n        for (int c = 0; c < cols; ++c)\n            if (m[r][c] == 0) { clear_row[r] = 1; clear_col[c] = 1; }\n\n    // Phase 2: APPLY. Writes here cannot influence phase 1's decisions.\n    for (int r = 0; r < rows; ++r)\n        for (int c = 0; c < cols; ++c)\n            if (clear_row[r] || clear_col[c]) m[r][c] = 0;\n\n    for (int r = 0; r < rows; ++r)\n        for (int c = 0; c < cols; ++c)\n            cout << m[r][c] << \" \\n\"[c == cols - 1];\n}\n```\n\nThis is the version to write. It is obviously correct, and O(rows + cols) extra space on a 200×200 matrix is 400 bytes.\n\n## Approach B: O(1) space, using the first row and column as the markers\n\nThe classic follow-up. Store the flags *inside* the matrix, in row 0 and column 0 — the cells that are going to be cleared anyway. The complication: cell `(0,0)` belongs to both, so one extra variable is needed.\n\n```cpp\nbool first_row_has_zero = false, first_col_has_zero = false;\nfor (int c = 0; c < cols; ++c) if (m[0][c] == 0) first_row_has_zero = true;\nfor (int r = 0; r < rows; ++r) if (m[r][0] == 0) first_col_has_zero = true;\n\n// Mark from the interior only, so the flags we just read are not disturbed.\nfor (int r = 1; r < rows; ++r)\n    for (int c = 1; c < cols; ++c)\n        if (m[r][c] == 0) { m[r][0] = 0; m[0][c] = 0; }\n\n// Apply to the interior FIRST — it still needs to read the markers.\nfor (int r = 1; r < rows; ++r)\n    for (int c = 1; c < cols; ++c)\n        if (m[r][0] == 0 || m[0][c] == 0) m[r][c] = 0;\n\n// Only now clear the marker row and column themselves.\nif (first_row_has_zero) for (int c = 0; c < cols; ++c) m[0][c] = 0;\nif (first_col_has_zero) for (int r = 0; r < rows; ++r) m[r][0] = 0;\n```\n\nThe ordering is the whole difficulty: clearing row 0 before applying to the interior destroys the column markers. Two separate booleans are needed because `(0,0)` cannot encode both its row's and its column's state.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Marker arrays | O(rows · cols) | O(rows + cols) |\n| In-place markers | O(rows · cols) | **O(1)** |\n\n## Pitfalls\n\n- **Clearing as you scan.** Cascades to an all-zero matrix.\n- **Using `rows × cols` space** to copy the matrix. Works, but O(1) or O(r+c) is easy enough that the copy is never the intended answer.\n- **In Approach B, clearing the first row too early.**\n- **A single flag for `(0,0)`.**",
     "testCases": [
-      { "visibility": "sample", "input": "3 3\n1 1 1\n1 0 1\n1 1 1\n", "expectedOutput": "1 0 1\n0 0 0\n1 0 1" },
-      { "visibility": "sample", "input": "3 4\n0 1 2 0\n3 4 5 2\n1 3 1 5\n", "expectedOutput": "0 0 0 0\n0 4 5 0\n0 3 1 0" },
-      { "visibility": "hidden", "input": "1 1\n0\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1 1\n5\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "2 2\n1 2\n3 4\n", "expectedOutput": "1 2\n3 4" },
-      { "visibility": "hidden", "input": "2 2\n0 1\n1 1\n", "expectedOutput": "0 0\n0 1" },
-      { "visibility": "hidden", "input": "1 3\n1 0 3\n", "expectedOutput": "0 0 0" }
+      {
+        "visibility": "sample",
+        "input": "3 3\n1 1 1\n1 0 1\n1 1 1\n",
+        "expectedOutput": "1 0 1\n0 0 0\n1 0 1"
+      },
+      {
+        "visibility": "sample",
+        "input": "3 4\n0 1 2 0\n3 4 5 2\n1 3 1 5\n",
+        "expectedOutput": "0 0 0 0\n0 4 5 0\n0 3 1 0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n0\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n5\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 2\n1 2\n3 4\n",
+        "expectedOutput": "1 2\n3 4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 2\n0 1\n1 1\n",
+        "expectedOutput": "0 0\n0 1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 3\n1 0 3\n",
+        "expectedOutput": "0 0 0"
+      }
     ]
   },
   {
@@ -169,8 +413,17 @@
     "difficulty": "medium",
     "sortOrder": 470,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["matrix", "simulation"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "matrix",
+      "simulation"
+    ],
     "sourceUrl": "https://leetcode.com/problems/spiral-matrix/",
     "sourceName": "LeetCode 54",
     "statement": "Print all values of a matrix in spiral order: left to right along the top, down the right side, right to left along the bottom, up the left side, then inwards and repeat.\n\n## Input\n\nThe first line holds `rows` and `cols`. The next `rows` lines each hold `cols` integers.\n\n## Output\n\nAll values in spiral order on one line, separated by single spaces.\n\n## Example\n\n```\nInput:\n3 3\n1 2 3\n4 5 6\n7 8 9\n\nOutput:\n1 2 3 6 9 8 7 4 5\n```",
@@ -178,13 +431,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<vector<long long>> m(rows, vector<long long>(cols));\n    for (auto& row : m) for (long long& x : row) cin >> x;\n\n    // Print all values in spiral order, separated by single spaces.\n\n    return 0;\n}\n",
     "editorial": "## Four shrinking boundaries\n\nTrack `top`, `bottom`, `left`, `right`. Walk one edge, then move that boundary inwards. Repeat until the boundaries cross.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<vector<long long>> m(rows, vector<long long>(cols));\n    for (auto& row : m) for (long long& x : row) cin >> x;\n\n    int top = 0, bottom = rows - 1, left = 0, right = cols - 1;\n    vector<long long> out;\n    out.reserve((size_t)rows * cols);\n\n    while (top <= bottom && left <= right) {\n        // 1. top row, left to right\n        for (int c = left; c <= right; ++c) out.push_back(m[top][c]);\n        ++top;\n\n        // 2. right column, top to bottom\n        for (int r = top; r <= bottom; ++r) out.push_back(m[r][right]);\n        --right;\n\n        // 🛑 3. bottom row, right to left — ONLY if a row remains. Without\n        // this guard, a single remaining row is emitted twice: once by step 1\n        // and again here, after top has already passed bottom.\n        if (top <= bottom) {\n            for (int c = right; c >= left; --c) out.push_back(m[bottom][c]);\n            --bottom;\n        }\n\n        // 4. left column, bottom to top — only if a column remains.\n        if (left <= right) {\n            for (int r = bottom; r >= top; --r) out.push_back(m[r][left]);\n            ++left;\n        }\n    }\n\n    for (size_t i = 0; i < out.size(); ++i)\n        cout << out[i] << \" \\n\"[i + 1 == out.size()];\n}\n```\n\n## The two guards are the entire problem\n\nSteps 1 and 2 are always safe, because the `while` condition guarantees a row and a column exist. Steps 3 and 4 are not: by the time they run, `top` and `right` have already moved.\n\nConsider a single row, `1 3`, with `rows = 1, cols = 3`. Step 1 emits `1 2 3` and sets `top = 1`. Step 2's loop does not execute (`top > bottom`). Without the guard, step 3 would walk the bottom row — which is the same row — and emit `2 1` again. The guard `top <= bottom` is false, so it is correctly skipped.\n\nThe same applies to a single column with step 4. **Test both shapes**; they are the cases that break naive implementations, and a square matrix hides the bug completely.\n\n## Why not a visited array and direction vectors\n\nThat alternative works: walk in the current direction until you hit a boundary or a visited cell, then turn right. It needs O(rows · cols) extra space and is easier to get subtly wrong about when to turn. The boundary version is O(1) extra and the logic is explicit.\n\n## Complexity\n\nO(rows · cols) time — every cell is emitted exactly once. O(1) extra space beyond the output.\n\n## Pitfalls\n\n- **Omitting the `top <= bottom` and `left <= right` guards.** Duplicates on single-row or single-column inputs.\n- **Testing only square matrices.**\n- **Off-by-one in the reversed loops.** They are `>=`, not `>`.\n- **`while (top < bottom)`.** Must be `<=`, or the final single row or column is dropped.",
     "testCases": [
-      { "visibility": "sample", "input": "3 3\n1 2 3\n4 5 6\n7 8 9\n", "expectedOutput": "1 2 3 6 9 8 7 4 5" },
-      { "visibility": "sample", "input": "3 4\n1 2 3 4\n5 6 7 8\n9 10 11 12\n", "expectedOutput": "1 2 3 4 8 12 11 10 9 5 6 7" },
-      { "visibility": "hidden", "input": "1 1\n7\n", "expectedOutput": "7" },
-      { "visibility": "hidden", "input": "1 3\n1 2 3\n", "expectedOutput": "1 2 3" },
-      { "visibility": "hidden", "input": "3 1\n1\n2\n3\n", "expectedOutput": "1 2 3" },
-      { "visibility": "hidden", "input": "2 2\n1 2\n3 4\n", "expectedOutput": "1 2 4 3" },
-      { "visibility": "hidden", "input": "4 4\n1 2 3 4\n5 6 7 8\n9 10 11 12\n13 14 15 16\n", "expectedOutput": "1 2 3 4 8 12 16 15 14 13 9 5 6 7 11 10" }
+      {
+        "visibility": "sample",
+        "input": "3 3\n1 2 3\n4 5 6\n7 8 9\n",
+        "expectedOutput": "1 2 3 6 9 8 7 4 5"
+      },
+      {
+        "visibility": "sample",
+        "input": "3 4\n1 2 3 4\n5 6 7 8\n9 10 11 12\n",
+        "expectedOutput": "1 2 3 4 8 12 11 10 9 5 6 7"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\n7\n",
+        "expectedOutput": "7"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 3\n1 2 3\n",
+        "expectedOutput": "1 2 3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 1\n1\n2\n3\n",
+        "expectedOutput": "1 2 3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 2\n1 2\n3 4\n",
+        "expectedOutput": "1 2 4 3"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4 4\n1 2 3 4\n5 6 7 8\n9 10 11 12\n13 14 15 16\n",
+        "expectedOutput": "1 2 3 4 8 12 16 15 14 13 9 5 6 7 11 10"
+      }
     ]
   },
   {
@@ -193,8 +474,16 @@
     "difficulty": "medium",
     "sortOrder": 480,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["matrix"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "matrix"
+    ],
     "sourceUrl": "https://leetcode.com/problems/rotate-image/",
     "sourceName": "LeetCode 48",
     "statement": "Rotate an `n` by `n` matrix 90 degrees clockwise, in place, and print the result.\n\n## Input\n\nThe first line holds `n`. The next `n` lines each hold `n` integers.\n\n## Output\n\n`n` lines, each holding `n` integers separated by single spaces.\n\n## Example\n\n```\nInput:\n3\n1 2 3\n4 5 6\n7 8 9\n\nOutput:\n7 4 1\n8 5 2\n9 6 3\n```",
@@ -202,11 +491,31 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<vector<long long>> m(n, vector<long long>(n));\n    for (auto& row : m) for (long long& x : row) cin >> x;\n\n    // Rotate in place, then print.\n\n    return 0;\n}\n",
     "editorial": "## Transpose, then reverse each row\n\nThe trick that makes this easy: a 90-degree clockwise rotation is exactly a **transpose** followed by a **horizontal flip** of every row. Both are simple in-place operations, and composing them avoids all the index gymnastics of a direct rotation.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<vector<long long>> m(n, vector<long long>(n));\n    for (auto& row : m) for (long long& x : row) cin >> x;\n\n    // 1. Transpose: swap across the main diagonal.\n    // 🛑 The inner loop starts at c = r + 1, not 0. Starting at 0 visits\n    // every pair TWICE, swapping it back and leaving the matrix unchanged.\n    for (int r = 0; r < n; ++r)\n        for (int c = r + 1; c < n; ++c)\n            swap(m[r][c], m[c][r]);\n\n    // 2. Reverse each row.\n    for (auto& row : m) reverse(row.begin(), row.end());\n\n    for (int r = 0; r < n; ++r)\n        for (int c = 0; c < n; ++c)\n            cout << m[r][c] << \" \\n\"[c == n - 1];\n}\n```\n\n## Why it works, on the sample\n\nStart:\n\n```\n1 2 3        1 4 7        7 4 1\n4 5 6   -->  2 5 8   -->  8 5 2\n7 8 9        3 6 9        9 6 3\n      transpose      reverse rows\n```\n\nThe transpose turns rows into columns; reversing then puts those columns in the right order. Reading off the result, the first column of the original (`1 4 7`) has become the first row reversed (`7 4 1`) — which is what a clockwise turn does.\n\n## The `c = r + 1` detail\n\nThis is the bug people actually write. With `c` from 0, the pair `(r, c)` is swapped when the loop reaches it and swapped *back* when it reaches `(c, r)`. The net effect is nothing, and the output equals the input — which looks like \"my rotation did not run\" rather than a logic error.\n\nIterating the upper triangle only, excluding the diagonal (which never moves), touches each pair exactly once.\n\n## The other direction\n\n- **Counter-clockwise:** transpose, then reverse each *column* — or equivalently reverse the row order first, then transpose.\n- **180 degrees:** reverse the row order and reverse each row.\n\n## The direct four-way rotation\n\nFor completeness, rotating four cells at a time in rings:\n\n```cpp\nfor (int layer = 0; layer < n / 2; ++layer) {\n    int last = n - 1 - layer;\n    for (int i = layer; i < last; ++i) {\n        long long top = m[layer][i];\n        m[layer][i] = m[n - 1 - i][layer];\n        m[n - 1 - i][layer] = m[last][n - 1 - i];\n        m[last][n - 1 - i] = m[i][last];\n        m[i][last] = top;\n    }\n}\n```\n\nOne pass instead of two, and far easier to get an index wrong. Prefer transpose-then-reverse unless you have a reason not to.\n\n## Complexity\n\nO(n²) time — unavoidable, every cell moves. O(1) extra space.\n\n## Pitfalls\n\n- **`c` starting at 0** in the transpose.\n- **Reversing columns instead of rows**, which gives a counter-clockwise rotation.\n- **Doing the two steps in the wrong order.** Reverse-then-transpose is the counter-clockwise rotation, not the clockwise one.",
     "testCases": [
-      { "visibility": "sample", "input": "3\n1 2 3\n4 5 6\n7 8 9\n", "expectedOutput": "7 4 1\n8 5 2\n9 6 3" },
-      { "visibility": "sample", "input": "2\n1 2\n3 4\n", "expectedOutput": "3 1\n4 2" },
-      { "visibility": "hidden", "input": "1\n5\n", "expectedOutput": "5" },
-      { "visibility": "hidden", "input": "4\n5 1 9 11\n2 4 8 10\n13 3 6 7\n15 14 12 16\n", "expectedOutput": "15 13 2 5\n14 3 4 1\n12 6 8 9\n16 7 10 11" },
-      { "visibility": "hidden", "input": "2\n-1 0\n1 -2\n", "expectedOutput": "1 -1\n-2 0" }
+      {
+        "visibility": "sample",
+        "input": "3\n1 2 3\n4 5 6\n7 8 9\n",
+        "expectedOutput": "7 4 1\n8 5 2\n9 6 3"
+      },
+      {
+        "visibility": "sample",
+        "input": "2\n1 2\n3 4\n",
+        "expectedOutput": "3 1\n4 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n5\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\n5 1 9 11\n2 4 8 10\n13 3 6 7\n15 14 12 16\n",
+        "expectedOutput": "15 13 2 5\n14 3 4 1\n12 6 8 9\n16 7 10 11"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n-1 0\n1 -2\n",
+        "expectedOutput": "1 -1\n-2 0"
+      }
     ]
   },
   {
@@ -215,8 +524,18 @@
     "difficulty": "medium",
     "sortOrder": 490,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["backtracking", "matrix", "dfs"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "backtracking",
+      "matrix",
+      "dfs"
+    ],
     "sourceUrl": "https://leetcode.com/problems/word-search/",
     "sourceName": "LeetCode 79",
     "statement": "Given a grid of letters and a word, decide whether the word can be spelled by moving between **horizontally or vertically adjacent** cells. The same cell may not be used more than once in a single spelling.\n\n## Input\n\nThe first line holds `rows` and `cols`. The next `rows` lines each hold a string of `cols` uppercase letters. The final line holds the word.\n\n## Output\n\n`true` or `false`.\n\n## Example\n\n```\nInput:\n3 4\nABCE\nSFCS\nADEE\nABCCED\n\nOutput:\ntrue\n```\n\nThe path runs A(0,0) → B(0,1) → C(0,2) → C(1,2) → E(2,2) → D(2,1).",
@@ -224,13 +543,41 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<string> grid(rows);\n    for (string& row : grid) cin >> row;\n    string word;\n    cin >> word;\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## Backtracking on a grid\n\nTry every cell as a starting point. From each, walk in the four directions matching the word one character at a time. Mark a cell as in-use before recursing and **unmark it on the way out**, so a different path may reuse it.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nbool search(vector<string>& grid, const string& word, int r, int c, size_t k) {\n    if (k == word.size()) return true;                 // whole word matched\n    if (r < 0 || r >= (int)grid.size()) return false;\n    if (c < 0 || c >= (int)grid[0].size()) return false;\n    if (grid[r][c] != word[k]) return false;           // mismatch, or '#'\n\n    // Mark in place rather than keeping a visited array: O(1) extra space,\n    // and '#' never matches a letter, so it doubles as the visited flag.\n    char saved = grid[r][c];\n    grid[r][c] = '#';\n\n    bool found = search(grid, word, r + 1, c, k + 1)\n              || search(grid, word, r - 1, c, k + 1)\n              || search(grid, word, r, c + 1, k + 1)\n              || search(grid, word, r, c - 1, k + 1);\n\n    // 🛑 Restore on EVERY exit path. Returning early after a success without\n    // restoring leaves '#' in the grid and corrupts any later search — a bug\n    // that only shows up on the second query, never the first.\n    grid[r][c] = saved;\n    return found;\n}\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<string> grid(rows);\n    for (string& row : grid) cin >> row;\n    string word;\n    cin >> word;\n\n    for (int r = 0; r < rows; ++r)\n        for (int c = 0; c < cols; ++c)\n            if (search(grid, word, r, c, 0)) {\n                cout << \"true\\n\";\n                return 0;\n            }\n    cout << \"false\\n\";\n}\n```\n\n## Why the bounds checks come first\n\nThey are tested *before* `grid[r][c]` is read, and `||` short-circuits, so no out-of-range access can happen. Putting the character comparison first would index the grid with coordinates that may be off the edge.\n\nDoing the checks at the top of the callee — rather than before each recursive call — means four call sites get them for free, which is less code and fewer chances to omit one.\n\n## The single restore is deliberate\n\nNotice there is exactly one `grid[r][c] = saved;`, placed after the four recursive calls and before the only `return`. An implementation that returns `true` early from inside the chain would need a restore on that path too — easy to forget. Structuring it as \"compute `found`, restore, return\" makes the restore unmissable.\n\n## A useful pruning check\n\nBefore searching at all, count the letters: if the grid does not contain enough copies of some letter in the word, the answer is `false` immediately. Cheap, and it turns pathological inputs like a 6×6 grid of `A` with word `AAAAAAAAAAAAAAB` from exponential into instant.\n\n## Complexity\n\nO(rows · cols · 4^L) in the worst case, where `L` is the word length — each cell starts a search that branches up to 4 ways (3 after the first step, since you never go back) per character. The constraints are small precisely because this is exponential.\n\nO(L) space for the recursion stack.\n\n## The follow-up\n\n\"Word Search II\" asks for many words at once. Running this once per word is too slow; the answer is a **trie** of all the words, walked alongside a single DFS of the grid, so one traversal tests every word and prunes as soon as no word has the current prefix.\n\n## Pitfalls\n\n- **Forgetting to restore the cell.**\n- **Checking the character before the bounds.**\n- **A separate `visited` array that is never reset** between starting cells.\n- **Allowing diagonal moves.** Four directions, not eight.",
     "testCases": [
-      { "visibility": "sample", "input": "3 4\nABCE\nSFCS\nADEE\nABCCED\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "3 4\nABCE\nSFCS\nADEE\nABCB\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "3 4\nABCE\nSFCS\nADEE\nSEE\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "1 1\nA\nA\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "1 1\nA\nB\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1 2\nAB\nABA\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "2 2\nAB\nCD\nACDB\n", "expectedOutput": "true" }
+      {
+        "visibility": "sample",
+        "input": "3 4\nABCE\nSFCS\nADEE\nABCCED\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "3 4\nABCE\nSFCS\nADEE\nABCB\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3 4\nABCE\nSFCS\nADEE\nSEE\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\nA\nA\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 1\nA\nB\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1 2\nAB\nABA\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 2\nAB\nCD\nACDB\n",
+        "expectedOutput": "true"
+      }
     ]
   }
 ]

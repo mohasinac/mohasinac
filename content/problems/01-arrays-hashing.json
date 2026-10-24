@@ -5,8 +5,17 @@
     "difficulty": "easy",
     "sortOrder": 10,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["hash map", "arrays"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "hash map",
+      "arrays"
+    ],
     "sourceUrl": "https://leetcode.com/problems/two-sum/",
     "sourceName": "LeetCode 1",
     "statement": "You are given a list of `n` integers and a target value. Exactly one pair of distinct positions in the list adds up to the target.\n\nPrint the two positions, smaller first, separated by a space. Positions are 0-based.\n\n## Input\n\nThe first line holds `n` and `target`. The second line holds `n` integers.\n\n## Output\n\nTwo 0-based indices, smaller first. Print `-1` if no pair exists.\n\n## Example\n\n```\nInput:\n4 9\n2 7 11 15\n\nOutput:\n0 1\n```\n\nBecause the values at positions 0 and 1 are 2 and 7, and 2 + 7 = 9.",
@@ -14,11 +23,31 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    long long n, target;\n    cin >> n >> target;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Brute force — O(n^2)\n\nTry every pair. Correct, and at `n = 100000` it is 10^10 operations, so it times out. Write it anyway as the baseline: it defines what the fast version must agree with.\n\n## The waste\n\nFor each `i` we re-scan the whole array looking for `target - a[i]`. That lookup is the repeated work. A hash map turns it into O(1).\n\n## Optimal — O(n) time, O(n) space\n\nOne pass. For each element, ask whether its complement has already been seen.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    long long n, target;\n    cin >> n >> target;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    unordered_map<long long, long long> seen;   // value -> index\n    for (long long i = 0; i < n; ++i) {\n        auto it = seen.find(target - a[i]);\n        if (it != seen.end()) {\n            cout << it->second << ' ' << i << '\\n';\n            return 0;\n        }\n        // Insert AFTER the lookup. Inserting first would let an element\n        // pair with itself whenever target == 2 * a[i].\n        seen[a[i]] = i;\n    }\n    cout << \"-1\\n\";\n}\n```\n\n## Why the insert order matters\n\nOn input `2 6` / `3 3` the answer is `0 1`. If you insert `a[0] = 3` before looking up `6 - 3 = 3`, you find index 0 and print `0 0` — using one position twice. Inserting after the lookup guarantees `it->second < i`, which also gives the required ordering for free.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Brute force | O(n^2) | O(1) |\n| Hash map | O(n) | O(n) |\n| Sort + two pointers | O(n log n) | O(n) for original indices |\n\nThe sorting approach is worth knowing but is strictly worse here, and sorting destroys the positions you have to report.",
     "testCases": [
-      { "visibility": "sample", "input": "4 9\n2 7 11 15\n", "expectedOutput": "0 1" },
-      { "visibility": "sample", "input": "3 6\n3 2 4\n", "expectedOutput": "1 2" },
-      { "visibility": "hidden", "input": "2 6\n3 3\n", "expectedOutput": "0 1" },
-      { "visibility": "hidden", "input": "5 -8\n-3 4 -5 7 1\n", "expectedOutput": "0 2" },
-      { "visibility": "hidden", "input": "2 5\n1 2\n", "expectedOutput": "-1" }
+      {
+        "visibility": "sample",
+        "input": "4 9\n2 7 11 15\n",
+        "expectedOutput": "0 1"
+      },
+      {
+        "visibility": "sample",
+        "input": "3 6\n3 2 4\n",
+        "expectedOutput": "1 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 6\n3 3\n",
+        "expectedOutput": "0 1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5 -8\n-3 4 -5 7 1\n",
+        "expectedOutput": "0 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2 5\n1 2\n",
+        "expectedOutput": "-1"
+      }
     ]
   },
   {
@@ -27,8 +56,17 @@
     "difficulty": "easy",
     "sortOrder": 20,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["hash set", "arrays"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "hash set",
+      "arrays"
+    ],
     "sourceUrl": "https://leetcode.com/problems/contains-duplicate/",
     "sourceName": "LeetCode 217",
     "statement": "Given a list of `n` integers, decide whether any value appears more than once.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` integers. When `n` is 0 the second line is empty.\n\n## Output\n\n`true` if some value appears at least twice, otherwise `false`.\n\n## Example\n\n```\nInput:\n4\n1 2 3 1\n\nOutput:\ntrue\n```",
@@ -36,12 +74,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## Three approaches\n\n**Brute force, O(n^2).** Compare every pair. Times out at 10^5.\n\n**Sort, then scan adjacent pairs — O(n log n), O(1) extra.** After sorting, duplicates are neighbours. Use this when memory is tight.\n\n**Hash set — O(n) average, O(n) space.** Insert as you go; if an insert finds the value already present, you are done.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    unordered_set<int> seen;\n    seen.reserve(n * 2);        // avoids ~log n rehashes\n\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        // insert returns {iterator, inserted?}. A false second means the\n        // value was already there — one lookup instead of two.\n        if (!seen.insert(x).second) {\n            cout << \"true\\n\";\n            return 0;\n        }\n    }\n    cout << \"false\\n\";\n}\n```\n\nThe early return matters: on an array whose first two elements match, this reads two values rather than all 10^5.\n\n## Edge cases\n\n`n = 0` and `n = 1` must both print `false` — there is nothing to duplicate. A loop that assumes at least two elements gets these wrong.\n\n## The sorting alternative\n\n```cpp\n// O(n log n) time, O(1) extra space beyond the input.\nsort(a.begin(), a.end());\nfor (size_t i = 1; i < a.size(); ++i)\n    if (a[i] == a[i - 1]) { cout << \"true\\n\"; return 0; }\ncout << \"false\\n\";\n```\n\nNote `i = 1` and comparing backwards. Writing `i < a.size() - 1` would underflow on an empty array, as the undefined-behaviour lesson warns.",
     "testCases": [
-      { "visibility": "sample", "input": "4\n1 2 3 1\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "4\n1 2 3 4\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "0\n\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "1\n7\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "5\n-1 -1 2 3 4\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "6\n1 2 3 4 5 6\n", "expectedOutput": "false" }
+      {
+        "visibility": "sample",
+        "input": "4\n1 2 3 1\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "4\n1 2 3 4\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "0\n\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n7\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n-1 -1 2 3 4\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6\n1 2 3 4 5 6\n",
+        "expectedOutput": "false"
+      }
     ]
   },
   {
@@ -50,8 +112,17 @@
     "difficulty": "easy",
     "sortOrder": 30,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["counting", "strings"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "counting",
+      "strings"
+    ],
     "sourceUrl": "https://leetcode.com/problems/valid-anagram/",
     "sourceName": "LeetCode 242",
     "statement": "Two strings are anagrams when one is a rearrangement of the other — the same characters with the same multiplicities.\n\nGiven two lowercase strings, decide whether they are anagrams.\n\n## Input\n\nTwo lines, one string per line.\n\n## Output\n\n`true` or `false`.\n\n## Example\n\n```\nInput:\nanagram\nnagaram\n\nOutput:\ntrue\n```",
@@ -59,12 +130,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    string a, b;\n    cin >> a >> b;\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
     "editorial": "## Counting — O(n) time, O(1) space\n\nThe alphabet is 26 letters, so the count table is fixed-size regardless of `n`. That is what makes the space O(1) rather than O(n).\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    string a, b;\n    cin >> a >> b;\n\n    // Different lengths can never be anagrams, and checking first avoids\n    // scanning two large strings for nothing.\n    if (a.size() != b.size()) {\n        cout << \"false\\n\";\n        return 0;\n    }\n\n    array<int, 26> count{};              // {} zero-initialises; omitting it\n                                         // leaves garbage — see the UB lesson\n    for (char c : a) ++count[c - 'a'];\n    for (char c : b) --count[c - 'a'];\n\n    for (int c : count) {\n        if (c != 0) {\n            cout << \"false\\n\";\n            return 0;\n        }\n    }\n    cout << \"true\\n\";\n}\n```\n\nOne table, incremented for the first string and decremented for the second. If every entry returns to zero the multiset of characters matched exactly. Two separate tables and a comparison also works; one table is less code and makes the invariant clearer.\n\n## The sorting alternative — O(n log n)\n\n```cpp\nsort(a.begin(), a.end());\nsort(b.begin(), b.end());\ncout << (a == b ? \"true\" : \"false\") << '\\n';\n```\n\nThree lines and obviously correct. Prefer it when `n` is small or you are short on time; the counting version when the input is large.\n\n## Generalising\n\nFor arbitrary Unicode, swap `array<int,26>` for `unordered_map<char,int>` — O(n) space, but no assumption about the alphabet. The length check stays the first thing you do.",
     "testCases": [
-      { "visibility": "sample", "input": "anagram\nnagaram\n", "expectedOutput": "true" },
-      { "visibility": "sample", "input": "rat\ncar\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "a\na\n", "expectedOutput": "true" },
-      { "visibility": "hidden", "input": "ab\nabc\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "aacc\nccac\n", "expectedOutput": "false" },
-      { "visibility": "hidden", "input": "listen\nsilent\n", "expectedOutput": "true" }
+      {
+        "visibility": "sample",
+        "input": "anagram\nnagaram\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "rat\ncar\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "a\na\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "ab\nabc\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "aacc\nccac\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "listen\nsilent\n",
+        "expectedOutput": "true"
+      }
     ]
   },
   {
@@ -73,8 +168,17 @@
     "difficulty": "easy",
     "sortOrder": 40,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["greedy", "arrays"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "greedy",
+      "arrays"
+    ],
     "sourceUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
     "sourceName": "LeetCode 121",
     "statement": "You are given the price of a stock on each of `n` consecutive days. You may buy on one day and sell on a strictly later day, at most once.\n\nPrint the maximum profit achievable. If no profitable trade exists, print `0` — you are allowed to do nothing.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` prices.\n\n## Output\n\nA single integer: the maximum profit.\n\n## Example\n\n```\nInput:\n6\n7 1 5 3 6 4\n\nOutput:\n5\n```\n\nBuy on day 1 at price 1, sell on day 4 at price 6.",
@@ -82,12 +186,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<int> price(n);\n    for (int& p : price) cin >> p;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The observation\n\nTo sell on day `i` for the most profit, you want to have bought at the **cheapest price among days 0..i-1**. So a single pass that tracks the minimum seen so far is enough — there is nothing to reconsider, which is what makes this greedy and not DP.\n\n## Optimal — O(n) time, O(1) space\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    int lowest = INT_MAX;\n    int best = 0;              // 0, because doing nothing is permitted\n\n    for (int i = 0; i < n; ++i) {\n        int p;\n        cin >> p;\n        // Order matters: update the minimum first and `best` could use\n        // today's price as both buy and sell, which the problem forbids.\n        // Evaluating the sale against the PREVIOUS minimum keeps buy < sell.\n        best = max(best, p - lowest);\n        lowest = min(lowest, p);\n    }\n    cout << best << '\\n';\n}\n```\n\nNote the ordering. `best` is computed against `lowest` *before* today's price is folded in, which is what enforces \"sell strictly later than buy\". Swapping the two lines yields `p - p = 0` as a candidate, which happens to be harmless here only because `best` starts at 0 — but it is wrong reasoning, and the same mistake breaks the variant where you must trade.\n\n## Why `best` starts at 0, not INT_MIN\n\nThe problem permits doing nothing, so on a strictly decreasing array the answer is 0. This is the mirror image of the maximum-subarray trap, where initialising to 0 is *wrong* because an empty selection is not allowed there. The initial value encodes whether the empty choice is legal — read the statement for it rather than copying a habit.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Brute force (every pair) | O(n^2) | O(1) |\n| One pass | O(n) | O(1) |",
     "testCases": [
-      { "visibility": "sample", "input": "6\n7 1 5 3 6 4\n", "expectedOutput": "5" },
-      { "visibility": "sample", "input": "5\n7 6 4 3 1\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1\n5\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "2\n1 2\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "2\n2 1\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "6\n3 2 6 5 0 3\n", "expectedOutput": "4" }
+      {
+        "visibility": "sample",
+        "input": "6\n7 1 5 3 6 4\n",
+        "expectedOutput": "5"
+      },
+      {
+        "visibility": "sample",
+        "input": "5\n7 6 4 3 1\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n5\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 2\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n2 1\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6\n3 2 6 5 0 3\n",
+        "expectedOutput": "4"
+      }
     ]
   },
   {
@@ -96,8 +224,18 @@
     "difficulty": "medium",
     "sortOrder": 50,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["greedy", "dynamic programming", "kadane"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "greedy",
+      "dynamic programming",
+      "kadane"
+    ],
     "sourceUrl": "https://leetcode.com/problems/maximum-subarray/",
     "sourceName": "LeetCode 53",
     "statement": "Given `n` integers, find the contiguous non-empty subarray with the largest sum and print that sum.\n\nThe subarray must be contiguous and must contain at least one element — so when every value is negative, the answer is the largest single value, not zero.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` integers.\n\n## Output\n\nA single integer: the maximum subarray sum.\n\n## Example\n\n```\nInput:\n9\n-2 1 -3 4 -1 2 1 -5 4\n\nOutput:\n6\n```\n\nThe subarray `4 -1 2 1` sums to 6.",
@@ -105,12 +243,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## Kadane's algorithm\n\nAt each element there are exactly two choices: extend the subarray ending at the previous element, or start a new one here. Take whichever is larger.\n\nThe reason this is safe: if the running sum has gone negative, it can only hurt anything that follows, so discarding it is never wrong.\n\n## Optimal — O(n) time, O(1) space\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    // 🛑 LLONG_MIN, not 0. A non-empty subarray is required, so on an\n    // all-negative array the answer is negative. Initialising to 0 is the\n    // single most common wrong answer on this problem.\n    long long best = LLONG_MIN;\n    long long cur = 0;\n\n    for (int i = 0; i < n; ++i) {\n        long long x;\n        cin >> x;\n        // Either start fresh at x, or extend the previous run.\n        cur = max(x, cur + x);\n        best = max(best, cur);\n    }\n    cout << best << '\\n';\n}\n```\n\n## Dry run on the sample\n\n| x | cur = max(x, cur+x) | best |\n|---|---|---|\n| -2 | -2 | -2 |\n| 1 | 1 | 1 |\n| -3 | -2 | 1 |\n| 4 | 4 | 4 |\n| -1 | 3 | 4 |\n| 2 | 5 | 5 |\n| 1 | **6** | **6** |\n| -5 | 1 | 6 |\n| 4 | 5 | 6 |\n\nNotice `cur` drops to 1 at the `-5` and the answer is already banked in `best`. Tracking both is what lets the algorithm abandon a run without losing the result.\n\n## As dynamic programming\n\nKadane is a rolled 1-D DP. The state is `dp[i]` = best sum of a subarray *ending at* `i`, with transition `dp[i] = max(a[i], dp[i-1] + a[i])`. Since `dp[i]` depends only on `dp[i-1]`, the array collapses to one variable — exactly the rolling trick from the DP lesson.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Every subarray | O(n^2) | O(1) |\n| Divide and conquer | O(n log n) | O(log n) |\n| Kadane | O(n) | O(1) |",
     "testCases": [
-      { "visibility": "sample", "input": "9\n-2 1 -3 4 -1 2 1 -5 4\n", "expectedOutput": "6" },
-      { "visibility": "sample", "input": "1\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "3\n-5 -2 -9\n", "expectedOutput": "-2" },
-      { "visibility": "hidden", "input": "5\n5 4 -1 7 8\n", "expectedOutput": "23" },
-      { "visibility": "hidden", "input": "1\n-1\n", "expectedOutput": "-1" },
-      { "visibility": "hidden", "input": "4\n-2 -1 -3 -4\n", "expectedOutput": "-1" }
+      {
+        "visibility": "sample",
+        "input": "9\n-2 1 -3 4 -1 2 1 -5 4\n",
+        "expectedOutput": "6"
+      },
+      {
+        "visibility": "sample",
+        "input": "1\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n-5 -2 -9\n",
+        "expectedOutput": "-2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n5 4 -1 7 8\n",
+        "expectedOutput": "23"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n-1\n",
+        "expectedOutput": "-1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\n-2 -1 -3 -4\n",
+        "expectedOutput": "-1"
+      }
     ]
   },
   {
@@ -119,8 +281,17 @@
     "difficulty": "medium",
     "sortOrder": 60,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["prefix sums", "arrays"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "prefix sums",
+      "arrays"
+    ],
     "sourceUrl": "https://leetcode.com/problems/product-of-array-except-self/",
     "sourceName": "LeetCode 238",
     "statement": "Given `n` integers, print a list of `n` integers where position `i` holds the product of every element **except** the one at position `i`.\n\nYou must solve it without using division, and in O(n) time.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` integers.\n\n## Output\n\n`n` integers on one line, separated by single spaces.\n\n## Example\n\n```\nInput:\n4\n1 2 3 4\n\nOutput:\n24 12 8 6\n```\n\nPosition 0 is 2*3*4 = 24, position 1 is 1*3*4 = 12, and so on.",
@@ -128,11 +299,31 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    // Your code here. Print n values separated by single spaces.\n\n    return 0;\n}\n",
     "editorial": "## Why not division\n\nThe tempting solution is \"total product divided by `a[i]`\". It fails on zeros: with one zero every other answer is 0 and the zero's own answer is the product of the rest — and division by zero is undefined. The no-division rule exists to force the real technique.\n\n## The idea: prefix and suffix products\n\nThe product of everything except position `i` is\n\n```\n(product of a[0..i-1])  *  (product of a[i+1..n-1])\n```\n\nBoth factors are computable in one pass each. This is the prefix-sum idea with multiplication in place of addition.\n\n## Optimal — O(n) time, O(1) extra space\n\nThe output array doubles as the prefix store, so no additional array is needed.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    vector<long long> out(n, 1);\n\n    // Pass 1, left to right: out[i] = product of everything BEFORE i.\n    long long running = 1;\n    for (int i = 0; i < n; ++i) {\n        out[i] = running;\n        running *= a[i];\n    }\n\n    // Pass 2, right to left: multiply in the product of everything AFTER i.\n    running = 1;\n    for (int i = n - 1; i >= 0; --i) {\n        out[i] *= running;\n        running *= a[i];\n    }\n\n    for (int i = 0; i < n; ++i) cout << out[i] << \" \\n\"[i == n - 1];\n}\n```\n\nIn both passes, `out[i]` is assigned **before** `running` absorbs `a[i]` — that ordering is what excludes position `i` from its own answer. Swap the two lines and every entry includes itself.\n\n## Dry run on `1 2 3 4`\n\nAfter pass 1: `out = [1, 1, 2, 6]` — the running product of everything to the left.\n\nAfter pass 2, walking backwards with `running` = 1, 4, 12, 24:\n\n- `out[3] = 6 * 1 = 6`\n- `out[2] = 2 * 4 = 8`\n- `out[1] = 1 * 12 = 12`\n- `out[0] = 1 * 24 = 24`\n\n## Zeros fall out for free\n\nNo special case is needed. With one zero, every other position has it in either its prefix or its suffix, so they are 0; the zero's own position sees only the others. With two or more zeros, everything is 0. Verify against the test case `-1 1 0 -3 3`.\n\n## The output idiom\n\n`\" \\n\"[i == n - 1]` indexes a two-character string: a space normally, a newline on the last element. It avoids a trailing space without an `if`.",
     "testCases": [
-      { "visibility": "sample", "input": "4\n1 2 3 4\n", "expectedOutput": "24 12 8 6" },
-      { "visibility": "sample", "input": "5\n-1 1 0 -3 3\n", "expectedOutput": "0 0 9 0 0" },
-      { "visibility": "hidden", "input": "2\n2 3\n", "expectedOutput": "3 2" },
-      { "visibility": "hidden", "input": "3\n0 0 5\n", "expectedOutput": "0 0 0" },
-      { "visibility": "hidden", "input": "4\n-1 -2 -3 -4\n", "expectedOutput": "-24 -12 -8 -6" }
+      {
+        "visibility": "sample",
+        "input": "4\n1 2 3 4\n",
+        "expectedOutput": "24 12 8 6"
+      },
+      {
+        "visibility": "sample",
+        "input": "5\n-1 1 0 -3 3\n",
+        "expectedOutput": "0 0 9 0 0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n2 3\n",
+        "expectedOutput": "3 2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n0 0 5\n",
+        "expectedOutput": "0 0 0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\n-1 -2 -3 -4\n",
+        "expectedOutput": "-24 -12 -8 -6"
+      }
     ]
   },
   {
@@ -141,8 +332,18 @@
     "difficulty": "medium",
     "sortOrder": 70,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["hash map", "heap", "bucket sort"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "hash map",
+      "heap",
+      "bucket sort"
+    ],
     "sourceUrl": "https://leetcode.com/problems/top-k-frequent-elements/",
     "sourceName": "LeetCode 347",
     "statement": "Given `n` integers and a value `k`, find the `k` values that occur most often.\n\nThe `k` most frequent values are guaranteed to be unambiguous — there are no ties at the cut-off.\n\nPrint them in **ascending numeric order**, so the output is deterministic.\n\n## Input\n\nThe first line holds `n` and `k`. The second line holds `n` integers.\n\n## Output\n\n`k` integers in ascending order, separated by single spaces.\n\n## Example\n\n```\nInput:\n6 2\n1 1 1 2 2 3\n\nOutput:\n1 2\n```\n\nThe value 1 appears three times and 2 appears twice, so those are the two most frequent. Printed in ascending order they are `1 2`.",
@@ -150,11 +351,31 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, k;\n    cin >> n >> k;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n\n    // Print k values in ASCENDING order.\n\n    return 0;\n}\n",
     "editorial": "## Step 1 is always the same\n\nCount frequencies with a hash map. The interesting part is selecting the top `k` from those counts.\n\n## Approach A: sort the counts — O(d log d)\n\nWhere `d` is the number of distinct values. Simple, and fast enough for almost every constraint.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n, k;\n    cin >> n >> k;\n\n    unordered_map<int, int> freq;\n    freq.reserve(n * 2);\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        ++freq[x];\n    }\n\n    vector<pair<int, int>> counts(freq.begin(), freq.end());   // {value, count}\n\n    // Partial sort is enough: we only need the first k in order, not all d.\n    // Comparator is STRICT (uses >, not >=) — see the algorithms lesson.\n    nth_element(counts.begin(), counts.begin() + k - 1, counts.end(),\n                [](const auto& x, const auto& y) { return x.second > y.second; });\n\n    vector<int> top;\n    for (int i = 0; i < k; ++i) top.push_back(counts[i].first);\n\n    // The problem asks for ascending numeric order, so sort the values.\n    sort(top.begin(), top.end());\n    for (int i = 0; i < k; ++i) cout << top[i] << \" \\n\"[i == k - 1];\n}\n```\n\n## Approach B: a min-heap of size k — O(d log k)\n\nBetter when `k` is much smaller than `d`, and the right choice on a stream where you cannot hold all counts.\n\nThe counter-intuitive part: to keep the `k` **largest**, use a **min**-heap. Its root is the weakest of the current best `k`, which is exactly the element to evict.\n\n```cpp\npriority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> keep;  // {count, value}\nfor (auto [value, count] : freq) {\n    keep.push({count, value});\n    if ((int)keep.size() > k) keep.pop();      // drop the least frequent\n}\n```\n\n## Approach C: bucket sort — O(n)\n\nA count can be at most `n`, so index an array of buckets by frequency and walk it from the top. Linear time, and the asymptotically best answer.\n\n```cpp\nvector<vector<int>> bucket(n + 1);\nfor (auto [value, count] : freq) bucket[count].push_back(value);\n\nvector<int> top;\nfor (int c = n; c >= 1 && (int)top.size() < k; --c)\n    for (int value : bucket[c]) {\n        top.push_back(value);\n        if ((int)top.size() == k) break;\n    }\n```\n\n## Which to use\n\n| | Time | Space | When |\n|---|---|---|---|\n| Sort counts | O(d log d) | O(d) | Default; shortest to write |\n| Min-heap of k | O(d log k) | O(k) | `k` much smaller than `d`, or streaming |\n| Bucket sort | O(n) | O(n) | Asymptotically best; needs bounded counts |\n\n## Pitfalls\n\n- **`operator[]` on the frequency map inserts.** Here that is exactly what `++freq[x]` relies on, but reading a missing key elsewhere silently grows the map.\n- **A max-heap for \"top k largest\".** You want a min-heap of size `k`.\n- **Assuming `unordered_map` iteration order.** It is unspecified, which is why this problem mandates sorted output.",
     "testCases": [
-      { "visibility": "sample", "input": "6 2\n1 1 1 2 2 3\n", "expectedOutput": "1 2" },
-      { "visibility": "sample", "input": "1 1\n1\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "7 2\n5 5 5 7 7 9 9\n", "expectedOutput": "5 7" },
-      { "visibility": "hidden", "input": "9 3\n4 4 4 3 3 3 2 2 1\n", "expectedOutput": "2 3 4" },
-      { "visibility": "hidden", "input": "4 1\n-3 -3 -3 8\n", "expectedOutput": "-3" }
+      {
+        "visibility": "sample",
+        "input": "6 2\n1 1 1 2 2 3\n",
+        "expectedOutput": "1 2"
+      },
+      {
+        "visibility": "sample",
+        "input": "1 1\n1\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "7 2\n5 5 5 7 7 9 9\n",
+        "expectedOutput": "5 7"
+      },
+      {
+        "visibility": "hidden",
+        "input": "9 3\n4 4 4 3 3 3 2 2 1\n",
+        "expectedOutput": "2 3 4"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4 1\n-3 -3 -3 8\n",
+        "expectedOutput": "-3"
+      }
     ]
   },
   {
@@ -163,8 +384,18 @@
     "difficulty": "medium",
     "sortOrder": 80,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["hash map", "counting", "strings"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "hash map",
+      "counting",
+      "strings"
+    ],
     "sourceUrl": "https://leetcode.com/problems/group-anagrams/",
     "sourceName": "LeetCode 49",
     "statement": "Given `n` lowercase words, partition them into groups of mutual anagrams — words that are rearrangements of one another.\n\nPrint how many groups there are.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` words separated by spaces.\n\n## Output\n\nA single integer: the number of anagram groups.\n\n## Example\n\n```\nInput:\n6\neat tea tan ate nat bat\n\nOutput:\n3\n```\n\nThe groups are `{eat, tea, ate}`, `{tan, nat}` and `{bat}`.",
@@ -172,11 +403,31 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<string> words(n);\n    for (string& w : words) cin >> w;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The key insight\n\nTwo words are anagrams exactly when they share some **canonical form** — a value that is identical for anagrams and different otherwise. Build that key, group by it, and the answer is the number of distinct keys.\n\nThis \"invent a canonical key, then hash it\" move is worth recognising; it recurs constantly.\n\n## Approach A: sorted letters as the key — O(n * L log L)\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n\n    unordered_set<string> groups;\n    for (int i = 0; i < n; ++i) {\n        string w;\n        cin >> w;\n        // Sorting the letters collapses every anagram onto one key:\n        // \"eat\", \"tea\" and \"ate\" all become \"aet\".\n        sort(w.begin(), w.end());\n        groups.insert(w);\n    }\n    cout << groups.size() << '\\n';\n}\n```\n\nA set of keys is enough when you only need the *count*. If the problem wanted the groups themselves, use `unordered_map<string, vector<string>>` and keep the originals.\n\n## Approach B: a letter-count signature — O(n * L)\n\nAvoids the sort. The key is the 26 counts rendered as a string.\n\n```cpp\nstring signature(const string& w) {\n    array<int, 26> count{};\n    for (char c : w) ++count[c - 'a'];\n    string key;\n    for (int c : count) {\n        key += to_string(c);\n        key += '#';           // the separator is NOT optional — see below\n    }\n    return key;\n}\n```\n\nThe `'#'` matters. Without it, counts `{1, 11}` and `{11, 1}` both render as `\"111\"` and two different words collide into one group. A multi-digit count makes the concatenation ambiguous, and with words up to length 100 the counts certainly reach double digits.\n\n## Complexity\n\nLet `n` be the word count and `L` the maximum word length.\n\n| | Time | Space |\n|---|---|---|\n| Sorted-letters key | O(n · L log L) | O(n · L) |\n| Count signature | O(n · L) | O(n · L) |\n\nIn practice the sorted key is faster for short words — `L log L` on 5 letters beats building a 26-entry string. Prefer it unless words are long.\n\n## Pitfalls\n\n- **Comparing every pair of words.** O(n² · L); times out.\n- **An ambiguous signature** with no separator.\n- **Sorting the input vector** rather than each word's letters. Different problem entirely.",
     "testCases": [
-      { "visibility": "sample", "input": "6\neat tea tan ate nat bat\n", "expectedOutput": "3" },
-      { "visibility": "sample", "input": "1\na\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "3\nabc bca cab\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "4\nab ba abc cba\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "5\none two three four five\n", "expectedOutput": "5" }
+      {
+        "visibility": "sample",
+        "input": "6\neat tea tan ate nat bat\n",
+        "expectedOutput": "3"
+      },
+      {
+        "visibility": "sample",
+        "input": "1\na\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\nabc bca cab\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\nab ba abc cba\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\none two three four five\n",
+        "expectedOutput": "5"
+      }
     ]
   },
   {
@@ -185,8 +436,17 @@
     "difficulty": "medium",
     "sortOrder": 90,
     "status": "published",
-    "sheets": ["blind75", "neetcode150", "neetcode250"],
-    "patterns": ["hash set", "arrays"],
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "hash set",
+      "arrays"
+    ],
     "sourceUrl": "https://leetcode.com/problems/longest-consecutive-sequence/",
     "sourceName": "LeetCode 128",
     "statement": "Given `n` integers in no particular order, find the length of the longest run of consecutive integers present in the list. The values need not be adjacent in the input, and duplicates do not extend a run.\n\nAim for O(n) time.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` integers. When `n` is 0 the second line is empty.\n\n## Output\n\nA single integer: the length of the longest consecutive run.\n\n## Example\n\n```\nInput:\n6\n100 4 200 1 3 2\n\nOutput:\n4\n```\n\nThe run `1 2 3 4` has length 4.",
@@ -194,12 +454,36 @@
     "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n\n    // Your code here.\n\n    return 0;\n}\n",
     "editorial": "## The easy O(n log n) answer\n\nSort, then scan counting consecutive neighbours while skipping duplicates. Perfectly acceptable, and what to write if the O(n) idea does not come to you.\n\n## The O(n) idea\n\nPut everything in a hash set. Then, for each value, only start counting if it is the **beginning** of a run — that is, if `x - 1` is absent.\n\nThat single condition is what makes the whole thing linear. Without it, the run `1 2 3 ... k` is walked from every one of its members, giving O(n²) on a single long run — a solution that looks linear and is not.\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    unordered_set<long long> present;\n    present.reserve(n * 2);\n    for (int i = 0; i < n; ++i) {\n        long long x;\n        cin >> x;\n        present.insert(x);      // the set also deduplicates, for free\n    }\n\n    int best = 0;\n    for (long long x : present) {\n        // 🛑 Only run-starts do any walking. Every other value is skipped in\n        // O(1), so the total work across all runs is O(n), not O(n^2).\n        if (present.count(x - 1)) continue;\n\n        long long cur = x;\n        int length = 1;\n        while (present.count(cur + 1)) {\n            ++cur;\n            ++length;\n        }\n        best = max(best, length);\n    }\n    cout << best << '\\n';\n}\n```\n\n## Why the total is linear\n\nEach value is visited by the outer loop once. The inner `while` only advances through members of the run whose start we are at, and each run is walked exactly once — from its smallest element. So across the whole execution the inner loop runs at most `n` times in total.\n\n## Edge cases\n\n- `n = 0` must print `0`. The loop body never executes, and `best` starts at 0.\n- Duplicates: `1 1 2` has longest run 2, not 3. The set handles it without a special case.\n- Negative values and values spanning zero: `-1 0 1` is a run of 3. Nothing special needed, which is why `long long` is used — `x - 1` at `-10^9` stays in range.\n\n## Complexity\n\n| | Time | Space |\n|---|---|---|\n| Sort and scan | O(n log n) | O(1) extra |\n| Hash set, run-starts only | O(n) average | O(n) |\n\nThe hash-set version is O(n) *average*. Against adversarial input designed to collide, it degrades — see the hash-table lesson. The sorting version has no such weakness, which is a real argument for it on a judge that allows hacks.",
     "testCases": [
-      { "visibility": "sample", "input": "6\n100 4 200 1 3 2\n", "expectedOutput": "4" },
-      { "visibility": "sample", "input": "10\n0 3 7 2 5 8 4 6 0 1\n", "expectedOutput": "9" },
-      { "visibility": "hidden", "input": "0\n\n", "expectedOutput": "0" },
-      { "visibility": "hidden", "input": "1\n5\n", "expectedOutput": "1" },
-      { "visibility": "hidden", "input": "3\n1 1 2\n", "expectedOutput": "2" },
-      { "visibility": "hidden", "input": "3\n-1 0 1\n", "expectedOutput": "3" }
+      {
+        "visibility": "sample",
+        "input": "6\n100 4 200 1 3 2\n",
+        "expectedOutput": "4"
+      },
+      {
+        "visibility": "sample",
+        "input": "10\n0 3 7 2 5 8 4 6 0 1\n",
+        "expectedOutput": "9"
+      },
+      {
+        "visibility": "hidden",
+        "input": "0\n\n",
+        "expectedOutput": "0"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n5\n",
+        "expectedOutput": "1"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n1 1 2\n",
+        "expectedOutput": "2"
+      },
+      {
+        "visibility": "hidden",
+        "input": "3\n-1 0 1\n",
+        "expectedOutput": "3"
+      }
     ]
   }
 ]
