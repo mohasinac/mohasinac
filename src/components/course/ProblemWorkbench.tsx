@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { VizPlayer } from "@dsa/render/VizPlayer";
+import { unavailableMessage } from "@dsa/trace/attribute";
+import { trapMessage } from "@dsa/trace/protocol";
+import type { AzLimits } from "@dsa/trace/az-trace-header";
+import type { VizTrace } from "@dsa/trace/types";
+import { runTrace } from "@/lib/trace-run";
 
 export interface TestCase {
   id: string;
@@ -54,10 +60,13 @@ export function ProblemWorkbench({
   problemSlug,
   starterCode,
   cases,
+  vizLimits,
 }: {
   problemSlug: string;
   starterCode: string;
   cases: TestCase[];
+  /** Per-problem cap overrides. Clamped to the hard ceilings regardless. */
+  vizLimits?: Partial<AzLimits>;
 }) {
   const [source, setSource] = useState(starterCode || "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    \n}\n");
   const [busy, setBusy] = useState(false);
@@ -65,6 +74,11 @@ export function ProblemWorkbench({
   const [outcomes, setOutcomes] = useState<CaseOutcome[] | null>(null);
   const [verdict, setVerdict] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  /** Step-through state, kept entirely separate from the judged run. */
+  const [trace, setTrace] = useState<VizTrace | null>(null);
+  const [traceNote, setTraceNote] = useState<string | null>(null);
+  const [tracing, setTracing] = useState(false);
 
   const workerRef = useRef<Worker | null>(null);
   const seqRef = useRef(0);
@@ -122,6 +136,86 @@ export function ProblemWorkbench({
       }),
     [source, getWorker],
   );
+
+  /**
+   * Visualize: a SEPARATE action from Run & submit, deliberately.
+   *
+   * 🛑 No click ever needs both compiles. Tracing costs a second compile and
+   * produces frames that must never influence a verdict, so binding it to
+   * submit would both slow every submission down and blur the one boundary
+   * this feature must keep sharp.
+   *
+   * It traces the FIRST sample case. Hidden cases are not an option even in
+   * principle: their expected output exists only as a SHA-256 on the server,
+   * and tracing one would show the learner an input chosen to be unseen.
+   */
+  async function onVisualize() {
+    const sample = cases.find((c) => c.visibility === "sample");
+    if (!sample) {
+      setTraceNote("This problem has no sample case to step through yet.");
+      return;
+    }
+    if (new TextEncoder().encode(source).length > MAX_SOURCE_BYTES) {
+      setError("Source exceeds the 64 KB limit.");
+      return;
+    }
+
+    setTracing(true);
+    setTrace(null);
+    setTraceNote(null);
+    setError(null);
+
+    try {
+      const r = await runTrace({
+        worker: getWorker(),
+        source,
+        stdin: sample.input,
+        ...(vizLimits ? { limits: vizLimits } : {}),
+        nextId: () => ++seqRef.current,
+        onStatus: setStatus,
+      });
+
+      switch (r.attribution.kind) {
+        case "learner-compile-error":
+          // Theirs, and from the ORIGINAL compile — the only diagnostics that
+          // are ever allowed to reach this panel.
+          setError(r.attribution.diagnostics);
+          break;
+        case "unavailable":
+          setTraceNote(unavailableMessage(r.attribution.reason));
+          // Telemetry about OUR bug. Logged, never rendered.
+          if (r.attribution.telemetry) {
+            console.warn("[tracer] %s: %s", r.attribution.reason, r.attribution.telemetry);
+          }
+          break;
+        case "learner-trap":
+          setTrace(r.trace ?? null);
+          setTraceNote(trapMessage(r.attribution.trap));
+          break;
+        case "ok":
+          setTrace(r.trace ?? null);
+          break;
+      }
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (msg === "TRACE_TIMEOUT") {
+        // terminate() is the only way to stop a spinning wasm program, and it
+        // destroys this worker — so drop the reference or every later run
+        // posts into a corpse.
+        workerRef.current?.terminate();
+        workerRef.current = null;
+        setTraceNote(
+          "Tracing timed out. If your program loops forever, the step limit stops the " +
+            "trace but not the program — fix the loop and try again.",
+        );
+      } else {
+        setTraceNote(msg);
+      }
+    } finally {
+      setTracing(false);
+      setStatus("");
+    }
+  }
 
   async function onSubmit() {
     if (new TextEncoder().encode(source).length > MAX_SOURCE_BYTES) {
@@ -225,6 +319,15 @@ export function ProblemWorkbench({
         >
           {busy ? "Running…" : "Run & submit"}
         </button>
+        <button
+          type="button"
+          onClick={onVisualize}
+          disabled={busy || tracing}
+          title="Compile a traced copy and step through it. Never affects your verdict."
+          className="rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-raised disabled:opacity-50"
+        >
+          {tracing ? "Tracing…" : "Visualize"}
+        </button>
         {status ? <span className="text-xs text-text-muted">{status}</span> : null}
         {verdict ? (
           <span className={verdict === "accepted" ? "text-sm text-success" : "text-sm text-error"}>
@@ -237,6 +340,18 @@ export function ProblemWorkbench({
         <pre role="alert" className="overflow-x-auto rounded-md border border-border bg-surface p-3 text-xs text-error">
           {error}
         </pre>
+      ) : null}
+
+      {/* 🛑 Worded as a limitation of the tool, because in every case that
+          produces one of these it IS one. Never "your code is wrong". */}
+      {traceNote ? (
+        <p className="rounded-md border border-border bg-surface p-3 text-xs text-text-muted">
+          {traceNote}
+        </p>
+      ) : null}
+
+      {trace ? (
+        <VizPlayer trace={trace} chrome="trace" title="step through your code" />
       ) : null}
 
       {outcomes ? (

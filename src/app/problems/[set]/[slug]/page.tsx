@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/session";
 import { getPublishedBySlug } from "@/lib/public-content";
 import { getDb } from "@/lib/firestore";
 import { ProblemWorkbench, type TestCase } from "@/components/course/ProblemWorkbench";
+import type { AzLimits } from "@dsa/trace/az-trace-header";
 import { Markdown } from "@/components/Markdown";
 import { ProblemExplainer } from "@/components/course/ProblemExplainer";
 import { ProblemScenarios } from "@/components/course/ProblemScenarios";
@@ -138,6 +139,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
         problemSlug={slug}
         starterCode={String(problem.starterCode ?? "")}
         cases={cases}
+        {...(problem.vizLimits ? { vizLimits: problem.vizLimits as Partial<AzLimits> } : {})}
       />
 
       {problem.editorial ? (

@@ -214,6 +214,42 @@ async function run(wasmBytes, stdinText) {
  * feature is that tracing cannot change what gets judged.
  */
 
+/**
+ * Dump the AST as JSON, for the splice planner.
+ *
+ * 🛑 Why this is a worker command rather than the worker doing the splicing
+ * itself: the planner is typed, tested TypeScript in the dsa package, and this
+ * file is plain JS served from /public so it can be loaded without a bundler.
+ * Re-implementing the planner here would mean two copies of the one component
+ * that must not be wrong. So the worker runs clang; the main thread plans.
+ *
+ * `-fsyntax-only`, so this costs a parse and not a codegen. The dump omits
+ * everything loaded from the PCH — clang does not re-emit PCH declarations —
+ * which is the only reason dumping the AST of a program that includes
+ * <bits/stdc++.h> is affordable at all.
+ */
+async function dumpAst(source) {
+  let stdout = "";
+  let stderr = "";
+  const files = { "sol.cpp": source, "stdcxx.pch": PCH, bits: { "stdc++.h": BITS } };
+  const args = [
+    "clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch",
+    "-Xclang", "-ast-dump=json", "-fsyntax-only", "sol.cpp",
+  ];
+  const t = performance.now();
+  try {
+    await runClang(args, files, {
+      stdout: (b) => { if (b) stdout += td.decode(b); },
+      stderr: (b) => { if (b) stderr += td.decode(b); },
+    });
+  } catch (err) {
+    const e = new Error("ast dump failed");
+    e.stderr = stderr || String(err);
+    throw e;
+  }
+  return { ast: stdout, stderr, ms: Math.round(performance.now() - t) };
+}
+
 /** Compile instrumented source, with `az_trace.h` planted in the VFS. */
 async function compileTraced(source) {
   let stderr = "";
@@ -362,6 +398,14 @@ self.onmessage = async (ev) => {
         wasmBytes: c.wasm.length,
         ...r,
       });
+      return;
+    }
+    if (cmd === "ast") {
+      await load();
+      const a = await dumpAst(source);
+      // `traced: true` so the judging path ignores this reply too — it rides
+      // the same "result" channel as a judged run.
+      post("result", { id, ok: true, traced: true, ast: a.ast, compileMs: a.ms });
       return;
     }
     if (cmd === "trace") {

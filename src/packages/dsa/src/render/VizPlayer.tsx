@@ -261,7 +261,17 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
     [watchExprs, frame],
   );
 
-  if (!frame || !spec) {
+  /*
+   * A frame is required; a SPEC is not.
+   *
+   * 🛑 A trace of a program with no collection in scope — a pure-arithmetic or
+   * bit-manipulation solution — has nothing to draw, but the code pane,
+   * variable panel and the whole step debugger are still exactly as useful.
+   * Refusing to render those because no diagram could be inferred would throw
+   * away the feature over a missing nice-to-have. The explain chrome does still
+   * need a spec, because a diagram is all it has.
+   */
+  if (!frame || (!spec && chrome === "explain")) {
     return (
       <p className="rounded-md border border-border bg-surface p-4 text-sm text-text-muted">
         No visualization available for this problem.
@@ -270,7 +280,7 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
   }
 
   const caption = frame.note ?? "";
-  const asString = spec.kind === "array" && spec.asString === true;
+  const asString = spec?.kind === "array" && spec.asString === true;
   const isTrace = chrome === "trace" && trace.source.trim() !== "";
   const condLine = frame.line;
   const condDraftOk = isConditionParseable(condDraft);
@@ -324,7 +334,7 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
       ) : null}
 
       <div className="overflow-x-auto p-3">
-        {spec.kind === "array" ? (
+        {!spec ? null : spec.kind === "array" ? (
           <ArrayView values={cells} roles={roles} asString={asString} idPrefix={idPrefix} />
         ) : spec.kind === "grid" ? (
           <GridView
@@ -563,7 +573,7 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
             {Object.entries(roles).map(([cell, role]) => (
               <div key={cell} className="col-span-2 grid grid-cols-subgrid">
                 <dt className="font-mono text-text-faint">
-                  {spec.var}[{cell}]
+                  {spec?.var}[{cell}]
                 </dt>
                 <dd>
                   {String(cells[Number(cell)] ?? "")} — {ROLE_WORD[role as VizRole]}
