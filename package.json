@@ -17,6 +17,8 @@
     "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check",
     "verify:firebase": "node scripts/verify-firebase.mjs .",
     "verify:course": "node scripts/verify-course.mjs",
+    "verify:queries": "node scripts/verify-queries.mjs",
+    "deploy:indexes": "node scripts/deploy-indexes.mjs",
     "seed": "node scripts/seed-content.mjs",
     "seed:apply": "node scripts/seed-content.mjs --apply"
   },
