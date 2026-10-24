@@ -151,6 +151,60 @@ const problemSchema = z.object({
   /** Attribution link to wherever the problem originates. */
   sourceUrl: z.string().url().optional(),
   sourceName: z.string().max(80).optional(),
+
+  /**
+   * How to read this problem's stdin, so the "understand the problem" explainer
+   * knows what the bytes mean before drawing them.
+   *
+   * 🛑 Optional on purpose, and absence is meaningful: a problem with no
+   * descriptor gets NO explainer rather than a guessed one. A confidently
+   * mis-parsed diagram teaches something false, which is worse than no diagram.
+   *
+   * Mirrors InputStep in @dsa/scenarios/input-format — the parser is the
+   * authority on the shapes; this is the storage schema for them.
+   */
+  inputFormat: z
+    .array(
+      z.union([
+        z.object({ read: z.literal("scalars"), names: z.array(z.string().max(40)).min(1).max(8) }),
+        z.object({
+          read: z.literal("array"),
+          name: z.string().max(40),
+          length: z.union([z.string().max(40), z.number().int().nonnegative()]),
+        }),
+        z.object({
+          read: z.literal("matrix"),
+          name: z.string().max(40),
+          rows: z.union([z.string().max(40), z.number().int().nonnegative()]),
+          cols: z.union([z.string().max(40), z.number().int().nonnegative()]),
+        }),
+        z.object({
+          read: z.literal("lines"),
+          name: z.string().max(40),
+          count: z.union([z.string().max(40), z.number().int().nonnegative()]),
+        }),
+        z.object({ read: z.literal("line"), name: z.string().max(40) }),
+        z.object({ read: z.literal("rest"), name: z.string().max(40) }),
+      ]),
+    )
+    .max(8)
+    .optional(),
+
+  /** Which structure the explainer draws, and which parsed var feeds it. */
+  vizKind: z
+    .enum(["array", "grid", "tree", "linkedList", "graph", "stack", "queue"])
+    .optional(),
+  vizVar: z.string().max(40).optional(),
+
+  /** Per-problem cap overrides for the tracer. Defaults apply when absent. */
+  vizLimits: z
+    .object({
+      maxSteps: z.number().int().min(1).max(5000).optional(),
+      maxLoopIterations: z.number().int().min(1).max(200).optional(),
+      maxDepth: z.number().int().min(1).max(10_000).optional(),
+      maxElements: z.number().int().min(1).max(2000).optional(),
+    })
+    .optional(),
 });
 
 export interface ResourceDef {
