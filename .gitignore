@@ -80,3 +80,6 @@ Thumbs.db
 *-firebase-adminsdk-*.json
 mohasinac-com-*.json
 /secrets/
+
+# Session-scoped Stop-hook state: per-session, never shared.
+.claude/plan-loop/
