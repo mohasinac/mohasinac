@@ -24,7 +24,9 @@
     "test:dsa": "node --test --experimental-strip-types src/packages/dsa/test/*.test.ts",
     "verify:explainers": "node --experimental-strip-types scripts/verify-explainers.mjs",
     "verify:az-header": "node --experimental-strip-types scripts/verify-az-header.mjs",
-    "stage:trace-header": "node --experimental-strip-types scripts/stage-trace-header.mjs"
+    "stage:trace-header": "node --experimental-strip-types scripts/stage-trace-header.mjs",
+    "verify:splice": "node --experimental-strip-types scripts/verify-splice.mjs",
+    "verify:splice:corpus": "node --experimental-strip-types scripts/verify-splice.mjs --corpus"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",
