@@ -54,7 +54,14 @@ export function ProblemExplainer({
       <h2 className="mb-2 font-mono text-xs uppercase tracking-wider text-text-faint">
         Understand the problem
       </h2>
-      <div className="space-y-3">
+      {/*
+        Side by side on a wide screen. A sample input is usually a handful of
+        cells, so each panel was ~190px of diagram in a ~980px box — stacking
+        two of them filled half a screen with empty space and pushed the editor
+        below the fold. Two columns also let the examples be COMPARED, which is
+        the point of having two: the same question, a different answer.
+      */}
+      <div className="grid gap-3 lg:grid-cols-2">
         {built.map((b, i) => (
           <VizPlayer
             key={i}
