@@ -24,6 +24,8 @@ import type { TraceValue, VizChrome, VizRole, VizTrace } from "../trace/types.ts
 import { ROLE_WORD } from "../theme/roles.ts";
 import { ArrayView } from "./ArrayView.tsx";
 import { GridView } from "./GridView.tsx";
+import { TreeView } from "./TreeView.tsx";
+import { decodeLevelOrder, type TreeModel } from "./tree-layout.ts";
 
 /*
  * prefers-reduced-motion as an external store rather than state set inside an
@@ -51,6 +53,8 @@ export interface VizPlayerProps {
   readonly chrome?: VizChrome;
   readonly title?: string;
 }
+
+const EMPTY_TREE: TreeModel = { nodes: [], cols: 0, depth: 0 };
 
 const SPEEDS = [0.5, 1, 2, 4] as const;
 const BASE_MS = 1400;
@@ -158,6 +162,15 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
   );
   const roles = spec ? frame?.roles?.cells?.[spec.var] : undefined;
 
+  /*
+   * Decoded once per frame rather than per render. The layout is deterministic,
+   * so a node sits at the same pixel in every frame — the anti-jitter rule.
+   */
+  const treeModel = useMemo(
+    () => (spec?.kind === "tree" ? decodeLevelOrder(cells.map((c) => String(c))) : EMPTY_TREE),
+    [spec, cells],
+  );
+
   if (!frame || !spec) {
     return (
       <p className="rounded-md border border-border bg-surface p-4 text-sm text-text-muted">
@@ -200,9 +213,11 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
             {...(spec.colLabels ? { colLabels: spec.colLabels } : {})}
             idPrefix={idPrefix}
           />
+        ) : spec.kind === "tree" ? (
+          <TreeView model={treeModel} roles={roles} idPrefix={idPrefix} />
         ) : (
-          // Tree, linked-list, graph and column views land in later phases.
-          // Saying so beats drawing the wrong shape.
+          // Linked-list, graph and column views land in later phases. Saying so
+          // beats drawing the wrong shape.
           <p className="text-sm text-text-muted">
             A <code className="font-mono">{spec.kind}</code> view is not built yet — the caption below is
             still accurate.

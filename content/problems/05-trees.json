@@ -60,7 +60,8 @@
         "read": "rest",
         "name": "nodes"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "same-tree",
@@ -128,7 +129,8 @@
         "read": "rest",
         "name": "nodes"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "invert-binary-tree",
@@ -196,7 +198,8 @@
         "read": "rest",
         "name": "nodes"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "binary-tree-level-order-traversal",
@@ -259,7 +262,8 @@
         "read": "rest",
         "name": "nodes"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "validate-binary-search-tree",
@@ -332,7 +336,8 @@
         "read": "rest",
         "name": "nodes"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "kth-smallest-element-in-a-bst",
@@ -518,7 +523,8 @@
         "read": "rest",
         "name": "nodes"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "binary-tree-maximum-path-sum",
@@ -591,7 +597,8 @@
         "read": "rest",
         "name": "nodes"
       }
-    ]
+    ],
+    "vizKind": "tree"
   },
   {
     "slug": "implement-trie-prefix-tree",
