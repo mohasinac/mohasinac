@@ -103,3 +103,51 @@ table {
   overflow-x: auto;
   max-width: 100%;
 }
+
+/*
+ * Visualization roles.
+ *
+ * 🛑 Ink is always an appkit token, never a hex literal, and the fill is
+ * derived from that same ink via color-mix. The light theme re-darkens every
+ * accent (primary #7c8cff -> #4b5bd6, success #4ade80 -> #13804f), so a hex
+ * here would be wrong the moment the theme is swapped. Because [data-theme]
+ * sits on <html> — i.e. on :root — these color-mix() calls resolve against the
+ * ACTIVE theme and re-derive for free.
+ *
+ * Fills are capped at 24%: verified that --appkit-color-text stays above 8:1
+ * on the strongest of them, so cell text never needs a per-role override.
+ */
+:root {
+  --viz-ink-idle: var(--appkit-color-text-muted);
+  --viz-ink-current: var(--appkit-color-primary);
+  --viz-ink-pointer: var(--appkit-color-focus-ring);
+  --viz-ink-window: var(--appkit-color-info);
+  --viz-ink-visited: var(--appkit-color-text-faint);
+  --viz-ink-frontier: var(--appkit-color-secondary);
+  --viz-ink-answer: var(--appkit-color-success);
+  --viz-ink-discarded: var(--appkit-color-error);
+  --viz-ink-comparing: var(--appkit-color-warning);
+
+  --viz-fill-idle: var(--appkit-color-surface);
+  --viz-fill-current: color-mix(in srgb, var(--viz-ink-current) 22%, transparent);
+  --viz-fill-pointer: color-mix(in srgb, var(--viz-ink-pointer) 18%, transparent);
+  --viz-fill-window: color-mix(in srgb, var(--viz-ink-window) 14%, transparent);
+  --viz-fill-visited: color-mix(in srgb, var(--viz-ink-visited) 10%, transparent);
+  --viz-fill-frontier: color-mix(in srgb, var(--viz-ink-frontier) 18%, transparent);
+  --viz-fill-answer: color-mix(in srgb, var(--viz-ink-answer) 24%, transparent);
+  --viz-fill-discarded: color-mix(in srgb, var(--viz-ink-discarded) 10%, transparent);
+  --viz-fill-comparing: color-mix(in srgb, var(--viz-ink-comparing) 18%, transparent);
+
+  --viz-cell-text: var(--appkit-color-text);
+}
+
+/*
+ * Belt and braces for reduced motion: a component that forgets to thread the
+ * prop still cannot animate.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .viz-animated {
+    transition: none !important;
+    animation: none !important;
+  }
+}

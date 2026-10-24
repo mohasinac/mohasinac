@@ -6,6 +6,7 @@ import { getPublishedBySlug } from "@/lib/public-content";
 import { getDb } from "@/lib/firestore";
 import { ProblemWorkbench, type TestCase } from "@/components/course/ProblemWorkbench";
 import { Markdown } from "@/components/Markdown";
+import { ProblemExplainer } from "@/components/course/ProblemExplainer";
 
 export async function generateMetadata({
   params,
@@ -121,6 +122,16 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
           </div>
         ) : null}
       </section>
+
+      <ProblemExplainer
+        samples={cases
+          .filter((c) => c.visibility === "sample" && c.expectedOutput !== null)
+          .map((c) => ({ input: c.input, expectedOutput: String(c.expectedOutput) }))}
+        inputFormat={problem.inputFormat as never}
+        {...(problem.vizKind ? { vizKind: problem.vizKind as never } : {})}
+        {...(problem.vizVar ? { vizVar: String(problem.vizVar) } : {})}
+        patterns={patterns}
+      />
 
       <ProblemWorkbench
         problemSlug={slug}
