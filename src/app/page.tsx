@@ -42,7 +42,7 @@ const SECTIONS: readonly Section[] = [
     meta: "clang 22 · wasm",
   },
   {
-    href: "/course",
+    href: "/learn",
     label: "CP course",
     note: "C++ from first principles: data structures built as classes, then Blind 75 and beyond.",
     art: "course",

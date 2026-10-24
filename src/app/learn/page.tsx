@@ -20,7 +20,7 @@ export const metadata: Metadata = {
  */
 export default async function CoursePage() {
   const user = await getSessionUser();
-  if (!user) redirect("/login?next=%2Fcourse");
+  if (!user) redirect("/login?next=%2Flearn");
 
   const [tracks, problems] = await Promise.all([
     listPublished("tracks"),
@@ -51,7 +51,7 @@ export default async function CoursePage() {
           <ul className="grid gap-px overflow-hidden rounded-md border border-border bg-border">
             {tracks.map((t) => (
               <li key={t.id} className="bg-surface">
-                <Link href={`/course/${t.slug}`} className="block p-4 transition-colors hover:bg-bg">
+                <Link href={`/learn/${t.slug}`} className="block p-4 transition-colors hover:bg-bg">
                   <span className="font-medium text-accent">{String(t.title ?? t.slug)}</span>
                   {t.summary ? (
                     <span className="mt-1 block text-sm text-text-muted">{String(t.summary)}</span>
@@ -82,7 +82,7 @@ export default async function CoursePage() {
               <span className="font-mono">{byDifficulty[d] ?? 0}</span>
             </span>
           ))}
-          <Link href="/course/problems" className="ml-auto text-accent hover:underline">
+          <Link href="/problems" className="ml-auto text-accent hover:underline">
             Browse all →
           </Link>
         </div>

@@ -5,8 +5,9 @@ import { SITE_URL } from "@/lib/site";
 /**
  * Sitemap for the PUBLIC surface only.
  *
- * 🛑 The course and admin areas are deliberately absent. Everything under
- * `/course` requires a login and is served with `robots: { index: false }`, so
+ * 🛑 The learning, problem and admin areas are deliberately absent. Everything
+ * under `/learn` and `/problems` requires a login and is served with
+ * `robots: { index: false }`, so
  * listing those URLs here would advertise paths that only ever return a
  * redirect to a crawler — and would leak the full problem and lesson slug list
  * to anyone who fetches the sitemap.

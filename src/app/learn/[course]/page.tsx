@@ -6,19 +6,19 @@ import { getPublishedBySlug, listChildren, listPublished } from "@/lib/public-co
 import { Markdown } from "@/components/Markdown";
 
 /*
- * Note on routing: `/course/problems` and `/course/lessons` are static
- * segments, so Next matches them before this dynamic one. A track whose slug
- * is literally "problems" or "lessons" would be unreachable — hence the guard
- * below rather than a silent 404 that looks like missing content.
+ * The old layout put `/course/problems` and `/course/lessons` as static
+ * siblings of this dynamic segment, so a course slugged "problems" or
+ * "lessons" was unreachable. Problems now live under their own `/problems`
+ * tree and lessons are nested inside the course, so that collision is gone and
+ * no reserved-slug guard is needed.
  */
-const RESERVED = new Set(["problems", "lessons"]);
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ track: string }>;
+  params: Promise<{ course: string }>;
 }): Promise<Metadata> {
-  const track = await getPublishedBySlug("tracks", (await params).track);
+  const track = await getPublishedBySlug("tracks", (await params).course);
   return {
     title: track ? String(track.title ?? track.slug) : "Track",
     // The course is behind a login, so there is nothing here for a crawler.
@@ -26,11 +26,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function TrackPage({ params }: { params: Promise<{ track: string }> }) {
-  const { track: slug } = await params;
+export default async function TrackPage({ params }: { params: Promise<{ course: string }> }) {
+  const { course: slug } = await params;
   const user = await getSessionUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(`/course/${slug}`)}`);
-  if (RESERVED.has(slug)) notFound();
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/learn/${slug}`)}`);
 
   const track = await getPublishedBySlug("tracks", slug);
   if (!track) notFound();
@@ -56,8 +55,8 @@ export default async function TrackPage({ params }: { params: Promise<{ track: s
   return (
     <main className="mx-auto max-w-3xl px-5 py-12">
       <nav className="mb-5 text-xs">
-        <Link href="/course" className="text-text-faint hover:text-accent">
-          ← Course
+        <Link href="/learn" className="text-text-faint hover:text-accent">
+          ← Courses
         </Link>
       </nav>
 
@@ -100,7 +99,7 @@ export default async function TrackPage({ params }: { params: Promise<{ track: s
                     {lessons.map((l) => (
                       <li key={l.id} className="bg-surface">
                         <Link
-                          href={`/course/lessons/${l.slug}`}
+                          href={`/learn/${slug}/${l.slug}`}
                           className="flex items-baseline gap-3 p-3 text-sm transition-colors hover:bg-bg"
                         >
                           <span className="flex-1">{String(l.title ?? l.slug)}</span>

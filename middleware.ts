@@ -21,7 +21,7 @@ import { buildAppCSP, generateNonce } from "@/lib/csp";
 const SESSION_COOKIE = "__session";
 
 /** Paths that require a signed-in user. Course is login-only by design. */
-const PROTECTED_PREFIXES = ["/course", "/admin", "/account"];
+const PROTECTED_PREFIXES = ["/learn", "/problems", "/admin", "/account"];
 
 /** Paths under PROTECTED_PREFIXES that must stay reachable while signed out. */
 const PROTECTED_EXCEPTIONS = ["/course/preview"];

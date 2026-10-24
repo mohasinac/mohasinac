@@ -16,10 +16,33 @@ let db: Firestore | null = null;
 
 export function getDb(): Firestore {
   if (db) return db;
-  db = getFirestore(getAdminApp());
-  // Undefined is a normal shape for an optional field in a partial update;
-  // without this Firestore throws instead of simply omitting it.
-  db.settings({ ignoreUndefinedProperties: true });
+  const instance = getFirestore(getAdminApp());
+
+  /*
+   * 🛑 `settings()` may only be called once per Firestore instance, and only
+   * before any other method on it. This module memoises, but the memo is
+   * per-module-instance — and Next's build spins up several workers, each of
+   * which can hand back an instance that something else already touched.
+   *
+   * It threw during `next build` and, because every caller catches and falls
+   * back to bundled content, the blog silently served nothing while the build
+   * reported success. That is the invisible-failure mode this codebase has
+   * already been bitten by, so the throw is absorbed here rather than taking
+   * out the read.
+   *
+   * Swallowing it is safe: the only reason it throws is that the instance is
+   * already configured, and `ignoreUndefinedProperties` is set identically
+   * everywhere it is set.
+   */
+  try {
+    // Undefined is a normal shape for an optional field in a partial update;
+    // without this Firestore throws instead of simply omitting it.
+    instance.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // Already configured by an earlier caller — nothing to do.
+  }
+
+  db = instance;
   return db;
 }
 

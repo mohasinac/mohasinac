@@ -7,6 +7,29 @@ import type { NextConfig } from "next";
  * app actually needs from appkit are imported explicitly elsewhere.
  */
 const nextConfig: NextConfig = {
+  /**
+   * The course split moved every learning and problem URL. Those paths were
+   * live, and `/course/problems/two-sum` is exactly the kind of link that gets
+   * bookmarked — so they redirect permanently rather than 404.
+   *
+   * 🛑 Order matters. Next matches these top to bottom, so the specific
+   * `/course/problems/:slug` and `/course/lessons/:slug` rules must come BEFORE
+   * the catch-all `/course/:course`, or a problem URL would be rewritten to a
+   * course named "problems".
+   *
+   * Problems now live under a SET and the old URLs carried none, so they land
+   * on the 75 — where a problem is first encountered.
+   */
+  async redirects() {
+    return [
+      { source: "/course", destination: "/learn", permanent: true },
+      { source: "/course/problems", destination: "/problems", permanent: true },
+      { source: "/course/problems/:slug", destination: "/problems/blind75/:slug", permanent: true },
+      { source: "/course/lessons/:slug", destination: "/learn/foundations/:slug", permanent: true },
+      { source: "/course/:course", destination: "/learn/:course", permanent: true },
+    ];
+  },
+
   reactStrictMode: true,
   poweredByHeader: false,
 

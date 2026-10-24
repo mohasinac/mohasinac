@@ -10,16 +10,16 @@ import { Markdown } from "@/components/Markdown";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ set: string; slug: string }>;
 }): Promise<Metadata> {
   const p = await getPublishedBySlug("problems", (await params).slug);
   return { title: p ? String(p.title ?? p.slug) : "Problem", robots: { index: false, follow: false } };
 }
 
-export default async function ProblemPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function ProblemPage({ params }: { params: Promise<{ set: string; slug: string }> }) {
+  const { set, slug } = await params;
   const user = await getSessionUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(`/course/problems/${slug}`)}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/problems/${set}/${slug}`)}`);
 
   const problem = await getPublishedBySlug("problems", slug);
   if (!problem) notFound();
@@ -71,8 +71,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
   return (
     <main className="mx-auto max-w-5xl px-5 py-10">
       <nav className="mb-5 text-xs">
-        <Link href="/course/problems" className="text-text-faint hover:text-accent">
-          ← Problems
+        <Link href={`/problems/${set}`} className="text-text-faint hover:text-accent">
+          ← Back to the set
         </Link>
       </nav>
 

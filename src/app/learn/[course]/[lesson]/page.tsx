@@ -8,19 +8,19 @@ import { Markdown } from "@/components/Markdown";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ course: string; lesson: string }>;
 }): Promise<Metadata> {
-  const lesson = await getPublishedBySlug("lessons", (await params).slug);
+  const lesson = await getPublishedBySlug("lessons", (await params).lesson);
   return {
     title: lesson ? String(lesson.title ?? lesson.slug) : "Lesson",
     robots: { index: false, follow: false },
   };
 }
 
-export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function LessonPage({ params }: { params: Promise<{ course: string; lesson: string }> }) {
+  const { course, lesson: slug } = await params;
   const user = await getSessionUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(`/course/lessons/${slug}`)}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/learn/${course}/${slug}`)}`);
 
   const lesson = await getPublishedBySlug("lessons", slug);
   if (!lesson) notFound();
@@ -39,13 +39,13 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   return (
     <main className="mx-auto max-w-3xl px-5 py-12">
       <nav className="mb-5 flex flex-wrap items-center gap-2 text-xs text-text-faint">
-        <Link href="/course" className="hover:text-accent">
+        <Link href="/learn" className="hover:text-accent">
           Course
         </Link>
         {trackSlug ? (
           <>
             <span aria-hidden>/</span>
-            <Link href={`/course/${trackSlug}`} className="hover:text-accent">
+            <Link href={`/learn/${trackSlug}`} className="hover:text-accent">
               {trackSlug}
             </Link>
           </>
@@ -73,7 +73,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         <nav className="mt-10 flex items-stretch gap-3 border-t border-border pt-5 text-sm">
           {prev ? (
             <Link
-              href={`/course/lessons/${prev.slug}`}
+              href={`/learn/${course}/${prev.slug}`}
               className="flex-1 rounded-md border border-border bg-surface p-3 transition-colors hover:bg-surface-raised"
             >
               <span className="block font-mono text-[11px] uppercase tracking-wider text-text-faint">
@@ -86,7 +86,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           )}
           {next ? (
             <Link
-              href={`/course/lessons/${next.slug}`}
+              href={`/learn/${course}/${next.slug}`}
               className="flex-1 rounded-md border border-border bg-surface p-3 text-right transition-colors hover:bg-surface-raised"
             >
               <span className="block font-mono text-[11px] uppercase tracking-wider text-text-faint">

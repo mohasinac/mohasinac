@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 /** Only allow relative paths — an open redirect would let a crafted
  *  /login?next=https://evil.example bounce a freshly-signed-in user off-site. */
 function safeNext(raw: string | undefined): string {
-  if (!raw) return "/course";
-  if (!raw.startsWith("/") || raw.startsWith("//")) return "/course";
+  if (!raw) return "/learn";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/learn";
   return raw;
 }
 
