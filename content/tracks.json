@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "foundations",
+    "title": "Track A — Foundations",
+    "sortOrder": 10,
+    "status": "published",
+    "summary": "How to read a problem, derive the complexity you need before writing any code, and the C++ you actually use under a one-second limit. Includes a proper treatment of OOP — classes as invariants, RAII, the rule of 0/3/5 — and an honest section on when *not* to use it in a contest.",
+    "metaTitle": "Foundations — approach, complexity, C++ and OOP",
+    "metaDescription": "Problem-solving method, complexity analysis, competitive C++ and object-oriented design done properly."
+  },
+  {
+    "slug": "data-structures",
+    "title": "Track B — Data structures from scratch",
+    "sortOrder": 20,
+    "status": "published",
+    "summary": "Every structure built as a class, against an interface, with its invariant stated up front. You will not reach for `std::stack` until you have written one. Each lesson follows the same shape: the problem it solves, the invariant, the implementation, the complexity table, the pitfalls, and the problems that need it.",
+    "metaTitle": "Data structures from scratch in C++",
+    "metaDescription": "Dynamic arrays, linked lists, stacks, queues, hash tables, trees, heaps, tries, graphs, DSU and range structures — each implemented as a class."
+  },
+  {
+    "slug": "patterns",
+    "title": "Track C — Patterns and problems",
+    "sortOrder": 30,
+    "status": "published",
+    "summary": "The fourteen shapes that most interview problems reduce to. Problems attach to patterns rather than to a flat list, because recognising the shape is the part that transfers — a solved problem you cannot classify teaches you almost nothing.",
+    "metaTitle": "Patterns — two pointers to dynamic programming",
+    "metaDescription": "Two pointers, sliding window, binary search on the answer, monotonic stacks, backtracking, graph traversal, DP, greedy and bit manipulation."
+  }
+]

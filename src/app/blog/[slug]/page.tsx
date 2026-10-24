@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublishedBySlug } from "@/lib/public-content";
+import { Markdown } from "@/components/Markdown";
 
 export const revalidate = 3600;
 
@@ -57,15 +58,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </header>
 
         {/*
-          Rendered as pre-wrapped text, NOT dangerouslySetInnerHTML. Content is
-          authored through the admin console, but injecting raw HTML into the
-          page would make the CMS an XSS vector against its own readers — and
-          the nonce-based CSP would not stop markup that the server itself
-          emitted. A markdown renderer with escaping comes with the editor.
+          Rendered through the structural markdown renderer, NOT
+          dangerouslySetInnerHTML. Content is authored through the admin
+          console, but injecting raw HTML here would make the CMS an XSS vector
+          against its own readers — and a nonce-based CSP would not stop markup
+          that the server itself emitted.
         */}
-        <div className="prose-editorial whitespace-pre-wrap text-text-muted">
-          {String(post.content ?? "")}
-        </div>
+        <Markdown source={String(post.content ?? "")} />
       </article>
     </main>
   );

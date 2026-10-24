@@ -15,7 +15,10 @@
     "toolchain:build": "node scripts/build-toolchain-assets.mjs",
     "vendor:appkit": "node scripts/vendor-appkit.mjs",
     "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check",
-    "verify:firebase": "node scripts/verify-firebase.mjs ."
+    "verify:firebase": "node scripts/verify-firebase.mjs .",
+    "verify:course": "node scripts/verify-course.mjs",
+    "seed": "node scripts/seed-content.mjs",
+    "seed:apply": "node scripts/seed-content.mjs --apply"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",

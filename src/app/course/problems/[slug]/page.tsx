@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/session";
 import { getPublishedBySlug } from "@/lib/public-content";
 import { getDb } from "@/lib/firestore";
 import { ProblemWorkbench, type TestCase } from "@/components/course/ProblemWorkbench";
+import { Markdown } from "@/components/Markdown";
 
 export async function generateMetadata({
   params,
@@ -39,16 +40,27 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
       .doc(String(problem.id))
       .collection("testCases")
       .get();
-    cases = snap.docs.map((d) => {
-      const data = d.data();
-      const visibility = String(data.visibility ?? "hidden") === "sample" ? "sample" : "hidden";
-      return {
-        id: d.id,
-        visibility,
-        input: String(data.input ?? ""),
-        expectedOutput: visibility === "sample" ? String(data.expectedOutput ?? "") : null,
-      };
-    });
+    cases = snap.docs
+      .map((d) => {
+        const data = d.data();
+        const visibility: TestCase["visibility"] =
+          String(data.visibility ?? "hidden") === "sample" ? "sample" : "hidden";
+        return {
+          id: d.id,
+          visibility,
+          input: String(data.input ?? ""),
+          expectedOutput: visibility === "sample" ? String(data.expectedOutput ?? "") : null,
+          sortOrder: Number(data.sortOrder ?? 0),
+        };
+      })
+      // Samples first, then authored order: the worked examples should be the
+      // ones a learner sees failing.
+      .sort(
+        (a, b) =>
+          (a.visibility === "sample" ? 0 : 1) - (b.visibility === "sample" ? 0 : 1) ||
+          a.sortOrder - b.sortOrder,
+      )
+      .map(({ sortOrder: _sortOrder, ...c }) => c);
   } catch (error) {
     console.error("[course] test cases unavailable", error);
   }
@@ -96,15 +108,17 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         ) : null}
       </header>
 
-      <section className="prose-editorial mb-6 max-w-prose whitespace-pre-wrap text-sm text-text-muted">
-        {String(problem.statement ?? "")}
+      <section className="mb-6 max-w-prose">
+        <Markdown source={String(problem.statement ?? "")} />
         {problem.constraints ? (
-          <>
-            {"\n\n"}
-            <strong className="text-text">Constraints</strong>
-            {"\n"}
-            {String(problem.constraints)}
-          </>
+          <div className="mt-4 rounded-md border border-border bg-surface p-3">
+            <h2 className="mb-1 font-mono text-[11px] uppercase tracking-wider text-text-faint">
+              Constraints
+            </h2>
+            <div className="text-sm">
+              <Markdown source={String(problem.constraints)} />
+            </div>
+          </div>
         ) : null}
       </section>
 
@@ -113,6 +127,19 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         starterCode={String(problem.starterCode ?? "")}
         cases={cases}
       />
+
+      {problem.editorial ? (
+        /* Collapsed by default — an editorial visible on arrival is just the
+           answer, and the point is to attempt it first. */
+        <details className="mt-8 rounded-md border border-border bg-surface">
+          <summary className="cursor-pointer px-4 py-3 font-mono text-xs uppercase tracking-wider text-text-faint hover:text-accent">
+            Editorial — approaches and complexity
+          </summary>
+          <div className="border-t border-border px-4 pb-4">
+            <Markdown source={String(problem.editorial)} />
+          </div>
+        </details>
+      ) : null}
     </main>
   );
 }

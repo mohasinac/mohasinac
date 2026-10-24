@@ -1,0 +1,140 @@
+[
+  {
+    "slug": "approach",
+    "trackSlug": "foundations",
+    "title": "How to approach a problem",
+    "sortOrder": 10,
+    "status": "published",
+    "summary": "A repeatable method: read the constraints first, derive the target complexity, then work brute force → observation → optimisation."
+  },
+  {
+    "slug": "complexity",
+    "trackSlug": "foundations",
+    "title": "Complexity",
+    "sortOrder": 20,
+    "status": "published",
+    "summary": "Big-O, amortised cost, and what actually matters when the limit is one second."
+  },
+  {
+    "slug": "cpp-for-cp",
+    "trackSlug": "foundations",
+    "title": "C++ for competitive coding",
+    "sortOrder": 30,
+    "status": "published",
+    "summary": "The STL you use every round, fast I/O, references versus pointers, and the undefined behaviour that costs people contests."
+  },
+  {
+    "slug": "oop",
+    "trackSlug": "foundations",
+    "title": "OOP done properly",
+    "sortOrder": 40,
+    "status": "published",
+    "summary": "Classes as invariants, encapsulation, RAII and the rule of 0/3/5, composition versus inheritance, virtual dispatch, templates — and when to skip all of it."
+  },
+
+  {
+    "slug": "linear",
+    "trackSlug": "data-structures",
+    "title": "Linear structures",
+    "sortOrder": 10,
+    "status": "published",
+    "summary": "Arrays and strings, then a dynamic array and both flavours of linked list, built from raw memory."
+  },
+  {
+    "slug": "adapters",
+    "trackSlug": "data-structures",
+    "title": "Stacks, queues and deques",
+    "sortOrder": 20,
+    "status": "published",
+    "summary": "Restricted-access structures: why taking capability away makes a structure more useful."
+  },
+  {
+    "slug": "hashing",
+    "trackSlug": "data-structures",
+    "title": "Hash tables",
+    "sortOrder": 30,
+    "status": "published",
+    "summary": "Separate chaining and open addressing, load factor, and why O(1) is an average rather than a guarantee."
+  },
+  {
+    "slug": "trees",
+    "trackSlug": "data-structures",
+    "title": "Trees, heaps and tries",
+    "sortOrder": 40,
+    "status": "published",
+    "summary": "Binary trees, the BST ordering invariant, the heap property in a flat array, and prefix trees."
+  },
+  {
+    "slug": "graphs",
+    "trackSlug": "data-structures",
+    "title": "Graphs and disjoint sets",
+    "sortOrder": 50,
+    "status": "published",
+    "summary": "Choosing a representation, and union-find with both optimisations."
+  },
+  {
+    "slug": "ranges",
+    "trackSlug": "data-structures",
+    "title": "Range structures",
+    "sortOrder": 60,
+    "status": "published",
+    "summary": "Prefix sums, Fenwick trees and segment trees — answering range queries faster than re-reading the range."
+  },
+
+  {
+    "slug": "pointers",
+    "trackSlug": "patterns",
+    "title": "Pointer patterns",
+    "sortOrder": 10,
+    "status": "published",
+    "summary": "Two pointers, sliding window, and fast-and-slow — one index is rarely enough."
+  },
+  {
+    "slug": "search",
+    "trackSlug": "patterns",
+    "title": "Search and prefix patterns",
+    "sortOrder": 20,
+    "status": "published",
+    "summary": "Binary search on the answer, and prefix sums as a preprocessing step."
+  },
+  {
+    "slug": "stack-patterns",
+    "trackSlug": "patterns",
+    "title": "Monotonic stacks and intervals",
+    "sortOrder": 30,
+    "status": "published",
+    "summary": "Next-greater-element in linear time, and the sort-then-sweep interval template."
+  },
+  {
+    "slug": "recursion",
+    "trackSlug": "patterns",
+    "title": "Recursion and backtracking",
+    "sortOrder": 40,
+    "status": "published",
+    "summary": "Choose, recurse, un-choose — and how to prune before the search explodes."
+  },
+  {
+    "slug": "graph-patterns",
+    "trackSlug": "patterns",
+    "title": "Graph traversal patterns",
+    "sortOrder": 50,
+    "status": "published",
+    "summary": "BFS versus DFS, grids as implicit graphs, topological order and shortest paths."
+  },
+  {
+    "slug": "dp",
+    "trackSlug": "patterns",
+    "title": "Dynamic programming",
+    "sortOrder": 60,
+    "status": "published",
+    "summary": "State, transition, base case, order — the only four questions, in one and two dimensions."
+  },
+  {
+    "slug": "greedy-bits",
+    "trackSlug": "patterns",
+    "title": "Greedy and bit manipulation",
+    "sortOrder": 70,
+    "status": "published",
+    "summary": "When a local choice is provably safe, and the bit tricks worth memorising."
+  }
+]
