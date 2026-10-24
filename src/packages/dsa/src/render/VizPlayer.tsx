@@ -23,6 +23,7 @@ import {
 import type { TraceValue, VizChrome, VizRole, VizTrace } from "../trace/types.ts";
 import { ROLE_WORD } from "../theme/roles.ts";
 import { ArrayView } from "./ArrayView.tsx";
+import { GridView } from "./GridView.tsx";
 
 /*
  * prefers-reduced-motion as an external store rather than state set inside an
@@ -189,12 +190,22 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
       <div className="overflow-x-auto p-3">
         {spec.kind === "array" ? (
           <ArrayView values={cells} roles={roles} asString={asString} idPrefix={idPrefix} />
+        ) : spec.kind === "grid" ? (
+          <GridView
+            // A grid's cells arrive as rows; a stray scalar row is wrapped so a
+            // malformed value degrades to one cell rather than throwing.
+            rows={cells.map((row) => (Array.isArray(row) ? row : [row]))}
+            roles={roles}
+            {...(spec.rowLabels ? { rowLabels: spec.rowLabels } : {})}
+            {...(spec.colLabels ? { colLabels: spec.colLabels } : {})}
+            idPrefix={idPrefix}
+          />
         ) : (
-          // Grid, tree, graph and column renderers land in later phases; until
-          // then say so rather than drawing the wrong shape.
+          // Tree, linked-list, graph and column views land in later phases.
+          // Saying so beats drawing the wrong shape.
           <p className="text-sm text-text-muted">
-            A <code className="font-mono">{spec.kind}</code> view is not built yet — the data below is
-            still correct.
+            A <code className="font-mono">{spec.kind}</code> view is not built yet — the caption below is
+            still accurate.
           </p>
         )}
       </div>
