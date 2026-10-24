@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
-import { SignOutButton } from "@/components/SignOutButton";
+import { listPublished } from "@/lib/public-content";
 
 export const metadata: Metadata = {
   title: "C++ course",
@@ -10,53 +11,82 @@ export const metadata: Metadata = {
 };
 
 /**
- * Course home. Gated — see §Protections.
+ * Course home — gated.
  *
- * 🛑 The server-side check below is the ACTUAL access control. middleware.ts
- * only tests that a cookie is present, because the edge runtime cannot verify a
+ * 🛑 This server-side check is the ACTUAL access control. middleware.ts only
+ * tests that a cookie is present, because the edge runtime cannot verify a
  * Firebase session cookie. Remove this and a cookie named `__session`
- * containing arbitrary bytes would get in.
+ * containing arbitrary bytes gets in.
  */
 export default async function CoursePage() {
   const user = await getSessionUser();
   if (!user) redirect("/login?next=%2Fcourse");
 
+  const [tracks, problems] = await Promise.all([
+    listPublished("tracks"),
+    listPublished("problems", { limit: 300 }),
+  ]);
+
+  const byDifficulty = (problems ?? []).reduce<Record<string, number>>((acc, p) => {
+    const d = String(p.difficulty ?? "unknown");
+    acc[d] = (acc[d] ?? 0) + 1;
+    return acc;
+  }, {});
+
   return (
-    <main className="mx-auto max-w-3xl px-5 py-16">
-      <header className="mb-10 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-text-faint">Competitive programming</p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">C++ course</h1>
-        </div>
-        <div className="flex items-center gap-3 text-xs">
-          <span className="text-text-muted">
-            {user.email}
-            {user.role === "admin" ? (
-              <span className="ml-2 rounded-sm bg-surface-raised px-1.5 py-0.5 text-accent">admin</span>
-            ) : null}
-          </span>
-          <SignOutButton />
-        </div>
+    <main className="mx-auto max-w-3xl px-5 py-12">
+      <header className="mb-8">
+        <p className="text-xs uppercase tracking-[0.2em] text-text-faint">competitive programming</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight">C++ course</h1>
+        <p className="prose-editorial mt-3 max-w-prose text-text-muted">
+          Signed in as {user.email}, so progress and submissions are saved against your account.
+          Every problem runs in the same in-browser toolchain as the sandbox — your solutions never
+          leave this machine.
+        </p>
       </header>
 
-      <p className="prose-editorial max-w-prose text-text-muted">
-        You are signed in, so progress and submissions can be saved. The lessons, the in-browser C++
-        sandbox and the problem set are being built — the compiler toolchain is already proven and
-        deployed.
-      </p>
+      <section className="mb-8">
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-text-faint">Tracks</h2>
+        {tracks?.length ? (
+          <ul className="grid gap-px overflow-hidden rounded-md border border-border bg-border">
+            {tracks.map((t) => (
+              <li key={t.id} className="bg-surface">
+                <Link href={`/course/${t.slug}`} className="block p-4 transition-colors hover:bg-bg">
+                  <span className="font-medium text-accent">{String(t.title ?? t.slug)}</span>
+                  {t.summary ? (
+                    <span className="mt-1 block text-sm text-text-muted">{String(t.summary)}</span>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="rounded-md border border-border bg-surface p-4 text-sm text-text-muted">
+            No tracks published yet. Content is imported through the admin console.
+          </p>
+        )}
+      </section>
 
-      <ul className="mt-8 grid gap-px overflow-hidden rounded-md border border-border bg-border">
-        {[
-          ["Track A — Foundations", "How to approach a problem, complexity, C++ for CP, OOP done properly"],
-          ["Track B — Data structures", "Each one built from scratch as a class, against an interface"],
-          ["Track C — Patterns & problems", "Blind 75, expanding toward NeetCode 150/250"],
-        ].map(([title, note]) => (
-          <li key={title} className="bg-surface p-4">
-            <span className="block font-medium">{title}</span>
-            <span className="mt-1 block text-sm text-text-muted">{note}</span>
-          </li>
-        ))}
-      </ul>
+      <section>
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-text-faint">Problems</h2>
+        <div className="flex flex-wrap gap-4 rounded-md border border-border bg-surface p-4 text-sm">
+          {(["easy", "medium", "hard"] as const).map((d) => (
+            <span key={d} className="flex items-baseline gap-2">
+              <span
+                className={
+                  d === "easy" ? "text-success" : d === "medium" ? "text-warning" : "text-error"
+                }
+              >
+                {d}
+              </span>
+              <span className="font-mono">{byDifficulty[d] ?? 0}</span>
+            </span>
+          ))}
+          <Link href="/course/problems" className="ml-auto text-accent hover:underline">
+            Browse all →
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

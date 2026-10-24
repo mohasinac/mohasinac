@@ -1,12 +1,38 @@
 import type { Metadata } from "next";
-import { PROJECTS } from "@/content/profile";
+import { PROJECTS, type Project } from "@/content/profile";
+import { listPublished } from "@/lib/public-content";
 
 export const metadata: Metadata = {
   title: "Projects",
   description: "Things I have built and shipped, the stacks behind them, and what each one taught me.",
 };
 
-export default function ProjectsPage() {
+/**
+ * Firestore is the source of truth once content is published there; the
+ * bundled file is the fallback until then. Returning `null` rather than `[]`
+ * from the read is what makes that distinction possible — an empty collection
+ * and an unreachable one would otherwise both render an empty page.
+ */
+async function loadProjects(): Promise<readonly Project[]> {
+  const docs = await listPublished("projects");
+  if (!docs) return PROJECTS;
+  return docs.map((d) => ({
+    slug: String(d.slug),
+    title: String(d.title ?? ""),
+    role: String(d.role ?? ""),
+    period: String(d.period ?? ""),
+    summary: String(d.summary ?? ""),
+    stack: Array.isArray(d.stack) ? (d.stack as string[]) : [],
+    highlights: Array.isArray(d.highlights) ? (d.highlights as string[]) : [],
+    repoUrl: typeof d.repoUrl === "string" ? d.repoUrl : undefined,
+    liveUrl: typeof d.liveUrl === "string" ? d.liveUrl : undefined,
+    verified: true,
+  }));
+}
+
+export default async function ProjectsPage() {
+  const projects = await loadProjects();
+
   return (
     <main className="mx-auto max-w-3xl px-5 py-12">
       <header className="mb-10">
@@ -19,7 +45,7 @@ export default function ProjectsPage() {
       </header>
 
       <ol className="space-y-px overflow-hidden rounded-md border border-border bg-border">
-        {PROJECTS.map((p) => (
+        {projects.map((p) => (
           <li key={p.slug} className="bg-surface p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
               <h2 className="text-lg font-medium text-accent">{p.title}</h2>
