@@ -16,6 +16,50 @@
 const HAS_MAIN = /\bint\s+main\s*\(/;
 
 /**
+ * Markers of a SKETCH rather than a program.
+ *
+ * 🛑 `HAS_MAIN` is not sufficient and seven editorials proved it. Each ended
+ * with:
+ *
+ *     int main() {
+ *         // ... read_tree() as given ...
+ *         TreeNode* root = nullptr;   // replaced by read_tree() in your solution
+ *         ...
+ *     }
+ *
+ * which has an entry point, compiles cleanly, and never reads its input — so
+ * it printed a sentinel or nothing, and the "reference trace" was a diagram of
+ * nothing. Nothing detected it, because every check only asked whether the
+ * program BUILT.
+ *
+ * Two of the seven also contained a real `cin >>`, so "does it read stdin?"
+ * does not work either. The reliable signal is the placeholder prose the author
+ * left behind, which is what this matches.
+ */
+const SKETCH_MARKERS: readonly RegExp[] = [
+  /\breplaced by\b/i,
+  /\bas given\b/i,
+  /\byour solution\b/i,
+  /\bomitted for brevity\b/i,
+  // A comment that is NOTHING but an ellipsis, or one whose text is enclosed
+  // by ellipses (`// ... read_tree() as given ...`).
+  //
+  // 🛑 Deliberately not a bare `// ...` anywhere: that flagged
+  // `implement-trie-prefix-tree`, whose real program contains the legitimate
+  // continuation comment `// ...so re-index nodes_[cur] AFTER the push_back`.
+  // A marker that rejects a working reference is worse than one that misses a
+  // sketch, because the sketch at least still gets caught by the generator's
+  // sample cross-check.
+  /\/\/\s*\.\.\.\s*$/m,
+  /\/\/\s*\.\.\.[^\n]*\.\.\.\s*$/m,
+];
+
+/** Does this fence look like illustrative prose rather than a runnable program? */
+export function looksLikeSketch(source: string): boolean {
+  return SKETCH_MARKERS.some((re) => re.test(source));
+}
+
+/**
  * Fenced code blocks tagged `cpp`.
  *
  * The fence regex matches the info string as a bare word, mirroring
@@ -77,6 +121,11 @@ export function extractReferenceProgram(editorial: string): ReferenceProgram | n
     if (source === undefined || !HAS_MAIN.test(source)) continue;
     const trimmed = source.trim();
     if (trimmed === "") continue;
+    // 🛑 Skip a sketch and keep looking. An editorial may legitimately show an
+    // illustrative `main` before the real one — and before this check, such a
+    // fence was returned as "the reference program" and silently traced a
+    // program that read nothing.
+    if (looksLikeSketch(trimmed)) continue;
     return { source: `${trimmed}\n`, fenceIndex: i + 1, fenceCount: fences.length };
   }
   return null;

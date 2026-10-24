@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { describe, it } from "node:test";
 
-import { extractReferenceProgram } from "../src/scenarios/reference-program.ts";
+import { extractReferenceProgram, looksLikeSketch } from "../src/scenarios/reference-program.ts";
 
 describe("extractReferenceProgram", () => {
   it("takes the LAST complete program, not the first", () => {
@@ -110,5 +110,57 @@ describe("extractReferenceProgram", () => {
   it("ends the source with exactly one newline", () => {
     const r = extractReferenceProgram(["```cpp", "int main() { return 0; }", "", "", "```"].join("\n"));
     assert.equal(r?.source.endsWith("}\n"), true);
+  });
+});
+
+describe("sketch detection", () => {
+  it("skips a placeholder main and keeps looking", () => {
+    // 🛑 The exact shape that shipped in seven editorials: it has an entry
+    // point, it compiles, and it reads nothing — so it traced a diagram of
+    // nothing while every check passed.
+    const editorial = [
+      "```cpp",
+      "int main() { int real = 1; std::cin >> real; std::cout << real; }",
+      "```",
+      "## A sketch of the idea",
+      "```cpp",
+      "int main() {",
+      "    TreeNode* root = nullptr;   // replaced by read_tree() in your solution",
+      "    std::cout << depth(root);",
+      "}",
+      "```",
+    ].join("\n");
+    const r = extractReferenceProgram(editorial);
+    assert.equal(r?.source.includes("std::cin"), true, "should pick the real program");
+    assert.equal(r?.source.includes("replaced by"), false);
+    assert.equal(r?.fenceIndex, 1);
+  });
+
+  it("returns null when every candidate is a sketch", () => {
+    // Better than handing back something that compiles and does nothing.
+    const editorial = [
+      "```cpp",
+      "int main() { /* ... read_tree() as given ... */ }",
+      "```",
+    ].join("\n");
+    assert.equal(extractReferenceProgram(editorial), null);
+  });
+
+  it("recognises each placeholder phrase", () => {
+    for (const phrase of [
+      "// replaced by read_tree() in your solution",
+      "// ... read_tree() as given ...",
+      "// the rest is omitted for brevity",
+      "// ...",
+    ]) {
+      assert.equal(looksLikeSketch(`int main() {\n    ${phrase}\n}`), true, phrase);
+    }
+  });
+
+  it("does not flag an ordinary program", () => {
+    assert.equal(
+      looksLikeSketch("int main() {\n    int n;\n    std::cin >> n;\n    std::cout << n;\n}"),
+      false,
+    );
   });
 });
