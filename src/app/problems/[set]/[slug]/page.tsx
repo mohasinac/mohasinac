@@ -7,6 +7,7 @@ import { getDb } from "@/lib/firestore";
 import { ProblemWorkbench, type TestCase } from "@/components/course/ProblemWorkbench";
 import { Markdown } from "@/components/Markdown";
 import { ProblemExplainer } from "@/components/course/ProblemExplainer";
+import { ProblemScenarios } from "@/components/course/ProblemScenarios";
 
 export async function generateMetadata({
   params,
@@ -148,6 +149,19 @@ export default async function ProblemPage({ params }: { params: Promise<{ set: s
           </summary>
           <div className="border-t border-border px-4 pb-4">
             <Markdown source={String(problem.editorial)} />
+
+            {/* Inside the reveal: naming the edge cases gives away most of the
+                approach, so it belongs with the editorial, not above the
+                editor. */}
+            {Array.isArray(problem.scenarios) ? (
+              <ProblemScenarios
+                scenarios={problem.scenarios as never}
+                inputFormat={problem.inputFormat as never}
+                {...(problem.vizKind ? { vizKind: problem.vizKind as never } : {})}
+                {...(problem.vizVar ? { vizVar: String(problem.vizVar) } : {})}
+                patterns={patterns}
+              />
+            ) : null}
           </div>
         </details>
       ) : null}

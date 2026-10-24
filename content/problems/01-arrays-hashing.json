@@ -62,6 +62,26 @@
         "name": "nums",
         "length": "n"
       }
+    ],
+    "scenarios": [
+      {
+        "label": "the ordinary case",
+        "input": "4 9\n2 7 11 15\n",
+        "output": "0 1",
+        "why": "Two distinct positions sum to the target. Nothing subtle."
+      },
+      {
+        "label": "the same value twice",
+        "input": "2 6\n3 3\n",
+        "output": "0 1",
+        "why": "3 + 3 = 6. This is why the hash-map insert must happen AFTER the lookup — inserting first lets an element pair with itself and prints 0 0."
+      },
+      {
+        "label": "no pair exists",
+        "input": "2 5\n1 2\n",
+        "output": "-1",
+        "why": "Every pair has to be ruled out before concluding there is none. A loop that returns early on the first miss gets this wrong."
+      }
     ]
   },
   {
@@ -130,6 +150,26 @@
         "read": "array",
         "name": "a",
         "length": "n"
+      }
+    ],
+    "scenarios": [
+      {
+        "label": "empty input",
+        "input": "0\n\n",
+        "output": "false",
+        "why": "Nothing can be duplicated. A loop assuming at least two elements, or `i < size() - 1` on an unsigned size, breaks here."
+      },
+      {
+        "label": "one element",
+        "input": "1\n7\n",
+        "output": "false",
+        "why": "The smallest case with data but no possible pair."
+      },
+      {
+        "label": "the duplicate is first",
+        "input": "5\n-1 -1 2 3 4\n",
+        "output": "true",
+        "why": "Negatives are values like any other, and the answer is found immediately — the early return should fire on the second read, not after all five."
       }
     ]
   },
@@ -265,6 +305,26 @@
         "name": "price",
         "length": "n"
       }
+    ],
+    "scenarios": [
+      {
+        "label": "prices only fall",
+        "input": "5\n7 6 4 3 1\n",
+        "output": "0",
+        "why": "Doing nothing is allowed, so the answer is 0 — which is why the best profit starts at 0 here, unlike maximum-subarray where 0 would be wrong."
+      },
+      {
+        "label": "two days, rising",
+        "input": "2\n1 2\n",
+        "output": "1",
+        "why": "The smallest profitable case. Buy must come strictly before sell."
+      },
+      {
+        "label": "two days, falling",
+        "input": "2\n2 1\n",
+        "output": "0",
+        "why": "If the minimum is updated before the sale is evaluated, this wrongly reports a same-day trade."
+      }
     ]
   },
   {
@@ -335,6 +395,26 @@
         "name": "a",
         "length": "n"
       }
+    ],
+    "scenarios": [
+      {
+        "label": "all negative",
+        "input": "3\n-5 -2 -9\n",
+        "output": "-2",
+        "why": "The single most common wrong answer. A non-empty subarray is required, so initialising the best to 0 returns 0 here instead of the largest single value."
+      },
+      {
+        "label": "one element",
+        "input": "1\n-1\n",
+        "output": "-1",
+        "why": "No room to extend or restart; the answer is the element itself."
+      },
+      {
+        "label": "the whole array",
+        "input": "5\n5 4 -1 7 8\n",
+        "output": "23",
+        "why": "The running sum never goes negative, so it is never worth restarting — the opposite of the all-negative case."
+      }
     ]
   },
   {
@@ -398,6 +478,20 @@
         "read": "array",
         "name": "a",
         "length": "n"
+      }
+    ],
+    "scenarios": [
+      {
+        "label": "one zero",
+        "input": "5\n-1 1 0 -3 3\n",
+        "output": "0 0 9 0 0",
+        "why": "Every position except the zero's has the zero in its prefix or suffix, so only the zero's own position is non-zero. No special case is needed — which is the point of the two-pass approach."
+      },
+      {
+        "label": "two zeros",
+        "input": "3\n0 0 5\n",
+        "output": "0 0 0",
+        "why": "With two zeros every answer is 0. A division-based solution cannot handle either zero case, which is why division is forbidden."
       }
     ]
   },

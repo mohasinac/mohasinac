@@ -86,3 +86,40 @@ if (failures.length) {
 }
 
 console.log("\nEvery declared input format parses its own sample cases.\n");
+
+/*
+ * Cross-check authored scenarios against the judge-verified test cases.
+ *
+ * 🛑 Scenarios are hand-written prose with a claimed output, so they can drift
+ * from the truth in a way nothing else would catch — and a scenario that states
+ * the wrong answer teaches the wrong lesson with full confidence. Where a
+ * scenario shares an input with a test case, the outputs must agree exactly.
+ */
+const norm = (s) => String(s).replace(/[ \t]+$/gm, "").trimEnd();
+let scenarioChecks = 0;
+const scenarioProblems = [];
+
+for (const file of readdirSync(CONTENT).filter((f) => f.endsWith(".json"))) {
+  for (const p of JSON.parse(readFileSync(join(CONTENT, file), "utf8"))) {
+    for (const s of p.scenarios ?? []) {
+      const tc = (p.testCases ?? []).find((c) => norm(c.input) === norm(s.input));
+      if (!tc) continue;
+      scenarioChecks++;
+      if (norm(tc.expectedOutput) !== norm(s.output)) {
+        scenarioProblems.push(
+          `${p.slug} / ${s.label}: scenario claims ${JSON.stringify(s.output)} but the ` +
+            `test case says ${JSON.stringify(tc.expectedOutput)}`,
+        );
+      }
+    }
+  }
+}
+
+console.log(`scenario outputs cross-checked against test cases: ${scenarioChecks}`);
+if (scenarioProblems.length) {
+  console.log(`\nSCENARIO MISMATCHES (${scenarioProblems.length}):`);
+  for (const m of scenarioProblems) console.log(`  ${m}`);
+  console.log("");
+  process.exit(1);
+}
+console.log("Every authored scenario agrees with its test case.\n");

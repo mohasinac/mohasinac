@@ -59,6 +59,20 @@
         "read": "line",
         "name": "s"
       }
+    ],
+    "scenarios": [
+      {
+        "label": "only punctuation",
+        "input": ".,;\n",
+        "output": "true",
+        "why": "Nothing alphanumeric survives the filter, so it is vacuously a palindrome. Without `lo < hi` inside each skip loop, both pointers run off the end here."
+      },
+      {
+        "label": "a digit and a letter",
+        "input": "0P\n",
+        "output": "false",
+        "why": "Digits count as alphanumeric, so this is a two-character comparison that fails. Solutions that only consider letters report true."
+      }
     ]
   },
   {
@@ -322,6 +336,26 @@
         "read": "line",
         "name": "s"
       }
+    ],
+    "scenarios": [
+      {
+        "label": "never closed",
+        "input": "((\n",
+        "output": "false",
+        "why": "Survives every loop iteration and is still unbalanced. This is the check people omit: leftover open brackets mean invalid."
+      },
+      {
+        "label": "closes with nothing open",
+        "input": ")\n",
+        "output": "false",
+        "why": "The stack is empty when a closer arrives — a distinct failure from closing the wrong kind."
+      },
+      {
+        "label": "overlapping, not nested",
+        "input": "([)]\n",
+        "output": "false",
+        "why": "Bracket COUNTS are balanced for both kinds, so counting cannot solve this. Only the stack's ordering catches it."
+      }
     ]
   },
   {
@@ -462,6 +496,26 @@
         "read": "array",
         "name": "a",
         "length": "n"
+      }
+    ],
+    "scenarios": [
+      {
+        "label": "target between elements",
+        "input": "2 2\n1 3\n",
+        "output": "-1",
+        "why": "The two-element case where a wrong bound update loops forever. `lo = mid` makes no progress when mid == lo."
+      },
+      {
+        "label": "target at the start",
+        "input": "5 1\n1 2 3 4 5\n",
+        "output": "0",
+        "why": "Index 0 is a boundary an off-by-one will miss."
+      },
+      {
+        "label": "target at the end",
+        "input": "5 5\n1 2 3 4 5\n",
+        "output": "4",
+        "why": "The other boundary. Half-open bounds make both of these fall out without special cases."
       }
     ]
   },

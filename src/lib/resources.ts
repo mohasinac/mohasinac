@@ -196,6 +196,32 @@ const problemSchema = z.object({
     .optional(),
   vizVar: z.string().max(40).optional(),
 
+  /**
+   * Teaching cases with VISIBLE expected outputs and an explanation of what
+   * each one is testing.
+   *
+   * 🛑 A separate field from the judged test cases, deliberately. Hidden cases
+   * store only a SHA-256 of their expected output — the plaintext is dropped at
+   * seed time precisely so it can never be served — so these must not be
+   * sourced from them. They are visible BY DESIGN, which is the opposite
+   * requirement.
+   *
+   * Shown behind the editorial reveal, because naming the edge cases tells you
+   * most of the approach.
+   */
+  scenarios: z
+    .array(
+      z.object({
+        label: z.string().max(80),
+        input: z.string().max(2000),
+        output: z.string().max(2000),
+        /** Why this case exists — the pitfall it catches. */
+        why: z.string().max(600),
+      }),
+    )
+    .max(12)
+    .optional(),
+
   /** Per-problem cap overrides for the tracer. Defaults apply when absent. */
   vizLimits: z
     .object({
