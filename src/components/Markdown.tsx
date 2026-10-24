@@ -175,7 +175,16 @@ function inline(text: string, keyBase: string): React.ReactNode[] {
   const out: React.ReactNode[] = [];
   // One pass over the three inline forms; order matters only in that code
   // wins, so `` `**x**` `` stays literal.
-  const re = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\[[^\]]+\]\([^)\s]+\))/g;
+  /*
+   * 🛑 `**bold**` is listed BEFORE `*italic*`, and the alternation is ordered,
+   * so `**x**` can never be read as an emphasised `*x*`.
+   *
+   * Italic was simply missing, which meant `*maximum*` rendered with its
+   * asterisks showing on a live problem page — visible only by looking at the
+   * page, never from the DOM or a test of the blocks.
+   */
+  const re =
+    /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*(?!\s)[^*\n`]+(?<!\s)\*)|(\[[^\]]+\]\([^)\s]+\))/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let n = 0;
@@ -185,7 +194,8 @@ function inline(text: string, keyBase: string): React.ReactNode[] {
     const key = `${keyBase}-i${n++}`;
     const code = m[1];
     const bold = m[2];
-    const link = m[3];
+    const italic = m[3];
+    const link = m[4];
 
     if (code) {
       out.push(
@@ -198,6 +208,12 @@ function inline(text: string, keyBase: string): React.ReactNode[] {
         <strong key={key} className="font-semibold text-text">
           {bold.slice(2, -2)}
         </strong>,
+      );
+    } else if (italic) {
+      out.push(
+        <em key={key} className="italic">
+          {italic.slice(1, -1)}
+        </em>,
       );
     } else if (link) {
       const parts = link.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
