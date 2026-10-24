@@ -22,16 +22,14 @@ const { AZ_TRACE_HEADER, AZ_DEFAULTS, limitsPrelude } = await import(
   pathToFileURL(join(ROOT, "src/packages/dsa/src/trace/az-trace-header.ts")).href
 );
 
-const manifest = JSON.parse(readFileSync(join(ROOT, "public/toolchain/current.json"), "utf8"));
-const base = join(ROOT, "public/toolchain", manifest.version);
-
-const { runClang } = await import(pathToFileURL(join(base, "bundle.js")).href);
-const wasi = await import(pathToFileURL(join(base, "wasi/index.js")).href);
-const BITS = readFileSync(join(base, "stdc++.h"), "utf8");
-const PCH = new Uint8Array(readFileSync(join(base, "stdcxx.pch")));
-
-/** Must match the PCH byte for byte, or clang rejects it. */
-const CXX_FLAGS = ["-std=c++20", "-O2", "-fno-exceptions"];
+/**
+ * The shared harness — one copy of the flags.
+ *
+ * 🛑 This script previously declared `CXX_FLAGS` and **no `LINK_FLAGS` at
+ * all**, so it compiled against the stock 64 KB stack while everything else
+ * used an explicit 1 MB. That drift is what motivated extracting the module.
+ */
+const { compile, run } = await import("./lib/toolchain.mjs");
 
 /**
  * A program touching every branch of the if-constexpr chain. If an overload set
@@ -99,68 +97,27 @@ int main() {
 
 console.log("\nCompiling az_trace.h against the real toolchain…\n");
 
-let stderr = "";
-const files = {
-  "t.cpp": PROGRAM,
-  "stdcxx.pch": PCH,
-  bits: { "stdc++.h": BITS },
-  "az_trace.h": AZ_TRACE_HEADER,
-};
-
-let out;
-const t0 = Date.now();
-try {
-  out = await runClang(
-    ["clang++", ...CXX_FLAGS, "-I.", "-include-pch", "stdcxx.pch", "t.cpp", "-o", "t.wasm"],
-    files,
-    { stderr: (b) => { if (b) stderr += new TextDecoder().decode(b); } },
-  );
-} catch (err) {
+const built = await compile(PROGRAM, { extra: { "az_trace.h": AZ_TRACE_HEADER } });
+const stderr = built.stderr;
+const wasmBytes = built.wasm;
+if (!built.ok || !wasmBytes) {
   console.log("COMPILE FAILED\n");
-  console.log(stderr || String(err));
-  process.exit(1);
-}
-
-const wasmBytes = out["t.wasm"];
-if (!wasmBytes) {
-  console.log("No wasm produced.\n");
   console.log(stderr);
   process.exit(1);
 }
-console.log(`  compiled in ${Date.now() - t0} ms, ${wasmBytes.length} bytes`);
+console.log(`  compiled in ${built.ms} ms, ${wasmBytes.length} bytes`);
 if (stderr.trim()) console.log(`  diagnostics:\n${stderr}`);
 
 // ---- run it -----------------------------------------------------------------
 
-const { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory } = wasi;
-let stdout = "";
-let errRaw = "";
-
-const fds = [
-  new OpenFile(new File(new TextEncoder().encode(""))),
-  ConsoleStdout.lineBuffered((l) => { stdout += `${l}\n`; }),
-  // Raw, not line-buffered: lineBuffered drops a final unterminated line, which
-  // is exactly what the 0x01 framing exists to survive.
-  new (class extends wasi.Fd {
-    fd_write(data) {
-      errRaw += new TextDecoder().decode(data);
-      return { ret: 0, nwritten: data.byteLength };
-    }
-  })(),
-  new PreopenDirectory(".", new Map()),
-];
-
-const instance = new WASI(["t"], [], fds);
-const mod = await WebAssembly.compile(wasmBytes);
-const inst = await WebAssembly.instantiate(mod, { wasi_snapshot_preview1: instance.wasiImport });
-
-let exitCode = 0;
-try {
-  instance.start(inst);
-} catch (err) {
-  exitCode = typeof err?.code === "number" ? err.code : -1;
-  if (exitCode === -1) console.log(`  [trap] ${err?.message ?? err}`);
-}
+// captureTrace, because the emitter writes 0x01-framed records to stderr and a
+// line-buffered sink drops a final unterminated line — exactly what the framing
+// exists to survive.
+const ran = await run(wasmBytes, "", { captureTrace: true });
+const stdout = ran.stdout;
+const errRaw = ran.raw;
+const exitCode = ran.exitCode;
+if (ran.trap) console.log(`  [trap] ${ran.trap}`);
 
 // ---- assert -----------------------------------------------------------------
 
