@@ -11,15 +11,7 @@
  * frames that came from running the code on screen.
  */
 
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import type { CapReason, TraceValue, VizChrome, VizRole, VizTrace } from "../trace/types.ts";
 import { ROLE_WORD } from "../theme/roles.ts";
 import {
@@ -41,25 +33,10 @@ import { decodeAdjacencyList, decodeEdgeList, type GraphModel } from "./graph-la
 import { decodeLevelOrder, type TreeModel } from "./tree-layout.ts";
 
 /*
- * prefers-reduced-motion as an external store rather than state set inside an
- * effect. Setting state synchronously in an effect causes cascading renders
- * (and eslint's react-hooks rule rejects it); this is the shape the hook exists
- * for, and `getServerSnapshot` returning true means the server always emits the
- * calm variant.
+ * There is deliberately no prefers-reduced-motion handling here any more.
+ * It existed to suppress the autoplay loop; with every advance driven by the
+ * reader, the player has no motion of its own to reduce.
  */
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribeReducedMotion(onChange: () => void): () => void {
-  if (typeof window === "undefined") return () => {};
-  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
-  mq.addEventListener("change", onChange);
-  return () => mq.removeEventListener("change", onChange);
-}
-
-function getReducedMotion(): boolean {
-  if (typeof window === "undefined") return true;
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
 
 export interface VizPlayerProps {
   readonly trace: VizTrace;
@@ -70,8 +47,6 @@ export interface VizPlayerProps {
 const EMPTY_TREE: TreeModel = { nodes: [], cols: 0, depth: 0 };
 const EMPTY_GRAPH: GraphModel = { nodes: [], edges: [], layers: 0, widest: 0 };
 
-const SPEEDS = [0.5, 1, 2, 4] as const;
-const BASE_MS = 1400;
 
 /** Plain-language cap reasons, for the badge. */
 const CAP_WORD: Record<CapReason, string> = {
@@ -111,8 +86,6 @@ function findBackEdge(
 
 export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) {
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
   const scopeRef = useRef<HTMLDivElement | null>(null);
 
   /*
@@ -134,47 +107,19 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
   const frame = at(trace.frames, Math.min(index, Math.max(0, total - 1)));
   const spec = at(trace.specs, 0);
 
-  const reducedMotion = useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotion,
-    // The server renders the CALM variant, which is both the safe default and
-    // hydration-stable.
-    () => true,
-  );
-
   /*
-   * requestAnimationFrame rather than setInterval: no drift, it pauses with a
-   * background tab, and — because every accumulator lives inside the effect
-   * closure — React's StrictMode double-mount in dev discards the whole thing
-   * on cleanup instead of running two timers at once. setIndex is a functional
-   * update for the same reason.
+   * 🛑 No autoplay. Every advance is a deliberate step the reader takes.
+   *
+   * This previously ran a requestAnimationFrame loop behind a play/pause
+   * button with a speed control. A diagram that advances on its own pulls the
+   * eye forward while you are still reading the caption for the step you are
+   * on — which is the opposite of what a teaching animation should do. It also
+   * removed the reduced-motion handling entirely, since there is now no motion
+   * to reduce.
    */
-  useEffect(() => {
-    if (!playing || reducedMotion || total <= 1) return;
-    let raf = 0;
-    let last = performance.now();
-    let acc = 0;
-    const tick = () => {
-      const now = performance.now();
-      acc += now - last;
-      last = now;
-      if (acc >= BASE_MS / speed) {
-        acc = 0;
-        setIndex((i) => {
-          if (i + 1 < total) return i + 1;
-          setPlaying(false);
-          return i;
-        });
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [playing, speed, total, reducedMotion]);
 
   const step = useCallback(
     (d: number) => {
-      setPlaying(false);
       setIndex((i) => Math.min(total - 1, Math.max(0, i + d)));
     },
     [total],
@@ -187,7 +132,6 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
    */
   const command = useCallback(
     (cmd: StepCommand, direction: 1 | -1 = 1) => {
-      setPlaying(false);
       setIndex((i) =>
         seek(cmd, { frames: trace.frames, from: i, direction, breakpoints, conditions }),
       );
@@ -227,15 +171,15 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
       if (tag === "input" || tag === "textarea" || t?.isContentEditable) return;
 
       const handled: Record<string, () => void> = {
-        " ": () => setPlaying((p) => !p),
-        k: () => setPlaying((p) => !p),
+        // Space advances one step rather than toggling play, which no longer
+        // exists. It stays bound because it is the key people press.
+        " ": () => step(1),
         ArrowRight: () => step(e.shiftKey ? 10 : 1),
         l: () => step(1),
         ArrowLeft: () => step(e.shiftKey ? -10 : -1),
         h: () => step(-1),
         Home: () => step(-total),
         End: () => step(total),
-        Escape: () => setPlaying(false),
         // The conventional debugger keys, so muscle memory transfers. Shift
         // reverses each one, which no real debugger can offer.
         F10: () => command("over", e.shiftKey ? -1 : 1),
@@ -438,22 +382,14 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
           so this text is what carries the meaning. */}
       <p className="border-t border-border px-3 py-2 text-sm text-text-muted">{caption}</p>
 
-      {/* Announced only while paused. A live region firing on every frame of a
-          playing animation is a denial of service on a screen reader. */}
+      {/* Safe to announce on every step now that steps only happen when the
+          reader asks for one. Under autoplay this fired continuously, which is
+          a denial of service on a screen reader. */}
       <p aria-live="polite" className="sr-only">
-        {!playing ? `Step ${index + 1} of ${total}. ${caption}` : ""}
+        {`Step ${index + 1} of ${total}. ${caption}`}
       </p>
 
       <div className="flex flex-wrap items-center gap-2 border-t border-border px-3 py-2 text-xs">
-        <button
-          type="button"
-          onClick={() => setPlaying((p) => !p)}
-          aria-pressed={playing}
-          disabled={total <= 1}
-          className="rounded-sm border border-border px-2 py-1 font-mono transition-colors hover:bg-surface-raised disabled:opacity-40"
-        >
-          {playing ? "pause" : "play"}
-        </button>
         <button
           type="button"
           onClick={() => step(-1)}
@@ -476,24 +412,14 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
           min={0}
           max={Math.max(0, total - 1)}
           value={index}
-          onChange={(e) => {
-            setPlaying(false);
-            setIndex(Number(e.target.value));
-          }}
+          onChange={(e) => setIndex(Number(e.target.value))}
           aria-label="Step"
           aria-valuetext={`Step ${index + 1} of ${total}`}
           className="h-1 flex-1 accent-accent"
         />
 
-        <button
-          type="button"
-          onClick={() => setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length] ?? 1)}
-          className="rounded-sm border border-border px-2 py-1 font-mono transition-colors hover:bg-surface-raised"
-        >
-          {speed}×
-        </button>
         <span className="font-mono text-[11px] text-text-faint">
-          space play · ←→ step
+          space or → to step
         </span>
       </div>
 

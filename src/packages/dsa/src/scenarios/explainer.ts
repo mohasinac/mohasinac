@@ -246,6 +246,18 @@ export function buildExplainer(opts: ExplainerInput): ExplainerResult {
       roles: { cells: { [drawnName]: Object.fromEntries(cells.map((c) => [c, "answer" as const])) } },
     });
   } else {
+    /*
+     * 🛑 No highlight, deliberately — and I tried the other thing and was
+     * wrong. Marking the first and last cell and captioning it "getting from
+     * one end of the sequence to the other" reads well for jump-game, and is
+     * nonsense for `contains-duplicate` ("does any value repeat?") and for
+     * `maximum-subarray`, whose answer is a SUM. Two existing tests caught it.
+     *
+     * The rule holds: when the answer does not name positions, say it in words.
+     * A problem that genuinely wants its ends marked should ask for that
+     * explicitly, the way `vizDerive` is explicit — never inferred from the
+     * mere absence of an index.
+     */
     frames.push({ vars, note: `For this input, the answer is ${answer}.` });
   }
 
