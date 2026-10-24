@@ -20,11 +20,20 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import type { TraceValue, VizChrome, VizRole, VizTrace } from "../trace/types.ts";
+import type { CapReason, TraceValue, VizChrome, VizRole, VizTrace } from "../trace/types.ts";
 import { ROLE_WORD } from "../theme/roles.ts";
+import {
+  type StepCommand,
+  evaluateWatch,
+  executableLines,
+  isConditionParseable,
+  seek,
+} from "../trace/debugger.ts";
 import { ArrayView } from "./ArrayView.tsx";
+import { CodePane } from "./CodePane.tsx";
 import { GridView } from "./GridView.tsx";
 import { TreeView } from "./TreeView.tsx";
+import { VarsPane } from "./VarsPane.tsx";
 import { decodeLevelOrder, type TreeModel } from "./tree-layout.ts";
 
 /*
@@ -59,6 +68,14 @@ const EMPTY_TREE: TreeModel = { nodes: [], cols: 0, depth: 0 };
 const SPEEDS = [0.5, 1, 2, 4] as const;
 const BASE_MS = 1400;
 
+/** Plain-language cap reasons, for the badge. */
+const CAP_WORD: Record<CapReason, string> = {
+  steps: "the step limit was reached",
+  loop: "a loop ran more times than the limit shows",
+  depth: "recursion went deeper than the limit",
+  bytes: "the trace grew too large",
+};
+
 /** Indexed reads are `T | undefined` under noUncheckedIndexedAccess. */
 const at = <T,>(xs: readonly T[], i: number): T | undefined => xs[i];
 
@@ -71,6 +88,17 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
   const scopeRef = useRef<HTMLDivElement | null>(null);
+
+  /*
+   * Debugger state. Only meaningful for chrome="trace", but held
+   * unconditionally — hooks cannot be called conditionally, and the explain
+   * chrome simply never renders the controls that read it.
+   */
+  const [breakpoints, setBreakpoints] = useState<ReadonlySet<number>>(() => new Set());
+  const [conditions, setConditions] = useState<ReadonlyMap<number, string>>(() => new Map());
+  const [watchExprs, setWatchExprs] = useState<readonly string[]>([]);
+  const [condDraft, setCondDraft] = useState("");
+  const [watchDraft, setWatchDraft] = useState("");
 
   // useId, not a literal: SVG `url(#...)` resolves against the DOCUMENT, so two
   // players on one page would cross-wire their patterns.
@@ -127,6 +155,41 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
   );
 
   /*
+   * Every debugger command is a seek over the frames already in memory — no
+   * re-execution, which is also why `direction: -1` exists at all. Reverse
+   * step-out is free here and a research project in a real debugger.
+   */
+  const command = useCallback(
+    (cmd: StepCommand, direction: 1 | -1 = 1) => {
+      setPlaying(false);
+      setIndex((i) =>
+        seek(cmd, { frames: trace.frames, from: i, direction, breakpoints, conditions }),
+      );
+    },
+    [trace.frames, breakpoints, conditions],
+  );
+
+  const toggleBreakpoint = useCallback((line: number) => {
+    setBreakpoints((prev) => {
+      const next = new Set(prev);
+      if (next.has(line)) next.delete(line);
+      else next.add(line);
+      return next;
+    });
+    // A condition belongs to a breakpoint, so clearing the breakpoint clears
+    // it — otherwise re-adding the breakpoint would silently resurrect an old
+    // condition and look like it was ignoring the click.
+    setConditions((prev) => {
+      if (!prev.has(line)) return prev;
+      const next = new Map(prev);
+      next.delete(line);
+      return next;
+    });
+  }, []);
+
+  const executable = useMemo(() => executableLines(trace.frames), [trace.frames]);
+
+  /*
    * 🛑 Scoped to this container, never bound to `window`. The problem page
    * renders ProblemWorkbench's <textarea id="sol"> alongside this, and a window
    * listener would swallow Space and the arrow keys while someone is typing C++.
@@ -147,13 +210,19 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
         Home: () => step(-total),
         End: () => step(total),
         Escape: () => setPlaying(false),
+        // The conventional debugger keys, so muscle memory transfers. Shift
+        // reverses each one, which no real debugger can offer.
+        F10: () => command("over", e.shiftKey ? -1 : 1),
+        F11: () => command(e.shiftKey ? "out" : "into"),
+        F8: () => command("continue", e.shiftKey ? -1 : 1),
+        F5: () => command("continue", e.shiftKey ? -1 : 1),
       };
       const fn = handled[e.key];
       if (!fn) return;
       e.preventDefault();
       fn();
     },
-    [step, total],
+    [step, total, command],
   );
 
   const cells = useMemo(
@@ -171,6 +240,27 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
     [spec, cells],
   );
 
+  /** The previous frame, so the variable panel can mark what changed. */
+  const prevFrame = at(trace.frames, Math.min(index, Math.max(0, total - 1)) - 1);
+
+  /** Lines the planner could not instrument, so the gutter can explain a gap. */
+  const skippedByLine = useMemo(() => {
+    const m = new Map<number, string>();
+    for (const s of trace.coverage?.skipped ?? []) m.set(s.line, s.reason);
+    return m;
+  }, [trace.coverage]);
+
+  const watches = useMemo(
+    () =>
+      watchExprs.map((expr) => {
+        const r = frame ? evaluateWatch(expr, frame.vars) : { ok: false as const };
+        // null means "could not resolve here", which the panel renders as
+        // "not in scope" rather than as a value.
+        return { expr, value: r.ok ? r.value : null };
+      }),
+    [watchExprs, frame],
+  );
+
   if (!frame || !spec) {
     return (
       <p className="rounded-md border border-border bg-surface p-4 text-sm text-text-muted">
@@ -181,6 +271,9 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
 
   const caption = frame.note ?? "";
   const asString = spec.kind === "array" && spec.asString === true;
+  const isTrace = chrome === "trace" && trace.source.trim() !== "";
+  const condLine = frame.line;
+  const condDraftOk = isConditionParseable(condDraft);
 
   return (
     <div
@@ -199,6 +292,36 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
           step {index + 1} / {total}
         </span>
       </div>
+
+      {/* 🛑 chrome="trace" only ever renders frames that came from running the
+          code shown here. Anything else is a WALKTHROUGH and uses the explain
+          chrome — otherwise the line highlight would point at code that was
+          never executed, which is a lie told convincingly. */}
+      {isTrace ? (
+        <div className="grid gap-px border-b border-border bg-border lg:grid-cols-[3fr_2fr]">
+          <div className="bg-surface">
+            <CodePane
+              source={trace.source}
+              {...(frame.line !== undefined ? { currentLine: frame.line } : {})}
+              breakpoints={breakpoints}
+              executable={executable}
+              onToggleBreakpoint={toggleBreakpoint}
+              conditions={conditions}
+              skipped={skippedByLine}
+            />
+          </div>
+          <div className="bg-surface">
+            <VarsPane
+              vars={frame.vars}
+              {...(prevFrame ? { previous: prevFrame.vars } : {})}
+              watches={watches}
+              onRemoveWatch={(expr) =>
+                setWatchExprs((prev) => prev.filter((e) => e !== expr))
+              }
+            />
+          </div>
+        </div>
+      ) : null}
 
       <div className="overflow-x-auto p-3">
         {spec.kind === "array" ? (
@@ -287,6 +410,147 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
           space play · ←→ step
         </span>
       </div>
+
+      {isTrace ? (
+        <>
+          <div className="flex flex-wrap items-center gap-2 border-t border-border px-3 py-2 text-xs">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-text-faint">
+              debug
+            </span>
+            {(
+              [
+                ["into", "into", "F11", "one frame"],
+                ["over", "over", "F10", "skip the whole call"],
+                ["out", "out", "⇧F11", "leave this function"],
+                ["continue", "continue", "F8", "to the next breakpoint"],
+              ] as const
+            ).map(([cmd, label, key, hint]) => (
+              <span key={cmd} className="inline-flex">
+                <button
+                  type="button"
+                  onClick={() => command(cmd)}
+                  title={`${hint} (${key})`}
+                  className="rounded-l-sm border border-border px-2 py-1 font-mono transition-colors hover:bg-surface-raised"
+                >
+                  {label}
+                </button>
+                {/* Reverse is a first-class button, not a modifier only, because
+                    it is the single most useful thing a captured trace can do
+                    that a live debugger cannot. */}
+                <button
+                  type="button"
+                  onClick={() => command(cmd, -1)}
+                  aria-label={`${label} backwards`}
+                  title={`${label} backwards — only possible because the whole trace is captured`}
+                  className="-ml-px rounded-r-sm border border-border px-1.5 py-1 font-mono text-text-faint transition-colors hover:bg-surface-raised hover:text-text"
+                >
+                  ↩
+                </button>
+              </span>
+            ))}
+            {breakpoints.size > 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setBreakpoints(new Set());
+                  setConditions(new Map());
+                }}
+                className="rounded-sm border border-border px-2 py-1 font-mono text-text-faint transition-colors hover:bg-surface-raised hover:text-text"
+              >
+                clear {breakpoints.size} breakpoint{breakpoints.size === 1 ? "" : "s"}
+              </button>
+            ) : (
+              <span className="font-mono text-[11px] text-text-faint">
+                click the gutter to set a breakpoint
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 border-t border-border px-3 py-2 text-xs">
+            {condLine !== undefined && breakpoints.has(condLine) ? (
+              <>
+                <label
+                  htmlFor={`${idPrefix}-cond`}
+                  className="font-mono text-[11px] text-text-faint"
+                >
+                  break on line {condLine} when
+                </label>
+                <input
+                  id={`${idPrefix}-cond`}
+                  value={condDraft}
+                  onChange={(e) => setCondDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter" || !condDraftOk) return;
+                    setConditions((prev) => {
+                      const next = new Map(prev);
+                      if (condDraft.trim() === "") next.delete(condLine);
+                      else next.set(condLine, condDraft.trim());
+                      return next;
+                    });
+                    setCondDraft("");
+                  }}
+                  placeholder="i == 5"
+                  aria-invalid={!condDraftOk}
+                  className="w-40 rounded-sm border border-border bg-bg px-2 py-1 font-mono"
+                />
+                {/* 🛑 Said out loud rather than failing silently. The evaluator
+                    fails CLOSED, so an unparseable condition means the
+                    breakpoint never fires — which without this message is
+                    indistinguishable from the debugger ignoring it. */}
+                {!condDraftOk ? (
+                  <span className="font-mono text-[11px] text-error">
+                    only <code>var op value</code> with == != &lt; &lt;= &gt; &gt;= and &amp;&amp;
+                    / || — no arithmetic or calls
+                  </span>
+                ) : null}
+              </>
+            ) : (
+              <span className="font-mono text-[11px] text-text-faint">
+                select a frame on a breakpoint line to add a condition
+              </span>
+            )}
+
+            <span className="flex-1" />
+
+            <label htmlFor={`${idPrefix}-watch`} className="font-mono text-[11px] text-text-faint">
+              watch
+            </label>
+            <input
+              id={`${idPrefix}-watch`}
+              value={watchDraft}
+              onChange={(e) => setWatchDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter") return;
+                const expr = watchDraft.trim();
+                if (expr === "") return;
+                setWatchExprs((prev) => (prev.includes(expr) ? prev : [...prev, expr]));
+                setWatchDraft("");
+              }}
+              placeholder="nums[lo]"
+              className="w-32 rounded-sm border border-border bg-bg px-2 py-1 font-mono"
+            />
+          </div>
+        </>
+      ) : null}
+
+      {/* 🛑 The coverage badge. "~85% and says so" is only true if it SAYS so on
+          screen, and a truncated trace presented as a complete one teaches the
+          wrong thing. Both facts are stated here or nowhere. */}
+      {isTrace && (trace.coverage || trace.capped) ? (
+        <p className="border-t border-border px-3 py-2 font-mono text-[11px] text-text-faint">
+          {trace.coverage
+            ? `traced ${trace.coverage.statementsInstrumented} of ${trace.coverage.statementsFound} statements`
+            : null}
+          {trace.coverage?.skipped?.length
+            ? ` · ${trace.coverage.skipped.length} skipped (${trace.coverage.skipped[0]?.reason ?? "unknown"})`
+            : null}
+          {trace.capped
+            ? ` · stopped early: ${CAP_WORD[trace.capped.reason]}${
+                trace.capped.line ? ` at line ${trace.capped.line}` : ""
+              } — this trace is incomplete`
+            : null}
+        </p>
+      ) : null}
 
       {/* Role information as WORDS, so nothing depends on colour. Doubles as the
           debugging view when a visualization looks wrong. */}
