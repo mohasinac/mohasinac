@@ -74,7 +74,9 @@ export function ChainView({
       aria-hidden="true"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="xMinYMid meet"
-      className="h-auto w-full"
+      width={width}
+      height={height}
+      className="h-auto max-w-full"
       style={{ maxHeight: "12rem" }}
     >
       <defs>

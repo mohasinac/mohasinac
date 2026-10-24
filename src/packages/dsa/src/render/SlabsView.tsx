@@ -65,7 +65,9 @@ function StackView({
       aria-hidden="true"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="xMinYMid meet"
-      className="h-auto w-full"
+      width={width}
+      height={height}
+      className="h-auto max-w-full"
       style={{ maxHeight: "16rem" }}
     >
       {values.map((value, i) => {
@@ -139,7 +141,9 @@ function QueueView({
       aria-hidden="true"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="xMinYMid meet"
-      className="h-auto w-full"
+      width={width}
+      height={height}
+      className="h-auto max-w-full"
       style={{ maxHeight: "9rem" }}
     >
       {values.map((value, i) => {
@@ -231,7 +235,9 @@ function HeapView({
       aria-hidden="true"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="xMidYMid meet"
-      className="h-auto w-full"
+      width={width}
+      height={height}
+      className="h-auto max-w-full"
       style={{ maxHeight: "16rem" }}
     >
       {/* Edges first, so nodes paint over their endpoints. */}

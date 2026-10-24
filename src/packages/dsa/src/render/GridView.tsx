@@ -52,7 +52,9 @@ export function GridView({ rows, roles, rowLabels, colLabels, idPrefix }: GridVi
       aria-hidden="true"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="xMinYMid meet"
-      className="h-auto w-full"
+      width={width}
+      height={height}
+      className="h-auto max-w-full"
       style={{ maxHeight: "20rem" }}
       fill="none"
       strokeLinecap="round"

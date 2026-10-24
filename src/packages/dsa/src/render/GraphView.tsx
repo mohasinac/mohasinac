@@ -59,7 +59,9 @@ export function GraphView({ model, roles, edgeRoles, directed, idPrefix }: Graph
       aria-hidden="true"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="xMidYMid meet"
-      className="h-auto w-full"
+      width={width}
+      height={height}
+      className="h-auto max-w-full"
       style={{ maxHeight: "18rem" }}
     >
       <defs>
