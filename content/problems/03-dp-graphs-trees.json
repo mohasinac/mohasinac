@@ -484,6 +484,7 @@
     "sortOrder": 260,
     "status": "published",
     "sheets": [
+      "blind75",
       "neetcode150",
       "neetcode250",
       "top100",
@@ -789,6 +790,7 @@
     "sortOrder": 300,
     "status": "published",
     "sheets": [
+      "blind75",
       "neetcode150",
       "neetcode250",
       "top100",
@@ -1048,6 +1050,7 @@
     "sortOrder": 330,
     "status": "published",
     "sheets": [
+      "blind75",
       "neetcode150",
       "neetcode250",
       "top100",

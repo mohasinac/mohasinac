@@ -10,7 +10,6 @@
  *
  *   npm run verify:az-header
  */
-import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 

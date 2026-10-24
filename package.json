@@ -36,7 +36,10 @@
     "verify:browser:session": "node scripts/mint-test-session.mjs",
     "verify:browser:cleanup": "node scripts/cleanup-test-session.mjs",
     "verify:demos": "node --experimental-strip-types scripts/verify-demos.mjs",
-    "verify:resume-presets": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-resume-presets.mjs"
+    "verify:resume-presets": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-resume-presets.mjs",
+    "verify:expected": "node --experimental-strip-types scripts/generate-expected-outputs.mjs",
+    "fix:expected": "node --experimental-strip-types scripts/generate-expected-outputs.mjs --write",
+    "verify:toolchain": "node scripts/verify-toolchain.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",
