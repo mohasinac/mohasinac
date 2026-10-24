@@ -1,0 +1,34 @@
+{
+  "name": "@mohasinac/dsa",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Algorithm visualization engine: trace protocol, layouts, themed SVG renderers, and self-tracing data structures",
+  "type": "module",
+  "//": [
+    "private: true for now. This directory is laid out to map 1:1 onto the root of",
+    "github.com/mohasinac/dsa, so extracting it later is a git mv plus flipping",
+    "private to false — no restructuring.",
+    "",
+    "It is consumed in-repo through the @dsa/* tsconfig path alias, as SOURCE. That",
+    "deliberately means no build step, no transpilePackages entry, no version bump per",
+    "change, and — critically — no separate node_modules, so it cannot reintroduce the",
+    "dual-React problem that forced appkit's postinstall to delete its own peer deps.",
+    "",
+    "Boundary rules, enforced by eslint rather than discipline:",
+    "  - no imports from @/ (the app)",
+    "  - no server-only, no firebase/*, no next/*",
+    "  - theme values are CSS custom property NAMES, never hex — so the package",
+    "    carries no palette and survives the light-theme swap untouched",
+    "",
+    "Tests use node:test with zero dependencies, following @mohasinac/sievejs."
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./trace": "./src/trace/index.ts",
+    "./scenarios": "./src/scenarios/index.ts",
+    "./theme": "./src/theme/index.ts"
+  },
+  "scripts": {
+    "test": "node --test --experimental-strip-types test/*.test.ts"
+  }
+}
