@@ -328,6 +328,27 @@ const ids = () => ++nextId;
   );
 }
 
+{
+  // 🛑 The exception to the rule above: an adjacency list IS nested by nature,
+  // so a declared graph must survive it. Without this every graph problem
+  // would render as a DP-style table, because `vector<vector<int>> adj` has
+  // exactly the shape a 2-D grid has.
+  const worker = mockWorker({
+    run: { result: { ok: true, stdout: "1", exitCode: 0 } },
+    ast: (m) => ({ result: { ok: true, ast: astFor(m.source) } }),
+    trace: {
+      chunks: [frame(2, { adj: [[1], [0, 2], [1]] })],
+      result: { ok: true, stdout: "1", exitCode: 0 },
+    },
+  });
+  const r = await runTrace({ worker, source: SOURCE, stdin: "", nextId: ids, vizKind: "graph" });
+  check(
+    "a declared graph survives a nested adjacency list",
+    r.trace?.specs[0]?.kind === "graph",
+    JSON.stringify(r.trace?.specs[0]),
+  );
+}
+
 /* --------------------------- a cap is surfaced, never silently swallowed */
 {
   const worker = mockWorker({

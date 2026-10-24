@@ -282,9 +282,21 @@ function inferSpec(
   if (!chosen) return null;
   const { name, nested } = chosen;
 
-  // A nested array is a grid whatever was declared: a 2-D value cannot be drawn
-  // as a list or a stack, and trying would throw away a dimension.
-  if (nested) return { id: "auto", kind: "grid", var: name };
+  /*
+   * A nested array is a grid — EXCEPT for a declared graph, whose natural
+   * representation is an adjacency list and therefore nested by nature.
+   *
+   * 🛑 Without that exception every graph problem would render as a DP-style
+   * table, because `vector<vector<int>> adj` is exactly the shape a 2-D grid
+   * also has. "Nested always wins" is right for the 1-D kinds (a list or a
+   * stack really cannot carry a second dimension) and wrong for the one kind
+   * that is defined by it.
+   */
+  if (nested) {
+    return declaredKind === "graph"
+      ? { id: "auto", kind: "graph", var: name, encoding: "adjacencyList" }
+      : { id: "auto", kind: "grid", var: name };
+  }
 
   switch (declaredKind) {
     case "linkedList":

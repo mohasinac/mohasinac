@@ -32,10 +32,12 @@ import {
 import { ArrayView } from "./ArrayView.tsx";
 import { ChainView } from "./ChainView.tsx";
 import { CodePane } from "./CodePane.tsx";
+import { GraphView } from "./GraphView.tsx";
 import { GridView } from "./GridView.tsx";
 import { SlabsView } from "./SlabsView.tsx";
 import { TreeView } from "./TreeView.tsx";
 import { VarsPane } from "./VarsPane.tsx";
+import { decodeAdjacencyList, decodeEdgeList, type GraphModel } from "./graph-layout.ts";
 import { decodeLevelOrder, type TreeModel } from "./tree-layout.ts";
 
 /*
@@ -66,6 +68,7 @@ export interface VizPlayerProps {
 }
 
 const EMPTY_TREE: TreeModel = { nodes: [], cols: 0, depth: 0 };
+const EMPTY_GRAPH: GraphModel = { nodes: [], edges: [], layers: 0, widest: 0 };
 
 const SPEEDS = [0.5, 1, 2, 4] as const;
 const BASE_MS = 1400;
@@ -289,6 +292,19 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
   const edgeHints = spec ? frame?.roles?.edges?.[spec.var] : undefined;
   const cycle = useMemo(() => findBackEdge(edgeHints), [edgeHints]);
 
+  /*
+   * Decoded once per frame, like the tree model. Deterministic by construction
+   * (see graph-layout.ts), so a node sits at the same pixel in every frame.
+   */
+  const graphEncoding = spec?.kind === "graph" ? spec.encoding : undefined;
+  const graphDirected = spec?.kind === "graph" && spec.directed === true;
+  const graphModel = useMemo(() => {
+    if (graphEncoding === undefined) return EMPTY_GRAPH;
+    return graphEncoding === "edgeList"
+      ? decodeEdgeList(cells, { directed: graphDirected })
+      : decodeAdjacencyList(cells, { directed: graphDirected });
+  }, [graphEncoding, graphDirected, cells]);
+
   /** The previous frame, so the variable panel can mark what changed. */
   const prevFrame = at(trace.frames, Math.min(index, Math.max(0, total - 1)) - 1);
 
@@ -408,13 +424,13 @@ export function VizPlayer({ trace, chrome = "explain", title }: VizPlayerProps) 
         ) : spec.kind === "stack" || spec.kind === "queue" ? (
           <SlabsView values={cells} kind={spec.kind} roles={roles} idPrefix={idPrefix} />
         ) : (
-          // Graph is the one kind still unbuilt. Saying so beats drawing the
-          // wrong shape — a list rendered as a strip, or a graph as a tree,
-          // teaches the exact thing the motif exists to distinguish.
-          <p className="text-sm text-text-muted">
-            A <code className="font-mono">{spec.kind}</code> view is not built yet — the caption below is
-            still accurate.
-          </p>
+          <GraphView
+            model={graphModel}
+            roles={roles}
+            {...(edgeHints ? { edgeRoles: edgeHints } : {})}
+            {...(spec.directed ? { directed: true } : {})}
+            idPrefix={idPrefix}
+          />
         )}
       </div>
 
