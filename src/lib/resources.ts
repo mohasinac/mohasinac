@@ -96,6 +96,24 @@ const moduleSchema = z.object({
   summary: z.string().max(2000).default(""),
 });
 
+/**
+ * A curated, ORDERED run of problems — Blind 75, Top 100, A-Z.
+ *
+ * Separate from `problems.sheets[]` because a sheet is a curriculum: the
+ * sequence is the teaching, and an array of tags cannot carry sequence. Keeping
+ * `order` here also means reordering a sheet touches one document instead of
+ * every problem in it.
+ *
+ * Courses deliberately contain no problems at all; this is the other axis.
+ */
+const problemSetSchema = z.object({
+  ...base,
+  title: z.string().min(1).max(160),
+  summary: z.string().max(2000).default(""),
+  /** Problem slugs, in the order they should be worked through. */
+  order: z.array(z.string().max(120)).max(500).default([]),
+});
+
 const lessonSchema = z.object({
   ...base,
   moduleSlug: z.string().min(1).max(120),
@@ -109,8 +127,22 @@ const problemSchema = z.object({
   title: z.string().min(1).max(200),
   difficulty: z.enum(["easy", "medium", "hard"]),
   patterns: z.array(z.string().max(60)).max(12).default([]),
-  /** A problem can belong to several sheets at once. */
-  sheets: z.array(z.enum(["blind75", "neetcode150", "neetcode250"])).max(3).default([]),
+  /**
+   * A problem can belong to several sheets at once.
+   *
+   * 🛑 `neetcode150` and `neetcode250` are kept deliberately. 53 problems are
+   * already tagged with them, and removing an enum member makes every one of
+   * those documents fail `safeParse` the next time anyone edits it in the admin
+   * console — a migration disguised as a tidy-up.
+   *
+   * Ordering lives in the `problemSets` collection, not here: this is a
+   * denormalised tag for filtering, and "work through these in this order" is
+   * something a tag cannot express.
+   */
+  sheets: z
+    .array(z.enum(["blind75", "top100", "a-z", "neetcode150", "neetcode250"]))
+    .max(5)
+    .default([]),
   /** Original wording. Statements are never copied from the source. */
   statement: z.string().max(20_000).default(""),
   constraints: z.string().max(4000).default(""),
@@ -194,9 +226,22 @@ export const RESOURCES = {
   },
   tracks: {
     collection: "courseTracks",
-    label: "Tracks",
+    // Relabelled from "Tracks": these are now four standalone courses
+    // (C++ Foundations, Data Structures, Algorithms, Competitive Approaches)
+    // containing teaching material only. The COLLECTION name is kept on
+    // purpose — renaming it would orphan every module's `trackSlug`.
+    label: "Courses",
     group: "Course",
     schema: trackSchema,
+    titleField: "title",
+    searchFields: ["title", "summary"],
+    orderBy: { field: "sortOrder", direction: "asc" },
+  },
+  problemSets: {
+    collection: "problemSets",
+    label: "Problem sets",
+    group: "Course",
+    schema: problemSetSchema,
     titleField: "title",
     searchFields: ["title", "summary"],
     orderBy: { field: "sortOrder", direction: "asc" },

@@ -93,6 +93,22 @@ const COLLECTIONS = {
     search: ["name", "note", "category"],
     enums: { category: ["language", "framework", "infra", "data", "tooling"] },
   },
+  problemSets: {
+    collection: "problemSets",
+    required: ["slug", "title"],
+    search: ["title", "summary"],
+  },
+  certifications: {
+    collection: "certifications",
+    required: ["slug", "title", "issuer"],
+    search: ["title", "issuer"],
+  },
+  hobbies: { collection: "hobbies", required: ["slug", "name"], search: ["name", "note"] },
+  businesses: {
+    collection: "businesses",
+    required: ["slug", "name"],
+    search: ["name", "legalName", "summary"],
+  },
   posts: {
     collection: "blogPosts",
     required: ["slug", "title"],
