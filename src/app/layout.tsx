@@ -1,12 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { SiteNav } from "@/components/SiteNav";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "Mohasin A C";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
+  // SITE_URL comes from @/lib/site so the sitemap, the RSS feed and these
+  // metadata tags cannot disagree. They previously had separate definitions
+  // with different fallbacks, which would have put localhost URLs in one and
+  // the production domain in another.
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${SITE_NAME} — engineer, writer, course author`,
@@ -15,6 +19,10 @@ export const metadata: Metadata = {
   description:
     "Portfolio, technical writing, an in-browser C++ sandbox, and a competitive-programming course taught from first principles.",
   robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": `${SITE_URL}/feed.xml` },
+  },
 };
 
 export const viewport: Viewport = {
