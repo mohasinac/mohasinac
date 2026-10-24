@@ -179,7 +179,7 @@ Ask two questions:
 
 ## Pitfalls
 
-- **Off-by-one at the boundary.** Prefix arrays are size `n + 1`; Fenwick is 1-based internally; the segment tree above takes an inclusive range and converts. Pick a convention per structure, write it in a comment, and never deviate — this is the [interval-convention rule](/course/lessons/edge-cases-and-dry-running) applied.
+- **Off-by-one at the boundary.** Prefix arrays are size `n + 1`; Fenwick is 1-based internally; the segment tree above takes an inclusive range and converts. Pick a convention per structure, write it in a comment, and never deviate — this is the [interval-convention rule](/learn/foundations/edge-cases-and-dry-running) applied.
 - **Overflow.** Summing 10⁵ values of 10⁹ exceeds `int` by four orders of magnitude. Every accumulator here is `long long` deliberately.
 - **Passing a value to Fenwick's `add`** when it wants a delta.
 - **Using a Fenwick tree for minimum.** There is no inverse for `min`, so `prefix(r) - prefix(l)` is meaningless. Silently wrong answers.

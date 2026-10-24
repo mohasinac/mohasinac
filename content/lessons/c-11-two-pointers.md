@@ -45,6 +45,14 @@ int main() {
 
 The comment is the proof. Without an argument for why discarding an index is safe, you have a guess, not an algorithm.
 
+## Watch them converge
+
+```viz
+{ "demo": "twoPointers", "values": [1, 3, 4, 6, 8, 11], "target": 10, "title": "two pointers for a sum of 10" }
+```
+
+Each step discards one index permanently, which is why the whole scan is O(n) despite looking like a nested loop.
+
 ## Template 2 — fixed-size window
 
 Recognition: "subarray of size `k`".

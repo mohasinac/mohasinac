@@ -117,7 +117,7 @@ int main() {
 }
 ```
 
-`find` returning a pointer — `nullptr` for absent — is deliberate. It cannot insert as a side effect, which is the trap in `std::unordered_map::operator[]` covered in the [containers lesson](/course/lessons/stl-containers).
+`find` returning a pointer — `nullptr` for absent — is deliberate. It cannot insert as a side effect, which is the trap in `std::unordered_map::operator[]` covered in the [containers lesson](/learn/foundations/stl-containers).
 
 ## Why O(1) is an average
 

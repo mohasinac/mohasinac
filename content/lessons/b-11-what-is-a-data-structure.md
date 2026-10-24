@@ -39,7 +39,7 @@ A distinction worth keeping straight, because interviews ask about it:
 - An **abstract data type (ADT)** is the *interface* — the operations and their meaning. "A stack supports push, pop and top, and pop removes the most recently pushed element."
 - A **data structure** is the *implementation* — how it is actually laid out. A stack can be an array or a linked list.
 
-The ADT is the promise; the structure is how the promise is kept. This is exactly the interface-versus-implementation idea from the [composition lesson](/course/lessons/composition-versus-inheritance), which is why the structures in this track are written against an interface: it keeps the promise and the mechanism visibly separate.
+The ADT is the promise; the structure is how the promise is kept. This is exactly the interface-versus-implementation idea from the [composition lesson](/learn/foundations/composition-versus-inheritance), which is why the structures in this track are written against an interface: it keeps the promise and the mechanism visibly separate.
 
 ```cpp
 #include <bits/stdc++.h>
@@ -124,4 +124,4 @@ A **queue** is the same idea with the opposite discipline: first in, first out, 
 5. **The pitfalls** — the bugs people actually write.
 6. **The problems** that need it.
 
-Step 2 is the one to slow down on. As the [invariants lesson](/course/lessons/classes-as-invariants) argued, once you can state the invariant, the implementation is nearly forced — and every bug you write in the structure will be a place where you broke it.
+Step 2 is the one to slow down on. As the [invariants lesson](/learn/foundations/classes-as-invariants) argued, once you can state the invariant, the implementation is nearly forced — and every bug you write in the structure will be a place where you broke it.

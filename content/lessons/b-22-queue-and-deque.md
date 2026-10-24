@@ -91,6 +91,14 @@ int main() {
 }
 ```
 
+## Watch it, next to the stack
+
+Same three values in, and the opposite order out. Comparing this with the stack walkthrough in the previous lesson is the clearest way to feel the difference.
+
+```viz
+{ "demo": "queue", "ops": [1, 2, 3], "title": "enqueue 1, 2, 3 then dequeue" }
+```
+
 ## The canonical application: BFS gives shortest paths
 
 ```cpp

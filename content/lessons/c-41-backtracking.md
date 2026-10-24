@@ -86,7 +86,7 @@ int main() {
 }
 ```
 
-Swapping in place avoids a `used[]` array. In a contest, `next_permutation` from the [algorithms lesson](/course/lessons/stl-algorithms) is shorter — but it requires sorted input and gives lexicographic order, which is not always what is wanted.
+Swapping in place avoids a `used[]` array. In a contest, `next_permutation` from the [algorithms lesson](/learn/foundations/stl-algorithms) is shorter — but it requires sorted input and gives lexicographic order, which is not always what is wanted.
 
 ## Template 3 — combinations with pruning
 
@@ -215,7 +215,7 @@ The restore must happen on **every** exit path. Returning early after a successf
 
 ## Complexity, and the constraint that tells you
 
-Backtracking is exponential: O(2ⁿ) for subsets, O(n!) for permutations. The [constraints lesson](/course/lessons/constraints-tell-you-the-algorithm) is the tell — **`n ≤ 20` means subsets, `n ≤ 10` means permutations.** If `n` is 10⁵, backtracking is not the intended solution and no amount of pruning will save it.
+Backtracking is exponential: O(2ⁿ) for subsets, O(n!) for permutations. The [constraints lesson](/learn/foundations/constraints-tell-you-the-algorithm) is the tell — **`n ≤ 20` means subsets, `n ≤ 10` means permutations.** If `n` is 10⁵, backtracking is not the intended solution and no amount of pruning will save it.
 
 ## Pitfalls
 

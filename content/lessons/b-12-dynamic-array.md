@@ -11,7 +11,7 @@ summary: Build std::vector. Once you have written the growth policy and the five
 
 A raw array has a size fixed when you create it. Real problems do not tell you the size in advance — you read until end of input, or you collect results whose count depends on the data. You need a sequence that grows.
 
-The naive growth policy is "allocate one bigger and copy". The [amortised cost lesson](/course/lessons/amortised-cost) showed why that is O(n²) over `n` appends and why **doubling** makes it O(1) amortised. That insight is the entire design.
+The naive growth policy is "allocate one bigger and copy". The [amortised cost lesson](/learn/foundations/amortised-cost) showed why that is O(n²) over `n` appends and why **doubling** makes it O(1) amortised. That insight is the entire design.
 
 ## The invariant
 
@@ -163,7 +163,7 @@ int main() {
 
 - **Doubling from zero.** `capacity_ * 2` is `0` when capacity is `0`. Without the `? 1 :` guard, `reserve(0)` returns immediately and `push_back` writes past the end — undefined behaviour on the very first append.
 - **Shrinking on `pop_back`.** Tempting and wrong: a loop alternating push and pop at the boundary would reallocate every iteration, turning O(1) amortised into O(n) per operation.
-- **Copying before freeing.** In `operator=`, allocate and fill the new buffer *before* `delete[]` the old. Reversed, a failure leaves a dangling pointer. Same ordering argument as the [RAII lesson](/course/lessons/raii-and-the-rule-of-zero).
+- **Copying before freeing.** In `operator=`, allocate and fill the new buffer *before* `delete[]` the old. Reversed, a failure leaves a dangling pointer. Same ordering argument as the [RAII lesson](/learn/foundations/raii-and-the-rule-of-zero).
 - **Self-assignment.** `a = a` without the `this == &other` check frees the storage it is about to read from.
 - **Forgetting `noexcept` on the moves.** `std::vector` only uses the move path during reallocation if the move is `noexcept`; without it, your type silently gets copied.
 - **Returning a reference into the buffer, then pushing.** `T& r = a.back(); a.push_back(x);` may reallocate and leave `r` dangling. This is why iterator invalidation is a rule and not a suggestion.

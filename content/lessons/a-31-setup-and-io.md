@@ -118,7 +118,7 @@ The `-fno-exceptions` is not a stylistic choice. The WebAssembly C++ runtime shi
 - **`vector::at()` and `stoi` on bad input trap** instead of throwing a catchable exception. Prefer `v[i]` with your own bounds check, and `from_chars` or manual parsing over `stoi` when input may be malformed.
 - **`new` cannot report failure by throwing.** Irrelevant at contest sizes.
 
-This costs you nothing for competitive programming, which does not use exceptions for control flow anyway — the convention is sentinel return values, `std::optional`, or asserting a precondition. The error-handling lesson in Track A covers that style. It does mean the exception-safety half of RAII is theory here rather than something you can run, and the [RAII lesson](/course/lessons/raii-and-the-rule-of-zero) says so where it matters.
+This costs you nothing for competitive programming, which does not use exceptions for control flow anyway — the convention is sentinel return values, `std::optional`, or asserting a precondition. The error-handling lesson in Track A covers that style. It does mean the exception-safety half of RAII is theory here rather than something you can run, and the [RAII lesson](/learn/foundations/raii-and-the-rule-of-zero) says so where it matters.
 
 ## Debugging output
 

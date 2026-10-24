@@ -1,4 +1,5 @@
 import { CodeBlock } from "@/components/CodeBlock";
+import { LessonViz } from "@/components/LessonViz";
 
 /**
  * A deliberately small markdown renderer.
@@ -25,6 +26,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 type Block =
   | { kind: "heading"; level: number; text: string }
   | { kind: "code"; lang: string; code: string }
+  | { kind: "viz"; source: string }
   | { kind: "list"; ordered: boolean; items: string[] }
   | { kind: "quote"; text: string }
   | { kind: "table"; rows: string[][] }
@@ -61,7 +63,22 @@ function parse(src: string): Block[] {
         i++;
       }
       i++; // closing fence
-      blocks.push({ kind: "code", lang: group(fence, 1), code: code.join("\n") });
+      const lang = group(fence, 1);
+      /*
+       * A ```viz fence is a playable visualization rather than a listing.
+       * Intercepted here, inside the existing fence branch, so the paragraph
+       * guard below needs no change — it already excludes any line starting
+       * with a fence.
+       *
+       * Note the fence regex is /^```(\w*)\s*$/, so the info string must be a
+       * bare word: ```viz works, ```viz {demo:"stack"} does not. The directive
+       * therefore lives in the BODY as JSON.
+       */
+      if (lang === "viz") {
+        blocks.push({ kind: "viz", source: code.join("\n") });
+        continue;
+      }
+      blocks.push({ kind: "code", lang, code: code.join("\n") });
       continue;
     }
 
@@ -242,6 +259,8 @@ export function Markdown({ source }: { source: string }) {
           }
           case "code":
             return <CodeBlock key={key} code={b.code} lang={b.lang} />;
+          case "viz":
+            return <LessonViz key={key} source={b.source} />;
           case "list": {
             const Tag = b.ordered ? "ol" : "ul";
             return (

@@ -73,6 +73,14 @@ int main() {
 
 Note the deliberate design choice: `pop()` both removes and returns. `std::stack` splits these (`top()` then `pop()`) because a combined version cannot be exception-safe when the copy throws. Here, with no exceptions, the combined form is safe and more convenient — a case where the standard library's constraint does not apply to us.
 
+## Watch it push and pop
+
+Three pushes, then three pops. Notice the order comes out reversed without anything reversing it — that falls out of the invariant.
+
+```viz
+{ "demo": "stack", "ops": [1, 2, 3], "title": "push 1, 2, 3 then pop" }
+```
+
 ## The canonical application: bracket matching
 
 ```cpp

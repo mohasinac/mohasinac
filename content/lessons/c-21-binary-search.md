@@ -37,9 +37,23 @@ int main() {
 }
 ```
 
-The two asymmetric updates — `mid + 1` versus `mid` — are what guarantee progress. As the [dry-running lesson](/course/lessons/edge-cases-and-dry-running) showed, writing `lo = mid` is an infinite loop.
+The two asymmetric updates — `mid + 1` versus `mid` — are what guarantee progress. As the [dry-running lesson](/learn/foundations/edge-cases-and-dry-running) showed, writing `lo = mid` is an infinite loop.
 
 In a contest, use `lower_bound` and `upper_bound` instead; write this only when the predicate is custom.
+
+## Watch the range halve
+
+Play this before reading on. Every step strikes out the half that has just been ruled out — that elimination is the whole algorithm, and the step count is the thing to notice.
+
+```viz
+{ "demo": "binarySearch", "values": [1, 3, 5, 7, 9, 11, 13, 15], "target": 13, "title": "binary search for 13" }
+```
+
+For contrast, the same search checking every position in turn:
+
+```viz
+{ "demo": "linearSearch", "values": [1, 3, 5, 7, 9, 11, 13, 15], "target": 13, "title": "linear search for 13" }
+```
 
 ## Part 2: searching the answer space
 

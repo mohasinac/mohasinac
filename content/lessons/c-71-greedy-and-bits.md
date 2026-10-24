@@ -106,7 +106,7 @@ int main() {
 }
 ```
 
-The interval greedies — sort by end time, take whatever fits — are in the [intervals lesson](/course/lessons/monotonic-stacks-and-intervals).
+The interval greedies — sort by end time, take whatever fits — are in the [intervals lesson](/learn/approaches/monotonic-stacks-and-intervals).
 
 ## Bit manipulation: the operations
 
