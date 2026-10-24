@@ -83,3 +83,6 @@ mohasinac-com-*.json
 
 # Session-scoped Stop-hook state: per-session, never shared.
 .claude/plan-loop/
+
+# Staged by prebuild from the TS source; not hand-edited.
+/public/trace/

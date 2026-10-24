@@ -5,7 +5,7 @@
   "description": "Personal site, technical blog, in-browser code sandbox and C++ competitive-coding course",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/build-toolchain-assets.mjs",
+    "prebuild": "node --experimental-strip-types scripts/stage-trace-header.mjs && node scripts/build-toolchain-assets.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
@@ -23,7 +23,8 @@
     "seed:apply": "node scripts/seed-content.mjs --apply",
     "test:dsa": "node --test --experimental-strip-types src/packages/dsa/test/*.test.ts",
     "verify:explainers": "node --experimental-strip-types scripts/verify-explainers.mjs",
-    "verify:az-header": "node --experimental-strip-types scripts/verify-az-header.mjs"
+    "verify:az-header": "node --experimental-strip-types scripts/verify-az-header.mjs",
+    "stage:trace-header": "node --experimental-strip-types scripts/stage-trace-header.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",
