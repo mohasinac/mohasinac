@@ -22,7 +22,8 @@
     "seed": "node scripts/seed-content.mjs",
     "seed:apply": "node scripts/seed-content.mjs --apply",
     "test:dsa": "node --test --experimental-strip-types src/packages/dsa/test/*.test.ts",
-    "verify:explainers": "node --experimental-strip-types scripts/verify-explainers.mjs"
+    "verify:explainers": "node --experimental-strip-types scripts/verify-explainers.mjs",
+    "verify:az-header": "node --experimental-strip-types scripts/verify-az-header.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",
