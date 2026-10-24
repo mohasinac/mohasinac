@@ -11,7 +11,7 @@
     "lint": "eslint src scripts",
     "lint:fix": "eslint src --fix",
     "check:types": "tsc --noEmit",
-    "check": "npm run check:types && npm run lint && npm run test:dsa && npm run verify:explainers && npm run verify:trace-pipeline && npm run verify:portfolio && npm run verify:demos",
+    "check": "npm run check:types && npm run lint && npm run test:dsa && npm run verify:explainers && npm run verify:trace-pipeline && npm run verify:portfolio && npm run verify:demos && npm run verify:resume-presets",
     "toolchain:build": "node scripts/build-toolchain-assets.mjs",
     "vendor:appkit": "node scripts/vendor-appkit.mjs",
     "vendor:appkit:check": "node scripts/vendor-appkit.mjs --check",
@@ -35,7 +35,8 @@
     "verify:reference-programs": "node --experimental-strip-types scripts/add-reference-programs.mjs",
     "verify:browser:session": "node scripts/mint-test-session.mjs",
     "verify:browser:cleanup": "node scripts/cleanup-test-session.mjs",
-    "verify:demos": "node --experimental-strip-types scripts/verify-demos.mjs"
+    "verify:demos": "node --experimental-strip-types scripts/verify-demos.mjs",
+    "verify:resume-presets": "node --experimental-strip-types --import ./scripts/register-aliases.mjs scripts/verify-resume-presets.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",

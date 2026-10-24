@@ -11,8 +11,8 @@ import {
 } from "@/content/profile";
 import { listPublished } from "@/lib/public-content";
 import { getSessionUser } from "@/lib/session";
-import { byRecencyDesc, buildSkillIndex, formatPartialDate } from "@/lib/portfolio";
-import { ResumeActions } from "@/components/ResumeActions";
+import { byRecencyDesc, buildSkillIndex } from "@/lib/portfolio";
+import { ResumeComposer } from "@/components/ResumeComposer";
 
 export const metadata: Metadata = {
   title: "Resume",
@@ -108,106 +108,55 @@ export default async function ResumePage() {
 
   const roles = byRecencyDesc(experience);
 
+  /*
+   * 🛑 The server renders EVERYTHING and the client filters it down.
+   *
+   * The other way round — a filtered resume requested from the server — would
+   * make the chosen skill set a URL parameter or a request body, and from
+   * there it is one step from being stored. Keeping the filter client-side is
+   * what makes "nothing is saved to the database" true by construction rather
+   * than by discipline.
+   */
   return (
     <main className="mx-auto max-w-3xl px-5 py-10 print:max-w-none print:px-0 print:py-0">
-      <div className="mb-8 print:hidden">
-        <ResumeActions />
-      </div>
-
-      <article className="resume space-y-7">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight">{PROFILE.name}</h1>
-          <p className="mt-1 text-sm text-text-muted">{PROFILE.tagline}</p>
-          <p className="mt-2 font-mono text-[11px] text-text-faint">
-            {[PROFILE.location, PROFILE.email, PROFILE.links.github].filter(Boolean).join(" · ")}
-          </p>
-        </header>
-
-        {PROFILE.bio ? (
-          <section>
-            <h2 className="resume-h2">Summary</h2>
-            <p className="mt-1 text-sm">{PROFILE.bio}</p>
-          </section>
-        ) : null}
-
-        {skillLine.length > 0 ? (
-          <section>
-            <h2 className="resume-h2">Skills</h2>
-            <p className="mt-1 text-sm">{skillLine.join(" · ")}</p>
-          </section>
-        ) : null}
-
-        {roles.length > 0 ? (
-          <section>
-            <h2 className="resume-h2">Experience</h2>
-            <ul className="mt-2 space-y-4">
-              {roles.map((r, i) => (
-                <li key={`${r.company}-${i}`} className="break-inside-avoid">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                    <h3 className="text-sm font-medium">
-                      {r.role} · {r.company}
-                    </h3>
-                    <span className="font-mono text-[11px] text-text-faint">
-                      {formatPartialDate(r.startDate)}
-                      {r.endDate ? ` — ${formatPartialDate(r.endDate)}` : " — present"}
-                    </span>
-                  </div>
-                  {r.summary ? <p className="mt-1 text-sm">{r.summary}</p> : null}
-                  {r.highlights && r.highlights.length > 0 ? (
-                    <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-text-muted">
-                      {r.highlights.map((h) => (
-                        <li key={h}>{h}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {projects.length > 0 ? (
-          <section>
-            <h2 className="resume-h2">Projects</h2>
-            <ul className="mt-2 space-y-3">
-              {projects.map((p) => (
-                <li key={p.title} className="break-inside-avoid">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                    <h3 className="text-sm font-medium">{p.title}</h3>
-                    {p.period ? (
-                      <span className="font-mono text-[11px] text-text-faint">{p.period}</span>
-                    ) : null}
-                  </div>
-                  {p.summary ? <p className="mt-0.5 text-sm">{p.summary}</p> : null}
-                  {p.stack.length > 0 ? (
-                    <p className="mt-0.5 font-mono text-[11px] text-text-faint">
-                      {p.stack.join(" · ")}
-                    </p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {certifications.length > 0 ? (
-          <section>
-            <h2 className="resume-h2">Certifications</h2>
-            <ul className="mt-2 space-y-1.5">
-              {byRecencyDesc(certifications).map((c, i) => (
-                <li key={`${c.title}-${i}`} className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
-                  <span>
-                    {c.title} <span className="text-text-muted">· {c.issuer}</span>
-                  </span>
-                  <span className="font-mono text-[11px] text-text-faint">
-                    {formatPartialDate(c.issuedAt)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-      </article>
+      <ResumeComposer
+        profile={{
+          name: PROFILE.name,
+          tagline: PROFILE.tagline,
+          bio: PROFILE.bio,
+          // PROFILE is `as const`, so these are literal types rather than
+          // `string` — a `v is string` predicate is not assignable to them.
+          // Dropping the empties is all that is needed.
+          contact: [PROFILE.location, PROFILE.email, PROFILE.links.github].filter(
+            (v) => v !== "",
+          ),
+        }}
+        roles={roles.map((r) => ({
+          role: r.role,
+          company: r.company,
+          startDate: r.startDate,
+          ...(r.endDate ? { endDate: r.endDate } : {}),
+          ...(r.summary ? { summary: r.summary } : {}),
+          highlights: r.highlights ?? [],
+          skills: r.skills ?? [],
+        }))}
+        projects={projects.map((p) => ({
+          title: p.title,
+          ...(p.period ? { period: p.period } : {}),
+          ...(p.summary ? { summary: p.summary } : {}),
+          // A project's `stack[]` IS its skill list, which is what the filter
+          // and the skill index both read it as.
+          skills: p.stack,
+        }))}
+        certifications={certifications.map((c) => ({
+          title: c.title,
+          issuer: c.issuer,
+          issuedAt: c.issuedAt,
+          skills: c.skills ?? [],
+        }))}
+        skillLine={skillLine}
+        tools={tools}
+      />
     </main>
   );
 }
