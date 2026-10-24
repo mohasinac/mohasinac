@@ -54,7 +54,8 @@
       "lowest-common-ancestor-of-a-bst",
       "subtree-of-another-tree",
       "binary-tree-maximum-path-sum",
-      "implement-trie-prefix-tree"
+      "implement-trie-prefix-tree",
+      "jump-game"
     ]
   },
   {
@@ -118,7 +119,8 @@
       "lowest-common-ancestor-of-a-bst",
       "subtree-of-another-tree",
       "binary-tree-maximum-path-sum",
-      "implement-trie-prefix-tree"
+      "implement-trie-prefix-tree",
+      "jump-game"
     ]
   },
   {
@@ -182,7 +184,8 @@
       "lowest-common-ancestor-of-a-bst",
       "subtree-of-another-tree",
       "binary-tree-maximum-path-sum",
-      "implement-trie-prefix-tree"
+      "implement-trie-prefix-tree",
+      "jump-game"
     ]
   }
 ]

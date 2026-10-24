@@ -1,0 +1,114 @@
+[
+  {
+    "slug": "jump-game",
+    "title": "Jump Game",
+    "difficulty": "medium",
+    "sortOrder": 600,
+    "status": "published",
+    "sheets": [
+      "blind75",
+      "neetcode150",
+      "neetcode250",
+      "top100",
+      "a-z"
+    ],
+    "patterns": [
+      "greedy",
+      "arrays"
+    ],
+    "sourceUrl": "https://leetcode.com/problems/jump-game/",
+    "sourceName": "LeetCode 55",
+    "statement": "You are standing on the first square of a row of `n` squares. Each square holds a number: the **maximum** number of squares you may jump forward from there. You may jump any distance from `1` up to that number, or stay put if it is `0`.\n\nDecide whether it is possible to reach the last square.\n\nNote the word *maximum*. A square holding `3` lets you jump 1, 2 or 3 squares — not exactly 3. That freedom is what makes the problem solvable in one pass.\n\n## Input\n\nThe first line holds `n`. The second line holds `n` integers, the jump limit of each square.\n\n## Output\n\nPrint exactly `true` if the last square is reachable, or `false` if it is not.\n\n## Example\n\n```\nInput:\n5\n2 3 1 1 4\n\nOutput:\ntrue\n```\n\nFrom square 0 (limit 2) jump one square to index 1. Square 1 holds 3, which is enough to cover the remaining three squares in one jump. There are other routes; you only need one to exist.",
+    "constraints": "- `1 <= n <= 100000`\n- `0 <= each jump limit <= 100000`\n- A row of one square is already finished, so the answer is `true`.",
+    "starterCode": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    // Print exactly \"true\" or \"false\".\n\n    return 0;\n}\n",
+    "editorial": "## The trap: this is not a DP problem\n\nThe obvious framing is `reachable[i] = any earlier j that can reach i`, which is O(n^2) and times out at `n = 100000`. It also hides the structure. The useful observation is much simpler.\n\n## The observation\n\nBecause a square's number is a **maximum**, reachability is *contiguous*: if you can reach square `i`, you can reach every square before it too. So the entire state of the problem collapses to one number — the furthest square reachable so far.\n\nThat is the whole solution. Walk left to right carrying `reach`:\n\n- If `i > reach`, there is a gap you cannot cross. Stop; the answer is `false`.\n- Otherwise square `i` is reachable, so extend: `reach = max(reach, i + a[i])`.\n\nIf the walk finishes, the last square was never unreachable.\n\n🛑 The check must come **before** the extension. Testing `i > reach` after updating would use square `i`'s own jump to prove square `i` is reachable, which is circular — and the bug passes the easy cases, because a gap only appears when a zero stalls you.\n\n## Why greedy is safe here\n\nGreedy needs an exchange argument, and this one has a clean one: taking the furthest jump available can never be worse than taking a shorter one, since every square a shorter jump reaches is also reached by the longer one. There is no choice to regret, so there is nothing to search.\n\n## Dry run on `3 2 1 0 4`\n\n| i | a[i] | i > reach? | reach after |\n|---|---|---|---|\n| 0 | 3 | no | 3 |\n| 1 | 2 | no | 3 |\n| 2 | 1 | no | 3 |\n| 3 | 0 | no | 3 |\n| 4 | 4 | **yes** | — |\n\nThe three squares after index 0 each promise less than they cost, and the zero at index 3 is the wall. `reach` never passes 3, so index 4 is unreachable.\n\n## Edge cases\n\n- `n = 1` is already finished. The loop runs once with `i = 0`, `0 > 0` is false, and the answer is `true` without any jump.\n- A leading `0` with `n > 1` is immediately stuck.\n- A zero anywhere else is harmless as long as an earlier square jumps over it.\n\n## Complexity\n\nO(n) time, O(1) extra space beyond the input. One pass, one accumulator.\n\n## The complete program\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<long long> a(n);\n    for (long long& x : a) cin >> x;\n\n    long long reach = 0;\n    bool ok = true;\n    for (int i = 0; i < n; ++i) {\n        // 🛑 Checked BEFORE extending. Updating first would let square i's own\n        // jump prove that square i is reachable.\n        if (i > reach) {\n            ok = false;\n            break;\n        }\n        reach = max(reach, (long long)i + a[i]);\n    }\n    cout << (ok ? \"true\" : \"false\") << '\\n';\n}\n```\n",
+    "testCases": [
+      {
+        "visibility": "sample",
+        "input": "5\n2 3 1 1 4\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "sample",
+        "input": "5\n3 2 1 0 4\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "1\n0\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n0 1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "2\n1 0\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "5\n2 0 0 0 1\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "6\n1 1 1 1 1 1\n",
+        "expectedOutput": "true"
+      },
+      {
+        "visibility": "hidden",
+        "input": "4\n0 0 0 0\n",
+        "expectedOutput": "false"
+      },
+      {
+        "visibility": "hidden",
+        "input": "7\n5 0 0 0 0 0 1\n",
+        "expectedOutput": "false"
+      }
+    ],
+    "inputFormat": [
+      {
+        "read": "scalars",
+        "names": [
+          "n"
+        ]
+      },
+      {
+        "read": "array",
+        "name": "a",
+        "length": "n"
+      }
+    ],
+    "vizKind": "array",
+    "vizVar": "a",
+    "scenarios": [
+      {
+        "label": "the ordinary case",
+        "input": "5\n2 3 1 1 4\n",
+        "output": "true",
+        "why": "One square with a generous number covers everything after it. `reach` climbs past the last index and the walk finishes."
+      },
+      {
+        "label": "a zero that actually blocks",
+        "input": "5\n3 2 1 0 4\n",
+        "output": "false",
+        "why": "The zero at index 3 is only fatal because nothing before it jumps far enough to clear it. `reach` stalls at 3 while the last index is 4."
+      },
+      {
+        "label": "a zero that does not block",
+        "input": "5\n2 0 0 0 1\n",
+        "output": "false",
+        "why": "Compare with the previous case: here index 0 reaches only as far as 2, and the zeros at 1 and 2 add nothing, so the wall arrives at index 3 instead. A zero is never the whole story — what matters is whether anything before it jumps past it."
+      },
+      {
+        "label": "already finished",
+        "input": "1\n0\n",
+        "output": "true",
+        "why": "A single square needs no jump at all. This is the case a solution that starts its loop at `i = 1`, or that requires `reach > 0`, gets wrong."
+      }
+    ]
+  }
+]
